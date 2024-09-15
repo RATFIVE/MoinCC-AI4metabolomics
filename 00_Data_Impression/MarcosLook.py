@@ -13,15 +13,12 @@ from pathlib import Path
 #pd.set_option('display.max_rows', None)
 
 def load_data():
-    path = Path('Data')
     path_list = []
-    for root, dirs, files in os.walk('data'):
+    for root, dirs, files in os.walk('../'):
         for file in files:
             if file.endswith('.csv'):
                 file_path = os.path.join(root, file)
                 path_list.append(file_path)
-            
-    
     return path_list
 
 
@@ -32,10 +29,6 @@ def load_df(path):
 def df_description(df):
     print(f'Dataframe Shape: {df.shape}')
     print(f'DataFrame Head: \n{df.head()}')
-    #print(f'Dataframe Description: \n{df.describe()}')
-
-    
-
     return None
 
 def main():
@@ -43,9 +36,6 @@ def main():
     df = load_df(path_list[1])
     df_description(df)
     
-
-
-
 
 
 
