@@ -8,6 +8,9 @@ __pycache__/
 # C extensions
 *.so
 
+# we dont want output files
+*output/
+
 # Distribution / packaging
 .Python
 build/
