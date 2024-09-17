@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 from pathlib import Path
+import numpy as np
 
 
 # read metadata
@@ -9,7 +10,6 @@ pd.set_option('display.max_columns', None)
 
 # get current working directory
 cwd = os.getcwd()
-print(cwd)
 # meta path independet of the OS
 meta_path = Path('..', 'Data', 'Data_description.xlsx')
 #meta_path = '../Data/Data_description.xlsx'
@@ -25,16 +25,13 @@ def get_file_names():
     for file in os.listdir(data_direc):
         if file.endswith('.csv'):
             path_list.append(file)
-
     return path_list
 
 def extract_ppm_all(meta_df, file_name):
-    meta_df = meta_df[meta_df['File'] == file_name]
+    meta_df = meta_df[meta_df['File'].astype(str).str.upper() == str(file_name).upper()]
     positions = []
     names = []
     # added substrat like acetone ppm
-    print('Comming')
-    print(meta_df['Substrate_ppm'])
     react_substrat = str(meta_df['Substrate_ppm'].iloc[0]).split(',')
     for i in range(len(react_substrat)):
         names.append('ReacSubs')
@@ -54,15 +51,22 @@ def extract_ppm_all(meta_df, file_name):
 def single_plot(df, y, ppm_lines, names, file_name):
     plt.figure(figsize=(10, 6))
     plt.plot(df[:, 0], df[:, y])
-    plt.ylim(0, 70000)
     plt.xlabel('Chemical Shift (ppm)')
     plt.ylabel('Intensity')
     plt.title(f'NMR Spectrum of {file_name}')
 
-    # make vertical lines for each ppm
+    # maximum height
+    max_height = np.max(df[:, 1:])
+    plt.ylim(0, max_height + 1000)
+
+    min_height = np.min(df[:, 1:])
+
+    # make vertical lines for each ppm, i want that to be at the first quartile
+    height = 10000
     for i in range(len(ppm_lines)):
         plt.axvline(x=ppm_lines[i], color='r', linestyle='--', label='ppm')
-        plt.text(ppm_lines[i], 7000, names[i], rotation=0)
+        plt.text(ppm_lines[i], height, names[i], rotation=0)
+        height += 10000
 
     # if output dir does not exist, create it
     if not os.path.exists('output'):
@@ -82,15 +86,12 @@ def create_gif(file_name, output_dir='output', gif_name='nmr_spectrum.gif'):
 
     # sort images by last number in file name
     image_files.sort(key=lambda x: int(x.split('_')[-1].split('.')[0]))
-    
-
-    print(image_files)
-    
+        
     # Open each image
     images = [Image.open(img) for img in image_files]
     
     # Save as GIF
-    images[0].save(f"{output_dir}/{gif_name}", save_all=True, append_images=images[1:], duration=250, loop=0)
+    images[0].save(f"{output_dir}/{gif_name}", save_all=True, append_images=images[1:], duration=100, loop=0)
     
     print(f"GIF saved as {output_dir}/{gif_name}")
 
