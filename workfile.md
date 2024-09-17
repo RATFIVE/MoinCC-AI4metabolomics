@@ -1,7 +1,5 @@
 ## space for structured(!) information about task, progress background info
 
-test234
-
 ## Questions
 
 ### technical background
