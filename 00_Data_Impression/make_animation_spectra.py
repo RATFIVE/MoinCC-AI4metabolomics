@@ -1,17 +1,26 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 # read metadata
 pd.set_option('display.max_columns', None)
-meta_path = '../Data/Data_description.xlsx'
+
+# get current working directory
+cwd = os.getcwd()
+print(cwd)
+# meta path independet of the OS
+meta_path = Path('..', 'Data', 'Data_description.xlsx')
+#meta_path = '../Data/Data_description.xlsx'
 meta_df = pd.read_excel(meta_path)
 
 # marcos load data
 def get_file_names():
     path_list = []
-    data_direc = '../Data/'
+    # data_direc independent of the OS
+    data_direc = Path('..','Data')
+    #data_direc = '../Data/'
     # get all filenames which end with .csv
     for file in os.listdir(data_direc):
         if file.endswith('.csv'):
@@ -54,6 +63,10 @@ def single_plot(df, y, ppm_lines, names, file_name):
     for i in range(len(ppm_lines)):
         plt.axvline(x=ppm_lines[i], color='r', linestyle='--', label='ppm')
         plt.text(ppm_lines[i], 7000, names[i], rotation=0)
+
+    # if output dir does not exist, create it
+    if not os.path.exists('output'):
+        os.makedirs('output')
     # save the plot
     plt.savefig(f'output/{file_name}_plot_{y}.png')
     # close figure
