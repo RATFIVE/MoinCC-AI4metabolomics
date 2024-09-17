@@ -57,7 +57,7 @@
 ## possibly interesting keywords (with info)
 - Markov Chain Monte carlo algorithm ( what is it? mentioned in several papers)
 - stochastic hill climbing algorithm (-:-)
-- streamlit for visualization ( recommended by Marco)
+- streamlit for visualization ( recommended by SuperMarco)
 
 
 ## interesting paper links / videos/ background information
