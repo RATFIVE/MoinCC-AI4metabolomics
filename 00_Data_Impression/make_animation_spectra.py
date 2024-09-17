@@ -24,6 +24,8 @@ def extract_ppm_all(meta_df, file_name):
     positions = []
     names = []
     # added substrat like acetone ppm
+    print('Comming')
+    print(meta_df['Substrate_ppm'])
     react_substrat = str(meta_df['Substrate_ppm'].iloc[0]).split(',')
     for i in range(len(react_substrat)):
         names.append('ReacSubs')
