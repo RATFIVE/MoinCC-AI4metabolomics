@@ -8,14 +8,16 @@
   
 ### about the data
 
-- What are the audiofiles?  
+- What are the audiofiles?
+  --> The Raw Files
   --> files how data is returned from MRS,before Fourier transformation; contains more information  
   --> maybe interesting  
 ---
 - what is the goal of the project? --> identificatuion and quantification(via integral)? --> identification just via range of peaks?  
 -->  identification of peaks and intergral, time series, show timeline of metabolites present  
 --> some metabolites create several peaks with different heights (hopefully in fatima's manuscript)  
--->  ideally also visual output with marked peaks  
+-->  ideally also visual output with marked peaks
+--> Integral Diagrams of the Kinematics of the Peaks (up or down)
 
 - physical reason for measurement, e.g. resonance frequency/ is identification peak dependent(or =) on reference frequency? (is reference frequency = exciting frequency)  
   --> ??? D4 classical refrence frequency for deuterium spectra, They used heavy water??  
@@ -26,14 +28,13 @@
   
 ---
 - (Why ppm on x axis? shouldn't it be the frequency? What is chemical shift?(because y= intensity))  
---> relative shift of reference frequency, what is reference frequency?  
+--> relative shift of reference frequency, what is reference frequency? (Water or something else?)  
   
 - what are characterististic curves/values? --> labeled data  
     - (file Data_description.xlsx feature ppm ? ) if multiple values, multiple                   
      states of same metabolite?--> ranges for metabolics ?  
     --> some metabolites cause several peaks (of different heights)  
     - in data, there are four peaks only three labels in data description (marco, Tom explain)  
-    - 
     - what are possible shifts? what are they caused by and how are they recognized?  
     --> shifts can be caused by external influences such as ph/ temperature etc. shouldn't be more than 0.5ppm  
       
