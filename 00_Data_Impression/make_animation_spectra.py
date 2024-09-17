@@ -11,7 +11,7 @@ pd.set_option('display.max_columns', None)
 cwd = os.getcwd()
 print(cwd)
 # meta path independet of the OS
-meta_path = Path('Data', 'Data_description.xlsx')
+meta_path = Path('..', 'Data', 'Data_description.xlsx')
 #meta_path = '../Data/Data_description.xlsx'
 meta_df = pd.read_excel(meta_path)
 
@@ -19,7 +19,7 @@ meta_df = pd.read_excel(meta_path)
 def get_file_names():
     path_list = []
     # data_direc independent of the OS
-    data_direc = Path('Data')
+    data_direc = Path('..','Data')
     #data_direc = '../Data/'
     # get all filenames which end with .csv
     for file in os.listdir(data_direc):
@@ -96,7 +96,7 @@ def main():
     file_names = get_file_names()
     for file_name in file_names:
         print(f'Processing {file_name}')
-        df = pd.read_csv(f'Data/{file_name}')
+        df = pd.read_csv(f'../Data/{file_name}')
         df = df.to_numpy()
         ppm_lines, names = extract_ppm_all(meta_df, file_name)
         for y in range(1, df.shape[1]):
