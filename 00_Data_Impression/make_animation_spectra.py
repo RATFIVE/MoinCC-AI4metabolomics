@@ -20,7 +20,6 @@ def get_file_names():
     path_list = []
     # data_direc independent of the OS
     data_direc = Path('..','Data')
-    #data_direc = '../Data/'
     # get all filenames which end with .csv
     for file in os.listdir(data_direc):
         if file.endswith('.csv'):
@@ -29,14 +28,19 @@ def get_file_names():
 
 def extract_ppm_all(meta_df, file_name):
     meta_df = meta_df[meta_df['File'].astype(str).str.upper() == str(file_name).upper()]
+    if meta_df.shape[0] == 0:
+        print(f'No metadata found for {file_name}')
+        return [], []
     positions = []
     names = []
+
     # added substrat like acetone ppm
-    react_substrat = str(meta_df['Substrate_ppm'].iloc[0]).split(',')
+    print(meta_df['Substrate_chemical shift (ppm)'])
+    react_substrat = str(meta_df['Substrate_chemical shift (ppm)'].iloc[0]).split(',')
     for i in range(len(react_substrat)):
         names.append('ReacSubs')
         positions.append(float(react_substrat[i]))
-
+  
     # add metabolite 1
     react_metabolite = str(meta_df['Metabolite_1_ppm'].iloc[0]).split(',')
     for i in range(len(react_metabolite)):
@@ -44,7 +48,7 @@ def extract_ppm_all(meta_df, file_name):
         positions.append(float(react_metabolite[i]))
 
     # water ppm
-    positions.append(float(meta_df['Water_ppm'].iloc[0]))
+    positions.append(float(meta_df['Water_chemical shift (ppm)'].iloc[0]))
     names.append('Water')
     return positions, names
 
@@ -59,14 +63,15 @@ def single_plot(df, y, ppm_lines, names, file_name):
     max_height = np.max(df[:, 1:])
     plt.ylim(0, max_height + 1000)
 
-    min_height = np.min(df[:, 1:])
+    min_height = np.min(df[:, 1:]) 
+    min_height += 1/12 * (max_height - min_height)
 
     # make vertical lines for each ppm, i want that to be at the first quartile
-    height = 10000
+    height = min_height
     for i in range(len(ppm_lines)):
         plt.axvline(x=ppm_lines[i], color='r', linestyle='--', label='ppm')
         plt.text(ppm_lines[i], height, names[i], rotation=0)
-        height += 10000
+        height += 1/12 * (max_height - min_height)
 
     # if output dir does not exist, create it
     if not os.path.exists('output'):
@@ -103,8 +108,11 @@ def main():
         df = df.to_numpy()
         ppm_lines, names = extract_ppm_all(meta_df, file_name)
         for y in range(1, df.shape[1]):
+            if ppm_lines == []:
+                continue
             single_plot(df, y, ppm_lines, names, file_name)
-        create_gif(file_name, output_dir='output', gif_name=f'nmr_spectrum_{file_name}.gif')
+        if ppm_lines != []:
+            create_gif(file_name, output_dir='output', gif_name=f'nmr_spectrum_{file_name}.gif')
 
         # remove all png files
         for file in os.listdir('output'):
