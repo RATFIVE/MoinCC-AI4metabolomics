@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from plotly.subplots import make_subplots
 from scipy.signal import find_peaks
+from scipy.integrate import trapezoid
 
 
 # Options to display all columns
@@ -59,11 +60,19 @@ class PeakDetection:
         fig.update_layout(title='Stacked Lines')
         fig.show()
 
-    def peaks_finder(self, y, tresh):
+    def peaks_finder(self, y):
         # Finde Peaks in y 
-        tresh = 20000
+        tresh = self.threshold(y)
         peaks, _ = find_peaks(y, height=tresh)
         return peaks
+    
+    def threshold(self, y):
+        mean = np.mean(y, axis=0)
+        std = np.std(y)
+
+        tresh = mean + std
+        #print(f'Mean: {mean}')
+        return tresh
 
 
     def animate(self):
@@ -74,7 +83,7 @@ class PeakDetection:
         # load data
         df = self.load_df(self.path)
 
-        peak_tresh = 20000
+        peak_tresh = self.threshold(df.iloc[:, 1])
 
         # Subplots 
         fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
@@ -85,16 +94,16 @@ class PeakDetection:
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='lines'), row=1, col=1)
         
         # Plot peaks to the graph
-        fig.add_trace(go.Scatter(x=x[self.peaks_finder(y, tresh=peak_tresh)], y=y[self.peaks_finder(y, tresh=peak_tresh)], mode='markers', marker=dict(color='red', size=8), name='Peaks'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=x[self.peaks_finder(y)], y=y[self.peaks_finder(y)], mode='markers', marker=dict(color='red', size=8), name='Peaks'), row=1, col=1)
         
         # Animation frames
         frames = []
-
+        
         for i in range(1, df.shape[1]):
             y = df.iloc[:, i]
             #print(f'x: {x}')
             #print(f'y: {y}')
-            peaks = self.peaks_finder(y, tresh=peak_tresh)
+            peaks = self.peaks_finder(y)
             frames.append(go.Frame(
                 data=[
                     go.Scatter(x=x, y=y, mode='lines'),
@@ -102,6 +111,8 @@ class PeakDetection:
                 ],
                 name=f'Frame {i}'
             ))
+            peak_dict = {'x_values': x[peaks], 'y_values': y[peaks]}
+            
         #print(f'Frames: {frames}')
         # Add frames to the figure
         fig.frames = frames
@@ -134,22 +145,55 @@ class PeakDetection:
         )
         #st.plotly_chart(fig)
         #fig.show()
+
         return fig
 
+    def intigrate_peaks(self):
+        # load data
+        df = self.load_df(self.path)
+        x = df['Chemical_Shift']
+        
+        peak_list = []
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            #print(f'x: {x}')
+            #print(f'y: {y}')
+            peaks = self.peaks_finder(y)
+            peak_dict = {'x_values': x[peaks], 'y_values': y[peaks]}
+            peak_list.append(peak_dict)
+
+        peak_df = pd.DataFrame(peak_list)
+        
+
+            # Integrate y_values over the rows
+        peak_df['integrated_y'] = peak_df.apply(lambda row: trapezoid(row['y_values'], row['x_values']), axis=1)
+            
+            
+        print(peak_df.info())
+
+        # plot integrated peaks
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=peak_df['x_values'], y=peak_df['integrated_y'], mode='lines+markers'))
+        fig.update_layout(title='Integrated Peaks')
+        return fig
 
 
 def main():
     path_list = load_data()
-    try:
-        for path in path_list:
-            model = PeakDetection(path)
-            fig = model.animate()
-            st.plotly_chart(fig)
-    except Exception as e:
-        print(f'Error: {e}')
+    # try:
+    #     for path in path_list:
+    #         model = PeakDetection(path)
+    #         fig = model.animate()
+    #         st.plotly_chart(fig)
+    # except Exception as e:
+    #     print(f'Error: {e}')
 
-    # model = PeakDetection(path_list[1])
-    # fig = model.animate()
+    model = PeakDetection(path_list[1])
+    fig = model.animate()
+    st.plotly_chart(fig)
+    fig = model.intigrate_peaks()
+    st.plotly_chart(fig)
+    
 
     
 
