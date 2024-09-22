@@ -1,6 +1,9 @@
 # space for structured(!) information about task, progress background info
 
-## Questions
+## Questions 24. 09.24
+- Do external conditions cause teh same shift for each metabolite? Skewing of the spectra also possible?
+- 
+## Questions 17.09.24
 
 ### technical background
 - How are the spectra produced? Difference MRI MRS? Different frequencies emitted or only different frequences "returned"?  
