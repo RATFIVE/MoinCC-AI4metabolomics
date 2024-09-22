@@ -7,6 +7,8 @@ import streamlit as st
 import shutil
 import time
 from pathlib import Path
+#
+
 
 # Options to display all columns
 #pd.set_option('display.max_columns', None)
@@ -14,9 +16,11 @@ from pathlib import Path
 
 def load_data():
     path_list = []
-    cwd = os.getcwd()
+    cwd = Path(os.getcwd())
     print(f'Working Dir: {cwd}')
-    for root, dirs, files in os.walk(cwd):
+
+    print(f'Path: {cwd.parent}')
+    for root, dirs, files in os.walk(cwd.parent):
         for file in files:
             if file.endswith('.csv'):
                 file_path = os.path.join(root, file)
@@ -36,7 +40,7 @@ def df_description(df):
 def melt_df(df):
     # Melt the dataframe (Polars)
     melted_df = df.melt(id_vars=[df.columns[0]], value_vars=df.columns[1:])
-    print(melted_df)
+    #print(melted_df)
     #Rename the columns for better understanding
     melted_df = melted_df.rename({
         df.columns[0]: 'Chemical Shift (ppm)',  # First column
@@ -45,11 +49,16 @@ def melt_df(df):
     })
     return melted_df
 
+def plotly_line(df):
+    # subplots 
+    fig = 
+
 def main():
     path_list = load_data()
     #print(path_list)
     df = load_df(path_list[1])
-    df = melt_df(df)
+
+    #df = melt_df(df)
     print(df)
     
 
