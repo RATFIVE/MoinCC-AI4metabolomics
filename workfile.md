@@ -67,27 +67,19 @@ NMR-Onion: https://doi.org/10.1016/j.heliyon.2024.e36998
 
 
 ## Model 1 - Function Fitting
-The distribution can be fitted as a linear combination of normal distributions:
+The distribution can be fitted as a linear combination of Lorentzian distributions:
 
 $$
-f(x, \mu, \sigma) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2} \left( \frac{x - \mu}{\sigma} \right)^2}, \quad x \in \mathbb{R}
+f(x, x_0, \gamma) = \frac{1}{\pi} \cdot \frac{\gamma}{(x - x_0)^2 + \gamma^2}, \quad x \in \mathbb{R}
 $$
 
-where the peak occurs at $\mu$, and the width is represented by the standard deviation $\sigma$. 
+where the peak occurs at \( x_0 \), and the width is represented by the scale parameter \( \gamma \).
 
-The overall spectrum is then expressed as a weighted sum of these normal distributions:
-
-$$
-\text{Spectrum}(x) = \sum_{i} w_i \cdot f_i(x, \mu_i, \sigma_i)
-$$
-
-where $w_i$ are the weights, and each $f_i(x, \mu_i, \sigma_i)$ is a normal distribution with mean $\mu_i$ and standard deviation $\sigma_i$. The integral $F(x)$ is simply given by the sum of the weight factors:
+The overall spectrum is then expressed as a weighted sum of these Lorentzian distributions:
 
 $$
-F(x) = \int_{-\infty}^{\infty} \sum_{i} w_i \cdot f_i(x, \mu_i, \sigma_i) = \sum_{i} \int_{-\infty}^{\infty}  w_i \cdot f_i(x, \mu_i, \sigma_i) = \sum_{i} w_i \int_{-\infty}^{\infty}  f_i(x, \mu_i, \sigma_i) = \sum_{i} w_i 
+\text{Spectrum}(x) = \sum_{i} w_i \cdot f_i(x, x_{0,i}, \gamma_i)
 $$
-
-The integral is one because the normal distribution is normalized.
 
 ## Model 2 - Peakfinder NumPy
 
