@@ -7,7 +7,7 @@ import streamlit as st
 import shutil
 import time
 from pathlib import Path
-#
+from plotly.subplots import make_subplots
 
 
 # Options to display all columns
@@ -30,6 +30,7 @@ def load_data():
 
 def load_df(path):
     df = pd.read_csv(path, sep=',', encoding='utf-8')
+    df.rename(columns={'Unnamed: 0': 'Chemical_Shift'}, inplace=True)
     return df
 
 def df_description(df):
@@ -49,15 +50,24 @@ def melt_df(df):
     })
     return melted_df
 
+
+
 def plotly_line(df):
     # subplots 
-    fig = 
+    fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
+    x = df['Chemical_Shift']
+    y = df.iloc[:, 1]
+    
+    # Add traces
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='lines'), row=1, col=1)
+    fig.update_layout(title='Stacked Lines')
+    fig.show()
 
 def main():
     path_list = load_data()
     #print(path_list)
     df = load_df(path_list[1])
-
+    plotly_line(df)
     #df = melt_df(df)
     print(df)
     
