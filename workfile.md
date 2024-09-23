@@ -1,8 +1,8 @@
 # space for structured(!) information about task, progress background info
 
 ## Questions 24. 09.24
-- Do external conditions cause teh same shift for each metabolite? Skewing of the spectra also possible?
-- 
+- Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?
+- why are shifts a problem, when the spectra is always calibrated to water = 4.7ppm? Is skewing teh only problem?
 ## Questions 17.09.24
 
 ### technical background
