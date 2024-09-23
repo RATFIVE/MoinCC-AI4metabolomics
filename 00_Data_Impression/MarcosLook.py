@@ -218,16 +218,18 @@ def main():
     path_list = load_data()
 
     # make cols for each path in the path_list
-    
+    col1, col2 = st.columns(2)
     try:
         for path in path_list:
             model = PeakDetection(path)
             fig = model.animate()
+            
             st.plotly_chart(fig)
 
             for bin in range(10):
                 try:
                     fig = model.bin_and_plot(bin)
+                    
                     st.plotly_chart(fig)
                 except:
                     pass
@@ -239,16 +241,20 @@ def main():
 
 
 def main2():
+
+    col1, col2 = st.columns(2)
     path_list = load_data()
 
     model = PeakDetection(path_list[1])
     fig = model.animate()
-    st.plotly_chart(fig)
+    with col1:
+        st.plotly_chart(fig)
 
     for bin in range(10):
         try:
             fig = model.bin_and_plot(bin)
-            st.plotly_chart(fig)
+            with col2:
+                st.plotly_chart(fig)
         except:
             pass
 
@@ -259,4 +265,4 @@ def main2():
 
 
 if __name__ == '__main__':
-    main2()
+    main()
