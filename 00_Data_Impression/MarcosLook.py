@@ -149,64 +149,114 @@ class PeakDetection:
         return fig
 
     def intigrate_peaks(self):
-        # load data
+        # Load data
+        df = self.load_df(self.path)
+        x = df['Chemical_Shift']
+        print(df.shape)
+        
+        integrated_y_values = []
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            peaks = self.peaks_finder(y)
+            print(f'Peaks: \n{x[peaks].values} \n{y[peaks].values}')
+
+        # return fig
+    def bin_and_plot(self, bin_index):
+        # Load data
         df = self.load_df(self.path)
         x = df['Chemical_Shift']
         
-        peak_list = []
+        binned_y_values = []
+        i_values = []
+
+        # Define bins
+        num_bins = 10
+        bins = np.linspace(x.min(), x.max(), num_bins + 1)
+
         for i in range(1, df.shape[1]):
             y = df.iloc[:, i]
-            #print(f'x: {x}')
-            #print(f'y: {y}')
             peaks = self.peaks_finder(y)
-            peak_dict = {'x_values': x[peaks], 'y_values': y[peaks]}
-            peak_list.append(peak_dict)
+            x_peaks = x[peaks].values
+            y_peaks = y[peaks].values
 
-        peak_df = pd.DataFrame(peak_list)
+            # Bin the x_peaks and calculate mean y_peaks for each bin
+            bin_indices = np.digitize(x_peaks, bins) - 1
+            bin_means = [y_peaks[bin_indices == j].mean() if len(y_peaks[bin_indices == j]) > 0 else np.nan for j in range(num_bins)]
+
+            binned_y_values.append(bin_means[bin_index])
+            i_values.append(i)
         
+        # if bun_index is empty return None
+        if np.isnan(binned_y_values).all():
+            return None
+        else:
 
-            # Integrate y_values over the rows
-        peak_df['integrated_y'] = peak_df.apply(lambda row: trapezoid(row['y_values'], row['x_values']), axis=1)
+            # Plotting
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=i_values, 
+                                     y=binned_y_values, 
+                                     mode='markers+lines', 
+                                     name=f'Bin {bin_index}',
+                                     line=dict(color='blue', width=2)))
+
+            # Plot the regression line
+            poly_coeffs = np.polyfit(i_values, binned_y_values, 7)
+            poly_eq = np.poly1d(poly_coeffs)
+            fig.add_trace(go.Scatter(x=i_values, 
+                                    y=poly_eq(i_values), 
+                                    mode='lines', 
+                                    name='Regression Line',
+                                    line=dict(color='red', width=2)))
+        
+            fig.update_layout(title=f'Values for Bin {bin_index} over Time at bin range {bins[bin_index]:.2f} to {bins[bin_index + 1]:.2f}', 
+                              xaxis_title='Time (i)', yaxis_title='Mean y-values in Bin')
             
-            
-        print(peak_df.info())
 
-        # plot integrated peaks
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=peak_df['x_values'], y=peak_df['integrated_y'], mode='lines+markers'))
-        fig.update_layout(title='Integrated Peaks')
-        return fig
-
+            return fig
 
 def main():
     path_list = load_data()
-    # try:
-    #     for path in path_list:
-    #         model = PeakDetection(path)
-    #         fig = model.animate()
-    #         st.plotly_chart(fig)
-    # except Exception as e:
-    #     print(f'Error: {e}')
+
+    # make cols for each path in the path_list
+    
+    try:
+        for path in path_list:
+            model = PeakDetection(path)
+            fig = model.animate()
+            st.plotly_chart(fig)
+
+            for bin in range(10):
+                try:
+                    fig = model.bin_and_plot(bin)
+                    st.plotly_chart(fig)
+                except:
+                    pass
+
+
+    except Exception as e:
+        print(f'Error: {e}')
+
+
+
+def main2():
+    path_list = load_data()
 
     model = PeakDetection(path_list[1])
     fig = model.animate()
     st.plotly_chart(fig)
-    fig = model.intigrate_peaks()
-    st.plotly_chart(fig)
-    
 
-    
+    for bin in range(10):
+        try:
+            fig = model.bin_and_plot(bin)
+            st.plotly_chart(fig)
+        except:
+            pass
 
-    # #print(path_list)
-    # df = load_df(path_list[1])
-    # #plotly_line(df)
-    # animate(df)
-    # #df = melt_df(df)
-    # #print(df)
+
 
     
 
 
 
 if __name__ == '__main__':
-    main()
+    main2()
