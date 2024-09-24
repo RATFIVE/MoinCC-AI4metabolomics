@@ -41,6 +41,9 @@ class PeakDetection:
         return df
 
     def plotly_line(self):
+
+        """Single Line Plot of the Spectra"""
+        
         
         # load data
         df = self.load_df(self.path)
@@ -61,6 +64,14 @@ class PeakDetection:
         fig.show()
 
     def peaks_finder(self, y):
+        """Find Peaks in the Spectra
+
+        Args:
+            y (float): y values of the spectra
+
+        Returns:
+            [int]: Index of the peaks
+        """
         # Finde Peaks in y 
         tresh = self.threshold(y)
         peaks, _ = find_peaks(y, height=tresh)
@@ -148,7 +159,9 @@ class PeakDetection:
 
         return fig
 
-    def intigrate_peaks(self):
+
+
+    def peak_plot(self):
         # load data
         df = self.load_df(self.path)
         x = df['Chemical_Shift']
@@ -191,7 +204,7 @@ def main():
     model = PeakDetection(path_list[1])
     fig = model.animate()
     st.plotly_chart(fig)
-    fig = model.intigrate_peaks()
+    fig = model.peak_plot()
     st.plotly_chart(fig)
     
 
