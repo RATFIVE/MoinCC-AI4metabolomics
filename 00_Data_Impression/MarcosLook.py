@@ -38,6 +38,9 @@ class PeakDetection:
     def __init__ (self, path):
         self.path = path
 
+        self.mean_shift = None
+        self.std_shift = None
+
 # --------------------------------------------------------------------------------------------
 
     def load_df(self, path):
@@ -103,7 +106,8 @@ class PeakDetection:
         from scipy.signal import find_peaks
 
         # load data
-        df = self.load_df(self.path)
+        #df = self.load_df(self.path)
+        df = self.shift_correction()
 
         peak_tresh = self.threshold(df.iloc[:, 1])
 
@@ -190,6 +194,7 @@ class PeakDetection:
         x_ref = 4.7 # Reference value of Water
         # Load data
         df = self.load_df(self.path)
+        
         x = df['Chemical_Shift']
 
         deviation_mean_list = []
@@ -210,18 +215,38 @@ class PeakDetection:
                     deviation_list.append(deviation)
                 else:
                     print(f'Peak: {peak} is not within the range of {x_lower} and {x_upper}')
+
             print(f'Deviation List: {deviation_list}')
             deviation_mean = np.mean(deviation_list)
             deviation_mean_list.append(deviation_mean)
-        print(f'Deviation Mean List: {deviation_mean_list}')
+        #print(f'Deviation Mean List: {deviation_mean_list}')
+
+        self.mean_shift = np.mean(deviation_mean_list)
+        print(f'Mean Shift: {self.mean_shift}')
+        self.std_shift = np.std(deviation_mean_list)
+        print(f'Std Shift: {self.std_shift}')
 
         return None
+    
+# --------------------------------------------------------------------------------------------
+
+    def shift_correction(self):
+        # Load data
+        df = self.load_df(self.path)
+        x = df['Chemical_Shift']
+        calculated_shift = self.calculate_peak_deviation()
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            df.iloc[:, i] = y - self.mean_shift
+
+        return df
 
 # --------------------------------------------------------------------------------------------
    
     def bin_and_plot(self, bin_index):
         # Load data
-        df = self.load_df(self.path)
+        #df = self.load_df(self.path)
+        df = self.shift_correction()
         x = df['Chemical_Shift']
         
         binned_y_values = []
