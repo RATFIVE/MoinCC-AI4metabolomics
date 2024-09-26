@@ -10,6 +10,7 @@ from pathlib import Path
 from plotly.subplots import make_subplots
 from scipy.signal import find_peaks
 from scipy.integrate import trapezoid
+import spm1d as spm
 
 
 # ----- Settings -----------------------------------------------------------
@@ -110,14 +111,17 @@ class PeakDetection:
         df = self.shift_correction()
 
         peak_tresh = self.threshold(df.iloc[:, 1])
-
+        smoothing = 30
         # Subplots 
         fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
         x = df['Chemical_Shift']
         y = df.iloc[:, 1]
+        y1 = spm.util.smooth(y, fwhm=smoothing)
         
             # Initial trace
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='lines'), row=1, col=1)
+        # add smoothed line
+        fig.add_trace(go.Scatter(x=x, y=y1, mode='lines', name='Smoothed Line', line=dict(color='orange')), row=1, col=1)
         
         # Plot peaks to the graph
         fig.add_trace(go.Scatter(x=x[self.peaks_finder(y)], y=y[self.peaks_finder(y)], mode='markers', marker=dict(color='red', size=8), name='Peaks'), row=1, col=1)
@@ -127,12 +131,14 @@ class PeakDetection:
         
         for i in range(1, df.shape[1]):
             y = df.iloc[:, i]
+            y1 = spm.util.smooth(y, fwhm=smoothing)
             #print(f'x: {x}')
             #print(f'y: {y}')
             peaks = self.peaks_finder(y)
             frames.append(go.Frame(
                 data=[
                     go.Scatter(x=x, y=y, mode='lines'),
+                    go.Scatter(x=x, y=y1, mode='lines'),
                     go.Scatter(x=x[peaks], y=y[peaks], mode='markers', marker=dict(color='red', size=8))
                 ],
                 name=f'Frame {i}'
