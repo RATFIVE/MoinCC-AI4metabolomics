@@ -2,10 +2,12 @@
 
 ## Questions 24. 09.24
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?
-- why are shifts a problem, when the spectra is always calibrated to water = 4.7ppm? Is skewing teh only problem?
-- how exactly are the spectra calibrated? Each by itself, by average of whole time series?
+- why are shifts a problem, when the spectra is always calibrated to water = 4.7ppm? Is skewing the only problem?
+- how exactly are the spectra calibrated/normalized? Each by itself, by average of whole time series?
 
-- when fourier transformed? is the data already smoothed?
+- realations of peaks to each other, when there are several characteristic peaks for one metabolite
+
+- when fourier transformed, is the data already smoothed?
 - 
 ## Questions 17.09.24
 
