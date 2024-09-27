@@ -12,9 +12,14 @@ from scipy.signal import find_peaks
 from scipy.integrate import trapezoid
 
 
+# ----- Settings -----------------------------------------------------------
+# set streamlit layout to wide
+st.set_page_config(layout="wide")
+
 # Options to display all columns
 #pd.set_option('display.max_columns', None)
 #pd.set_option('display.max_rows', None)
+
 def load_data():
     path_list = []
     cwd = Path(os.getcwd())
@@ -28,17 +33,22 @@ def load_data():
                 path_list.append(file_path)
     return path_list
 
+# ----- Class for Peak Detection -----------------------------------------------------------
 class PeakDetection:
     def __init__ (self, path):
         self.path = path
 
-        
+        self.mean_shift = None
+        self.std_shift = None
 
+# --------------------------------------------------------------------------------------------
 
     def load_df(self, path):
         df = pd.read_csv(path, sep=',', encoding='utf-8')
         df.rename(columns={'Unnamed: 0': 'Chemical_Shift'}, inplace=True)
         return df
+    
+# --------------------------------------------------------------------------------------------
 
     def plotly_line(self):
 
@@ -63,6 +73,8 @@ class PeakDetection:
         fig.update_layout(title='Stacked Lines')
         fig.show()
 
+# --------------------------------------------------------------------------------------------
+
     def peaks_finder(self, y):
         """Find Peaks in the Spectra
 
@@ -77,6 +89,8 @@ class PeakDetection:
         peaks, _ = find_peaks(y, height=tresh)
         return peaks
     
+# --------------------------------------------------------------------------------------------
+
     def threshold(self, y):
         mean = np.mean(y, axis=0)
         std = np.std(y)
@@ -85,14 +99,15 @@ class PeakDetection:
         #print(f'Mean: {mean}')
         return tresh
 
-
+# --------------------------------------------------------------------------------------------
     def animate(self):
         import plotly.graph_objects as go
         from plotly.subplots import make_subplots
         from scipy.signal import find_peaks
 
         # load data
-        df = self.load_df(self.path)
+        #df = self.load_df(self.path)
+        df = self.shift_correction()
 
         peak_tresh = self.threshold(df.iloc[:, 1])
 
@@ -158,6 +173,8 @@ class PeakDetection:
         #fig.show()
 
         return fig
+    
+# --------------------------------------------------------------------------------------------
 
     def intigrate_peaks(self):
         # Load data
@@ -171,10 +188,65 @@ class PeakDetection:
             peaks = self.peaks_finder(y)
             print(f'Peaks: \n{x[peaks].values} \n{y[peaks].values}')
 
-        # return fig
-    def bin_and_plot(self, bin_index):
+# --------------------------------------------------------------------------------------------
+    def calculate_peak_deviation(self):
+        
+        x_ref = 4.7 # Reference value of Water
         # Load data
         df = self.load_df(self.path)
+        
+        x = df['Chemical_Shift']
+
+        deviation_mean_list = []
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            peaks = self.peaks_finder(df.iloc[:, i])
+            #print(f'x Peaks: {x[peaks].values} \ny Peaks: {y[peaks].values}')
+            ref_range = 0.1
+            x_upper = x_ref + ref_range
+            x_lower = x_ref - ref_range
+            deviation_list = []
+            for peak in x[peaks].values:
+                if peak >= x_lower and peak <= x_upper:
+                    print(f'Peak: {peak} is within the range of {x_lower} and {x_upper}')
+
+                    # calculate the deviation
+                    deviation = peak - x_ref
+                    deviation_list.append(deviation)
+                else:
+                    print(f'Peak: {peak} is not within the range of {x_lower} and {x_upper}')
+
+            print(f'Deviation List: {deviation_list}')
+            deviation_mean = np.mean(deviation_list)
+            deviation_mean_list.append(deviation_mean)
+        #print(f'Deviation Mean List: {deviation_mean_list}')
+
+        self.mean_shift = np.mean(deviation_mean_list)
+        print(f'Mean Shift: {self.mean_shift}')
+        self.std_shift = np.std(deviation_mean_list)
+        print(f'Std Shift: {self.std_shift}')
+
+        return None
+    
+# --------------------------------------------------------------------------------------------
+
+    def shift_correction(self):
+        # Load data
+        df = self.load_df(self.path)
+        x = df['Chemical_Shift']
+        calculated_shift = self.calculate_peak_deviation()
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            df.iloc[:, i] = y - self.mean_shift
+
+        return df
+
+# --------------------------------------------------------------------------------------------
+   
+    def bin_and_plot(self, bin_index):
+        # Load data
+        #df = self.load_df(self.path)
+        df = self.shift_correction()
         x = df['Chemical_Shift']
         
         binned_y_values = []
@@ -224,6 +296,7 @@ class PeakDetection:
             
 
             return fig
+# --------------------------------------------------------------------------------------------
 
 def main():
     path_list = load_data()
@@ -257,6 +330,7 @@ def main2():
     path_list = load_data()
 
     model = PeakDetection(path_list[1])
+    model.calculate_peak_deviation()
     fig = model.animate()
     with col1:
         st.plotly_chart(fig)
@@ -276,4 +350,4 @@ def main2():
 
 
 if __name__ == '__main__':
-    main()
+    main2()
