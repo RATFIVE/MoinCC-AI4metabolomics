@@ -1,16 +1,7 @@
 import pandas as pd
-import numpy as np
 import os
-import plotly.graph_objects as go
-import plotly.express as px
-import streamlit as st
-import shutil
-import time
 from pathlib import Path
-from plotly.subplots import make_subplots
-from scipy.signal import find_peaks
-from scipy.integrate import trapezoid
-import spm1d as spm
+
 
 class DataParser:
     def __init__(self):
@@ -42,18 +33,30 @@ class DataParser:
         return path_list
     
     def load_df(self, path):
+        """
+        Lädt eine CSV-Datei in ein Pandas DataFrame und benennt die erste Spalte in 'Chemical_Shift' um.
+
+        Diese Methode lädt eine CSV-Datei von dem angegebenen Pfad in ein Pandas DataFrame. 
+        Die erste Spalte der CSV-Datei, die normalerweise keinen Namen hat und als 'Unnamed: 0' bezeichnet wird, 
+        wird in 'Chemical_Shift' umbenannt.
+
+        Args:
+            path (str): Der Pfad zur CSV-Datei, die geladen werden soll.
+
+        Returns:
+            pd.DataFrame: Ein Pandas DataFrame, das die Daten der CSV-Datei enthält, wobei die erste Spalte in 'Chemical_Shift' umbenannt wurde.
+        """
+        
         df = pd.read_csv(path, sep=',', encoding='utf-8')
 
         # Rename the first column to 'Chemical_Shift'
-        df.iloc[:, 0].name == 'Chemical_Shift'
-        #df.rename(columns={'Unnamed: 0': 'Chemical_Shift'}, inplace=True)
-        print(df.head())
+        df.rename(columns={'Unnamed: 0': 'Chemical_Shift'}, inplace=True)
+        
         return df
     
 
+if __name__ == '__main__':
 
-
-    
-model = DataParser()
-data = model.load_data()
-model.load_df(data[1])
+    model = DataParser()
+    data = model.load_data()
+    model.load_df(data[1])
