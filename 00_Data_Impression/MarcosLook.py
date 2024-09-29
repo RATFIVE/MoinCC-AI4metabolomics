@@ -10,6 +10,7 @@ from pathlib import Path
 from plotly.subplots import make_subplots
 from scipy.signal import find_peaks
 from scipy.integrate import trapezoid
+import spm1d as spm
 
 
 # ----- Settings -----------------------------------------------------------
@@ -38,6 +39,9 @@ class PeakDetection:
     def __init__ (self, path):
         self.path = path
 
+        self.mean_shift = None
+        self.std_shift = None
+
 # --------------------------------------------------------------------------------------------
 
     def load_df(self, path):
@@ -57,12 +61,12 @@ class PeakDetection:
 
         # subplots 
         fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
-        x = df['Chemical_Shift']
+        x = df.iloc[:, 0]
         y = df.iloc[:, 1]
         # finde peaks in y 
         peak_tresh = 20000
         peaks, _ = find_peaks(df.iloc[:, 1], height=peak_tresh)
-        print(f'Peaks: {peaks}')
+        #print(f'Peaks: {peaks}')
         # Add traces
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='lines'), row=1, col=1)
         # plot peaks to the graph
@@ -104,16 +108,20 @@ class PeakDetection:
 
         # load data
         df = self.load_df(self.path)
+        #df = self.shift_correction()
 
         peak_tresh = self.threshold(df.iloc[:, 1])
-
+        smoothing = 30
         # Subplots 
         fig = make_subplots(rows=1, cols=1, shared_xaxes=True, shared_yaxes=True)
-        x = df['Chemical_Shift']
+        x = df.iloc[:, 0]
         y = df.iloc[:, 1]
+        y1 = spm.util.smooth(y, fwhm=smoothing)
         
             # Initial trace
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='lines'), row=1, col=1)
+        # add smoothed line
+        fig.add_trace(go.Scatter(x=x, y=y1, mode='lines', name='Smoothed Line', line=dict(color='orange')), row=1, col=1)
         
         # Plot peaks to the graph
         fig.add_trace(go.Scatter(x=x[self.peaks_finder(y)], y=y[self.peaks_finder(y)], mode='markers', marker=dict(color='red', size=8), name='Peaks'), row=1, col=1)
@@ -123,12 +131,14 @@ class PeakDetection:
         
         for i in range(1, df.shape[1]):
             y = df.iloc[:, i]
+            y1 = spm.util.smooth(y, fwhm=smoothing)
             #print(f'x: {x}')
             #print(f'y: {y}')
             peaks = self.peaks_finder(y)
             frames.append(go.Frame(
                 data=[
                     go.Scatter(x=x, y=y, mode='lines'),
+                    go.Scatter(x=x, y=y1, mode='lines'),
                     go.Scatter(x=x[peaks], y=y[peaks], mode='markers', marker=dict(color='red', size=8))
                 ],
                 name=f'Frame {i}'
@@ -175,14 +185,14 @@ class PeakDetection:
     def intigrate_peaks(self):
         # Load data
         df = self.load_df(self.path)
-        x = df['Chemical_Shift']
-        print(df.shape)
+        
+        #print(df.shape)
         
         integrated_y_values = []
         for i in range(1, df.shape[1]):
             y = df.iloc[:, i]
             peaks = self.peaks_finder(y)
-            print(f'Peaks: \n{x[peaks].values} \n{y[peaks].values}')
+            #print(f'Peaks: \n{x[peaks].values} \n{y[peaks].values}')
 
 # --------------------------------------------------------------------------------------------
     def calculate_peak_deviation(self):
@@ -190,7 +200,8 @@ class PeakDetection:
         x_ref = 4.7 # Reference value of Water
         # Load data
         df = self.load_df(self.path)
-        x = df['Chemical_Shift']
+        
+        x = df.iloc[:, 0]
 
         deviation_mean_list = []
         for i in range(1, df.shape[1]):
@@ -210,19 +221,56 @@ class PeakDetection:
                     deviation_list.append(deviation)
                 else:
                     print(f'Peak: {peak} is not within the range of {x_lower} and {x_upper}')
-            print(f'Deviation List: {deviation_list}')
-            deviation_mean = np.mean(deviation_list)
-            deviation_mean_list.append(deviation_mean)
-        print(f'Deviation Mean List: {deviation_mean_list}')
+                    pass
 
-        return None
+            if deviation_list:
+                deviation_mean = np.mean(deviation_list)
+                deviation_mean_list.append(deviation_mean)
+            else:
+                print(f'No peaks within the range for column {i}')
+
+        if deviation_mean_list:
+            self.mean_shift = np.mean(deviation_mean_list)
+            self.std_shift = np.std(deviation_mean_list)
+            
+            #print(f'Mean Shift: {self.mean_shift}')
+            #print(f'Standard Deviation Shift: {self.std_shift}')
+        else:
+            #print('No deviations calculated.')
+            self.mean_shift = None
+            self.std_shift = None
+
+        return self.mean_shift, self.std_shift
+    
+# --------------------------------------------------------------------------------------------
+
+    def shift_correction(self):
+        # Load data
+        df = self.load_df(self.path)
+
+
+        x = df.iloc[:, 0]
+
+
+        calculated_shift = self.calculate_peak_deviation()
+        for i in range(1, df.shape[1]):
+            y = df.iloc[:, i]
+            df.iloc[:, i] = y - self.mean_shift
+
+        return df
 
 # --------------------------------------------------------------------------------------------
    
     def bin_and_plot(self, bin_index):
         # Load data
         df = self.load_df(self.path)
-        x = df['Chemical_Shift']
+        #df = self.shift_correction()
+
+        x = df.iloc[:, 0]
+            
+        
+
+        
         
         binned_y_values = []
         i_values = []
@@ -294,8 +342,9 @@ def main():
                     pass
 
 
-    except Exception as e:
-        print(f'Error: {e}')
+    except:
+        #print(f'Error: {e}')
+        pass
 
 
 
@@ -319,10 +368,27 @@ def main2():
             pass
 
 
+def main3():
+    means_list = []
+    path_list = load_data()
+    error_list = []
+    try:
+        for path in path_list:
+            model = PeakDetection(path)
+            mean, std = model.calculate_peak_deviation()
+            means_list.append(mean)
+    except Exception as e:
 
-    
+        error_list.append(path)
+        print(f'Error: {e}')
 
+    filtered_means = [m for m in means_list if m is not None]
+    means = np.array(filtered_means)
+    mean = np.mean(means)
+    std = np.std(means)
+    print(f'Mean: {mean} \nStd: {std}')
+    print(f'Error List: {error_list}')
 
 
 if __name__ == '__main__':
-    main2()
+    main3()
