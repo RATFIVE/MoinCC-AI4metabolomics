@@ -43,7 +43,7 @@ def generate_synthetic_spectrum(peak_list, spectrum_length=10000, noise_level=0.
     
 
     # Add peak at pos: 
- 
+    labels = []
     for peak_pos in peak_list:
         peak_position = int(peak_pos * spectrum_length/10)
         #peak_position = int(peak_pos)
@@ -55,6 +55,10 @@ def generate_synthetic_spectrum(peak_list, spectrum_length=10000, noise_level=0.
         start = max(0, peak_position - peak_width // 2)
         end = min(spectrum_length, peak_position + peak_width // 2)
         spectrum[start:end] += peak[:end-start]
+        
+        # Generate label for the peak position
+        label = f"Metabolite_{peak_pos}"
+        labels.append(label)
 
     #random_noise_level = np.random.rand() * 0.01
     noise_level = 0.01
