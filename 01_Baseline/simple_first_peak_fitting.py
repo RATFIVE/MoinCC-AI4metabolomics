@@ -6,6 +6,10 @@ import numpy as np
 # fitting library
 from scipy.optimize import curve_fit
 
+# Questions:
+# How is the concentration calculated? How is the integral calculated?
+# How big is the shift? Is it only shifted? Or also skewed?
+
 # get file names
 def get_file_names():
     path_list = []
@@ -17,7 +21,7 @@ def get_file_names():
             path_list.append(file)
     return path_list
 
-def containing_string(file_names, string, not_string = None):
+def containing_string(file_names, string = '', not_string = None):
     # get all filenames which contain the string
     return [file for file in file_names if string in file and (not_string is None or not_string not in file)]
 
@@ -55,7 +59,11 @@ def extract_ppm_all(meta_df, file_name):
     return positions, names
 
 
-def plot_single(x, y_fits, positions, names, file_name, df, output_direc):
+def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params):
+# create output directory if it does not exist
+    if not os.path.exists(output_direc):
+        os.makedirs(output_direc)
+
     for i in range(y_fits.shape[1] - 1):
         plt.figure(figsize=(10, 6))
         plt.plot(x, y_fits[:, i], label='Fit')
@@ -66,52 +74,115 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc):
         plt.ylabel('Intensity')
         plt.title(f'NMR Spectrum of {file_name}')
         
-        colors = ['r', 'g', 'b', 'y', 'm', 'c']
+        colors = [
+    (1.0, 0.0, 0.0),  # Red
+    (0.0, 1.0, 0.0),  # Green
+    (0.0, 0.0, 1.0),  # Blue
+    (1.0, 1.0, 0.0),  # Yellow
+    (1.0, 0.0, 1.0),  # Magenta
+    (0.0, 1.0, 1.0),  # Cyan
+    (0.5, 0.0, 0.5),  # Purple
+    (0.5, 0.5, 0.0),  # Olive
+    (0.0, 0.5, 0.5),  # Teal
+    (0.5, 0.5, 0.5),  # Gray
+    (0.75, 0.25, 0.0),  # Brown
+    (0.25, 0.75, 0.0),  # Lime Green
+    (0.0, 0.25, 0.75),  # Deep Blue
+    (0.75, 0.0, 0.25),  # Deep Red
+    (0.25, 0.0, 0.75)   # Indigo
+]
+
         # Add vertical lines for the ppm
         for j in range(len(positions)):
             plt.axvline(x=positions[j], linestyle='--', label=names[j], color=colors[j % len(colors)])
-        
+            # each individual line
+            x_0 = fit_params[i, j]
+            gamma = fit_params[i, len(positions) + j]
+            A = fit_params[i, 2*len(positions) + j]
+            plt.plot(df.iloc[:,0], lorentzian(df.iloc[:,0], x_0, gamma, A), linestyle='--', color=colors[j % len(colors)])
+        #no also plot each individual
         # Add legend to avoid repetition
         plt.legend()
-        
-        # create output directory if it does not exist
-        if not os.path.exists(output_direc):
-            os.makedirs(output_direc)
 
         # Save the plot
         plt.savefig(f'{output_direc}/{file_name}_{i}.png')
         plt.close()
 
-def plot_time_dependece(y_fits, positions, names, popt, output_direc):
-    # the area of the indivudal peaks is the concentration with some kind of linear transformation on top.
-    area_per_peak = np.zeros((y_fits.shape[1], len(positions)))
+def smoothing(df):
+    # perform smoothing via random window
+    for column in df.iloc[:,1:]:
+        pass
 
-    for i in range(y_fits.shape[1]):
-        for j in range(len(positions)):
-            area_per_peak[i, j] = popt[i,len(positions) + j] * popt[i, len(positions)*2 + j]
+def main():
+    file_names  = get_file_names()
+    #file_names = containing_string(file_names, string='Pyruvate', not_string='ser')
+
+    for file_name in file_names:
+        print(f'Processing {file_name}')
+        df = pd.read_csv(f'../Data/{file_name}')
+        # meta path independet of the OS
+        meta_path = Path('..', 'Data', 'Data_description.xlsx')
+        # meta_path = '../Data/Data_description.xlsx'
+        meta_df = pd.read_excel(meta_path)
+        # extract ppm lines and names
+        positions, names = extract_ppm_all(meta_df, file_name)
+        if len(positions) == 0:
+            print(f'No ppm values found for {file_name}')
+            continue
+
+        number_peaks = len(positions)
+        y_fits = np.zeros((df.shape[0], df.shape[1]))
+        fit_params = np.zeros((df.shape[1], number_peaks * 3))
+
+        for i in range(1, df.shape[1]):
+            try:
+                print(f'Fitting column {i/df.shape[1]*100:.2f}%')
+                # perform fitting
+                x = df.iloc[:,0]
+                y = df.iloc[:,i]
+                popt, pcov = curve_fit(grey_spectrum, x, y, p0 = [positions, [0.1]*len(positions), [1000]*len(positions)], maxfev=20000)
+                y_fits[:,i-1] = grey_spectrum(x, *popt)
+
+                fit_params[i-1] = popt
+            except Exception:
+                print('Fitting failed.')
+                continue
+        output_direc = f'output/1st_fit/{file_name}_output'
+        plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
 
 
-    time_points = range(y_fits.shape[1])
+def lorentzian(x, x0, gamma, A):
+    '''
+    x is the datapoint
+    x0 is the peak position
+    gamma is the width
+    A is the amplitude
+    '''
+    return A * gamma / ((x - x0)**2 + gamma**2)
 
-    # scatter plot of time evolution of the peak areas
-    plt.figure(figsize=(10, 6))
-    colors = ['r', 'g', 'b', 'y', 'm', 'c']
-    for i in range(len(positions)):
-        plt.scatter(time_points, area_per_peak[:, i], label=names[i], color=colors[i % len(colors)])
+def grey_spectrum(x, *params):
+    '''
+    x is the independent variable array
+    params should be a flattened list of x0, gamma, and A values
+    '''
+    n = len(params) // 3
+    x0 = params[:n]
+    gamma = params[n:2*n]
+    A = params[2*n:3*n]
 
-    plt.xlabel('Time')
-    plt.ylabel('Area')
-    plt.title('Time evolution of peak areas')
-    plt.ylim((-0, 50))
-    plt.legend()
+    y = np.zeros(len(x))
+    for i in range(n):
+        y += lorentzian(x, x0[i], gamma[i], A[i])
+    return y
 
-    #create output directory if it does not exist
-    if not os.path.exists(output_direc):
-        os.makedirs(output_direc)
+main()
 
-    plt.savefig(f'{output_direc}/Time_evolution_areas.png')
-    plt.close()    
 
+#########################
+# Not used for now
+#########################
+
+'''
 def correct_starting_point(df, positions, names):
     # Sum up all intensities
     sum_intensities = df.iloc[:, 1:].sum(axis=1) / df.shape[1]
@@ -187,71 +258,36 @@ def correct_starting_point(df, positions, names):
         plt.plot(df.iloc[:, 0], lorentzian(df.iloc[:, 0], popt[i], popt[i + len(positions)], popt[i + 2*len(positions)]))
     plt.show()
 
-
-
-
-def main():
-    file_names  = get_file_names()
-    print(file_names)
-    file_names = containing_string(file_names, 'Fumarate', 'ser')
-    print(file_names)
-    for file_name in file_names:
-        print(f'Processing {file_name}')
-        df = pd.read_csv(f'../Data/{file_name}')
-        # meta path independet of the OS
-        meta_path = Path('..', 'Data', 'Data_description.xlsx')
-        # meta_path = '../Data/Data_description.xlsx'
-        meta_df = pd.read_excel(meta_path)
-        # extract ppm lines and names
-        positions, names = extract_ppm_all(meta_df, file_name)
-        if len(positions) == 0:
-            print(f'No ppm values found for {file_name}')
-            continue
-
-        number_peaks = len(positions)
-        y_fits = np.zeros((df.shape[0], df.shape[1]))
-        fit_params = np.zeros((df.shape[1], number_peaks * 3))
-
-        correct_starting_point(df, positions, names)
-        '''for i in range(1, df.shape[1]):
-            print(f'Fitting column {i/df.shape[1]*100:.2f}%')
-            # perform fitting
-            x = df.iloc[:,0]
-            y = df.iloc[:,i]
-            popt, pcov = curve_fit(grey_spectrum, x, y, p0 = [positions, [0.1]*len(positions), [1000]*len(positions)], maxfev=10000)
-            y_fits[:,i-1] = grey_spectrum(x, *popt)
-
-            fit_params[i-1] = popt
-
-        output_direc = f'{file_name}_output'
-        plot_single(x, y_fits, positions, names, file_name, df, output_direc)
-        plot_time_dependece(y_fits, positions, names, fit_params, output_direc)
 '''
 
-def lorentzian(x, x0, gamma, A):
-    '''
-    x is the datapoint
-    x0 is the peak position
-    gamma is the width
-    A is the amplitude
-    '''
-    return A * gamma / ((x - x0)**2 + gamma**2)
+'''
+def plot_time_dependece(y_fits, positions, names, popt, output_direc):
+    # the area of the indivudal peaks is the concentration with some kind of linear transformation on top.
+    area_per_peak = np.zeros((y_fits.shape[1], len(positions)))
 
-def grey_spectrum(x, *params):
-    '''
-    x is the independent variable array
-    params should be a flattened list of x0, gamma, and A values
-    '''
-    n = len(params) // 3
-    x0 = params[:n]
-    gamma = params[n:2*n]
-    A = params[2*n:3*n]
-    
-    y = np.zeros(len(x))
-    for i in range(n):
-        y += lorentzian(x, x0[i], gamma[i], A[i])
-    return y
+    for i in range(y_fits.shape[1]):
+        for j in range(len(positions)):
+            area_per_peak[i, j] = popt[i,len(positions) + j] * popt[i, len(positions)*2 + j]
 
-main()
-# FA_20240215_2H_yeast_Pyruvate-d3_5.csv
-# FA_20231113_2H Yeast_Pyruvate-d3_1.csv
+
+    time_points = range(y_fits.shape[1])
+
+    # scatter plot of time evolution of the peak areas
+    plt.figure(figsize=(10, 6))
+    colors = ['r', 'g', 'b', 'y', 'm', 'c']
+    for i in range(len(positions)):
+        plt.scatter(time_points, area_per_peak[:, i], label=names[i], color=colors[i % len(colors)])
+
+    plt.xlabel('Time')
+    plt.ylabel('Area')
+    plt.title('Time evolution of peak areas')
+    plt.ylim((-0, 50))
+    plt.legend()
+
+    #create output directory if it does not exist
+    if not os.path.exists(output_direc):
+        os.makedirs(output_direc)
+
+    plt.savefig(f'{output_direc}/Time_evolution_areas.png')
+    plt.close()    
+'''
