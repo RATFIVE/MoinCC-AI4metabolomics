@@ -137,7 +137,7 @@ if __name__ == "__main__":
     # Output shapes
     print("Spectra shape:", spectra.shape)  # Should be (1000, 10000)
     print("Concentrations shape:", concentrations.shape)  # Should be (1000, 9)
-    print("Labels shape:", labels.shape)  # Should be (1000, 9)
+    #print("Labels shape:", labels.shape)  Problem: labels is a list, not an array
 
 
     # animate the spctra
@@ -155,6 +155,10 @@ if __name__ == "__main__":
 
     ani = animation.FuncAnimation(fig, update, frames=range(num_samples), interval=50)
     plt.show()
+
+    # save the animation as gif
+
+    ani.save('synthetic_spectrum_animation.gif', writer='imagemagick', fps=60)
 
     # # Plot one example spectrum
     # plt.figure(figsize=(10, 4))

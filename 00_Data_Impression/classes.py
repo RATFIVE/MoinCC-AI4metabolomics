@@ -138,11 +138,12 @@ class PeakFinder:
         """
         mean = np.mean(y, axis=0)
         std = np.std(y)
+        q1 = np.percentile(y, 25)
 
-        tresh = mean 
+        tresh = q1 
     
         #print(f'Mean: {mean}')
-        return tresh
+        return tresh 
     
     def peaks_finder(self, y: np.ndarray) -> tuple:
         """
@@ -162,4 +163,4 @@ class PeakFinder:
         # Finde Peaks in y 
         tresh = self.threshold(y)
         peaks, prob = find_peaks(y, height=tresh)
-        return peaks, prob
+        return peaks, prob, tresh
