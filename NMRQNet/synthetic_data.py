@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter1d
 """
 Explanation of the Code:
 generate_synthetic_spectrum:
@@ -13,7 +14,7 @@ spectra: A NumPy array of shape (1000, 10000), representing 1000 synthetic NMR s
 concentrations: A NumPy array of shape (1000, 9), representing the concentrations of 9 metabolites for each spectrum.
 """
 
-def generate_synthetic_spectrum(peak_list, spectrum_length=10000, noise_level=0.01):
+def generate_synthetic_spectrum(peak_list, spectrum_length=10000, noise_level=0.01, spectrum_range=10):
     """
     Generate a synthetic NMR spectrum with random peaks and added noise.
     
@@ -44,31 +45,51 @@ def generate_synthetic_spectrum(peak_list, spectrum_length=10000, noise_level=0.
 
     # Add peak at pos: 
     labels = []
-    for peak_pos in peak_list:
-        peak_position = int(peak_pos * spectrum_length/10)
+    areas = []
+    for peak_posistion in peak_list:
+
+        # shift peak_pos random amount between -0.02 and 0.02
+        peak_pos = peak_posistion + np.random.uniform(-0.2, 0.2)
+        
+        
+        peak_position = int(peak_pos * spectrum_length/spectrum_range)
         #peak_position = int(peak_pos)
         peak_width = np.random.randint(50, 200)
-        peak_height = np.random.rand() * 2
+        peak_height = np.random.rand() * 1
         # create lorentzian peak
         peak = peak_height * (1 / (1 + np.square(np.linspace(-3, 3, peak_width))))
         # peak = peak_height * np.exp(-np.linspace(-3, 3, peak_width)**2)
         start = max(0, peak_position - peak_width // 2)
         end = min(spectrum_length, peak_position + peak_width // 2)
-        spectrum[start:end] += peak[:end-start]
+                # Sicherstellen, dass die Indizes korrekt sind
+        if start < end:
+            spectrum[start:end] += peak[:end-start]
+
+        if peak_pos > peak_posistion or peak_pos < peak_posistion:
+            label = peak_posistion
+        else: 
+            label = 0
         
-        # Generate label for the peak position
-        label = f"Metabolite_{peak_pos}"
         labels.append(label)
 
-    #random_noise_level = np.random.rand() * 0.01
-    noise_level = 0.01
+        # calculate the area under the peak
+        area = np.trapz(peak)
+        #print(f'Peak at {peak}')
+        areas.append(area)
+
+     # Generieren eines zufälligen Rauschpegels zwischen 0.005 und 0.01
+    random_noise_level = np.random.uniform(0.05, 0.15)
+    #noise_level = 0.1
     # Add random noise to the spectrum
-    noise = np.random.normal(0, noise_level, spectrum_length)
+    noise = np.random.normal(0, random_noise_level, spectrum_length)
+    # smooth the noise with gaussian filter
+    noise = gaussian_filter1d(noise, 10)
+    
     spectrum += noise
     
-    return spectrum
+    return spectrum, labels, areas
 
-def generate_synthetic_data(peak_list, num_samples=1000, spectrum_length=10000, num_metabolites=9):
+def generate_synthetic_data(peak_list, num_samples=1000, spectrum_length=10000, spectrum_range=10, num_metabolites=9):
     """
     Generate synthetic NMR spectra and corresponding metabolite concentrations.
     
@@ -82,36 +103,41 @@ def generate_synthetic_data(peak_list, num_samples=1000, spectrum_length=10000, 
     """
     spectra = []
     concentrations = []
+    labels = []
+
     
     for _ in range(num_samples):
         # Generate a random NMR spectrum
-        spectrum = generate_synthetic_spectrum(peak_list, spectrum_length)
+        spectrum, labels, area = generate_synthetic_spectrum(peak_list, spectrum_length, spectrum_range)
         spectra.append(spectrum)
+        labels.append(labels)
+        concentrations.append(area)
         
-        # Generate random metabolite concentrations (between 0 and 1)
-        concentration = np.random.rand(num_metabolites)
-        concentrations.append(concentration)
     
-    return np.array(spectra), np.array(concentrations)
+    return np.array(spectra), np.array(concentrations), labels
 
 
 if __name__ == "__main__":
     # Generate synthetic data
     num_samples = 1000
     spectrum_length = 10000
+    spectrum_range = 10
 
 
     # Peaks for FA_20231122_2H_yeast_acetone-d6_1.csv
     peak_list = [2.323, 4.7, 1.201]
+    #peak_list = [2.323, 6.653, 9.094, 8.876, 8.420, 7.772, 2.468, 4.7, 1.201, 4.368, 2.475, 9.031, 8.714, 8.376, 7.659, 1.2261, 1.9775]
     num_metabolites = len(peak_list)
 
-    spectra, concentrations = generate_synthetic_data(peak_list, num_samples, spectrum_length, num_metabolites)
+    spectra, concentrations, labels = generate_synthetic_data(peak_list, num_samples, spectrum_length, num_metabolites)
     print("Synthetic data generated successfully!")
     print(f'Spectra: \n {spectra}\n')
     print(f'Concentrations: \n {concentrations}\n')
+    print(f'Labels: \n {labels}\n')
     # Output shapes
     print("Spectra shape:", spectra.shape)  # Should be (1000, 10000)
     print("Concentrations shape:", concentrations.shape)  # Should be (1000, 9)
+    print("Labels shape:", labels.shape)  # Should be (1000, 9)
 
 
     # animate the spctra
