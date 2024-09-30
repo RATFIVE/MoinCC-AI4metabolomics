@@ -1,5 +1,11 @@
 '''
-This model fits all the peaks metioned in the metadata file. Starting points are chosen from the metadata file.
+After peak fitting V2 we will perform a fine tuning according to version 1.
+
+Outcome:
+    The model semmed to perform less good as V1, since the peaks are sometimes shifted accross the hole world. More then in model 1.
+
+    -> Apllying bounding boxes to the fitting might be a good idea. But I will go back to teh first moel again and will try to improve the fitting there,
+       by finding apprpriate bounding boxes.
 '''
 
 import pandas as pd
@@ -9,7 +15,7 @@ from pathlib import Path
 import numpy as np
 # fitting library
 from scipy.optimize import curve_fit
-
+import sys
 
 
 # get file names
@@ -96,32 +102,32 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
 
         # Add vertical lines for the ppm
         for j in range(len(positions)):
-            plt.axvline(x=positions[j], linestyle='--', label=names[j], color=colors[j % len(colors)])
-            # each individual line
-            x_0 = fit_params[i, j]
+            # Add vertical lines for ppm positions
+            plt.axvline(x=positions[j], linestyle='--', color=colors[j % len(colors)], label=names[j])
+            # Extract fitted parameters for this peak
+            shift = fit_params[i, j]
             gamma = fit_params[i, len(positions) + j]
             A = fit_params[i, 2*len(positions) + j]
-            plt.plot(df.iloc[:,0], lorentzian(df.iloc[:,0], x_0, gamma, A), linestyle='--', color=colors[j % len(colors)])
+
+            # Plot the individual Lorentzian for this peak
+            plt.plot(x, lorentzian(x, shift, gamma, A), linestyle='--', color=colors[j % len(colors)], label=f'Peak {names[j]}')
+
         #no also plot each individual
         # Add legend to avoid repetition
         plt.legend()
 
         # Save the plot
-        plt.savefig(f'{output_direc}/{file_name}_{i}.png')
+        plt.savefig(f'{output_direc}/{file_name}_{i}.pdf')
         plt.close()
 
-def smoothing(df):
-    # perform smoothing via random window
-    for column in df.iloc[:,1:]:
-        pass
+
 
 def main():
     file_names  = get_file_names()
-    #file_names = containing_string(file_names, string='Pyruvate', not_string='ser') # testing 
 
     for file_name in file_names:
         print(f'Processing {file_name}')
-        df = pd.read_csv(f'../Data/{file_name}')
+        df = pd.read_csv(f'../Data/{ file_name}')
         # meta path independet of the OS
         meta_path = Path('..', 'Data', 'Data_description.xlsx')
         # meta_path = '../Data/Data_description.xlsx'
@@ -131,39 +137,109 @@ def main():
         if len(positions) == 0:
             print(f'No ppm values found for {file_name}')
             continue
+        # define bounds for peakfitting
+        # width lower bounds
+
+        # Assume positions is already defined
+        n_positions = len(positions)
+
+        # width lower bounds
+        width_lower_bounds = np.full(n_positions, 0)
+        # width upper bounds
+        width_upper_bounds = np.full(n_positions, np.inf)
+
+        # amplitude lower bounds
+        amplitude_lower_bounds = np.full(n_positions, 0)
+        # amplitude upper bounds
+        amplitude_upper_bounds = np.full(n_positions, np.inf)
+
+        # shift lower bounds
+        shift_lower_bounds = np.full(1, -np.inf)  # Single value, hence length 1
+        # shift upper bounds
+        shift_upper_bounds = np.full(1, np.inf)
+
+        # combine bounds
+        lower = np.concatenate([shift_lower_bounds, width_lower_bounds, amplitude_lower_bounds])
+        upper = np.concatenate([shift_upper_bounds, width_upper_bounds, amplitude_upper_bounds])
+        flattened_bounds = (lower, upper)
+
+        # shift lower bounds fine-tune
+        shift_lower_bounds_fine = np.full(n_positions, -np.inf)
+        print('Amplitude lower bounds fine', amplitude_lower_bounds)
+        print('Shift lower bounds fine', shift_lower_bounds_fine)
+
+        # shift upper bounds fine-tune
+        shift_upper_bounds_fine = np.full(n_positions, np.inf)
+        lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
+        upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
+
+        flattened_bounds_fine = (lower_fine, upper_fine)
+
+        print(flattened_bounds_fine)
 
         number_peaks = len(positions)
         y_fits = np.zeros((df.shape[0], df.shape[1]))
+        # the shift parameter will be shared between all peaks
         fit_params = np.zeros((df.shape[1], number_peaks * 3))
-
         for i in range(1, df.shape[1]):
-            # using try in case the fitting fails
             try:
                 print(f'Fitting column {i/df.shape[1]*100:.2f}%')
                 # perform fitting
                 x = df.iloc[:,0]
                 y = df.iloc[:,i]
-                popt, pcov = curve_fit(grey_spectrum, x, y, p0 = [positions, [0.1]*len(positions), [1000]*len(positions)], maxfev=20000)
-                y_fits[:,i-1] = grey_spectrum(x, *popt)
-
+                popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, *params),
+                                    x, y, p0=[0] + [0.1]*len(positions) + [1000]*len(positions),
+                                    maxfev=5000, bounds=flattened_bounds)
+                
+                # init parameters for fine tuning
+                positions_fine = popt[0] + positions
+                widths = popt[1:1+number_peaks]
+                amplitudes = popt[1+number_peaks:]
+                print('Fine tuning...')
+                # Fine tune the fit
+                popt, pcov = curve_fit(grey_spectrum_fine_tune, x, y, p0= np.array([positions_fine, widths, amplitudes]).flatten(), maxfev=20000, bounds= flattened_bounds_fine)
+                y_fits[:,i-1] = grey_spectrum_fine_tune(x, *popt)
                 fit_params[i-1] = popt
+        
+
             except Exception:
+                # what is the error
+                import traceback
+                traceback.print_exc()
                 print('Fitting failed.')
                 continue
-        output_direc = f'output/1st_fit/{file_name}_output'
+        output_direc = f'output/3rd_fit/{file_name}_output'
         plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
 
 
-def lorentzian(x, x0, gamma, A):
+def lorentzian(x, shift, gamma, A):
     '''
     x is the datapoint
     x0 is the peak position
     gamma is the width
     A is the amplitude
     '''
-    return A * gamma / ((x - x0)**2 + gamma**2)
+    return A * gamma / ((x - shift)**2 + gamma**2)
 
-def grey_spectrum(x, *params):
+
+def grey_spectrum(x, positions,*params):
+    '''
+    x is the independent variable array
+    params should be a flattened list of shift, gamma, and A values
+    '''
+    n = (len(params) - 1 ) // 2  # The number of peaks
+    shift = params[0]            # Single shift parameter
+    gamma = params[1:n+1]        # Extract n gamma values
+    A = params[n+1:]             # Extract n A values
+
+
+    y = np.zeros(len(x))
+    for i in range(n):
+        # Peak position is shared between all peaks
+        y += lorentzian(x, shift + positions[i], gamma[i], A[i])
+    return y
+
+def grey_spectrum_fine_tune(x, *params):
     '''
     x is the independent variable array
     params should be a flattened list of x0, gamma, and A values
@@ -178,42 +254,5 @@ def grey_spectrum(x, *params):
         y += lorentzian(x, x0[i], gamma[i], A[i])
     return y
 
+
 main()
-
-
-#########################
-# Not used for now
-#########################
-
-
-'''
-def plot_time_dependece(y_fits, positions, names, popt, output_direc):
-    # the area of the indivudal peaks is the concentration with some kind of linear transformation on top.
-    area_per_peak = np.zeros((y_fits.shape[1], len(positions)))
-
-    for i in range(y_fits.shape[1]):
-        for j in range(len(positions)):
-            area_per_peak[i, j] = popt[i,len(positions) + j] * popt[i, len(positions)*2 + j]
-
-
-    time_points = range(y_fits.shape[1])
-
-    # scatter plot of time evolution of the peak areas
-    plt.figure(figsize=(10, 6))
-    colors = ['r', 'g', 'b', 'y', 'm', 'c']
-    for i in range(len(positions)):
-        plt.scatter(time_points, area_per_peak[:, i], label=names[i], color=colors[i % len(colors)])
-
-    plt.xlabel('Time')
-    plt.ylabel('Area')
-    plt.title('Time evolution of peak areas')
-    plt.ylim((-0, 50))
-    plt.legend()
-
-    #create output directory if it does not exist
-    if not os.path.exists(output_direc):
-        os.makedirs(output_direc)
-
-    plt.savefig(f'{output_direc}/Time_evolution_areas.png')
-    plt.close()    
-'''

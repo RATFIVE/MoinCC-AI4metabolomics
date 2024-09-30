@@ -1,3 +1,13 @@
+'''
+This model fits all the peaks metioned in the metadata file. Starting points are chosen from the metadata file. 
+But instead of giving the Lorentz distribution the chance to find the correct ppm on its own, we will only shift the hole spectrum. 
+This way the fitted distribution has the right order and we can be more sure that the fitted peaks are the right ones and not mixed order. 
+
+Outcome:
+    It seems that the fitting is working less good than the previous version. But the peaks are in the right order. 
+    So ew can not evaluate finaly whether this is a better approach or not.
+'''
+
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
@@ -7,9 +17,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import sys
 
-# Questions:
-# How is the concentration calculated? How is the integral calculated?
-# How big is the shift? Is it only shifted? Or also skewed?
+
 
 # get file names
 def get_file_names():
@@ -110,7 +118,7 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
         plt.legend()
 
         # Save the plot
-        plt.savefig(f'{output_direc}/{file_name}_{i}.png')
+        plt.savefig(f'{output_direc}/{file_name}_{i}.pdf')
         plt.close()
 
 
@@ -121,7 +129,7 @@ def main():
 
     for file_name in file_names:
         print(f'Processing {file_name}')
-        df = pd.read_csv(f'../Data/{file_name}')
+        df = pd.read_csv(f'../Data/{ file_name}')
         # meta path independet of the OS
         meta_path = Path('..', 'Data', 'Data_description.xlsx')
         # meta_path = '../Data/Data_description.xlsx'
@@ -164,9 +172,10 @@ def main():
                 y = df.iloc[:,i]
                 popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, *params),
                                     x, y, p0=[0] + [0.1]*len(positions) + [1000]*len(positions),
-                                    maxfev=20000, bounds=flattened_bounds)
+                                    maxfev=5000, bounds=flattened_bounds)
                 y_fits[:,i-1] = grey_spectrum(x,positions, *popt)
-                fit_params[i-1] = popt
+                fit_params[i-1] = popt   
+
             except Exception:
                 # what is the error
                 import traceback
