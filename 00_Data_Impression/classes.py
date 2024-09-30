@@ -22,9 +22,9 @@ class DataParser:
         cwd = Path(os.getcwd())
 
         print(f'Working Dir: {cwd}')
-        print(f'Path: {cwd.parent}')
-
-        for root, dirs, files in os.walk(cwd.parent):
+        #print(f'Path: {cwd.parent}')
+        data_path = Path(cwd.parent, 'Data')
+        for root, dirs, files in os.walk(data_path):
             for file in files:
                 if file.endswith('.csv'):
                     file_path = os.path.join(root, file)
