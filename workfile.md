@@ -6,7 +6,7 @@
 
 - relations of peaks to each other, when there are several characteristic peaks for one metabolite
 
-- different 'thresholds' for peaks --> why?
+- different 'thresholds' for peaks (e.g. nicotinamide d4) --> why?
 - more peaks recognized than mentioned in the metadata --> how should we deal with them? Calculate as normal but leave unlabeled?
 
 - How can we validate the model in the end?
