@@ -13,6 +13,8 @@
    
 - when fourier transformed, is the data already smoothed? --> several measurements averaged thereby partly smoothed
 
+- Why are .ser files not in metadata.
+
 
 ## Questions 17.09.24
 
