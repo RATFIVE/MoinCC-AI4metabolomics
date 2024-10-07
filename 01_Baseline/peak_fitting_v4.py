@@ -1,11 +1,5 @@
 '''
-After peak fitting V2 we will perform a fine tuning according to version 1.
-
-Outcome:
-    The model semmed to perform less good as V1, since the peaks are sometimes shifted accross the hole world. More then in model 1.
-
-    -> Apllying bounding boxes to the fitting might be a good idea. But I will go back to teh first moel again and will try to improve the fitting there,
-       by finding apprpriate bounding boxes.
+This model contains now boundaries for the fitting.
 '''
 
 import pandas as pd
@@ -49,7 +43,7 @@ def extract_ppm_all(meta_df, file_name):
         positions.append(float(react_substrat[i]))
   
     # add metabolite 1
-    for i in range(1, 6):
+    for i in range(1, 6 ):
         react_metabolite = str(meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
         if react_metabolite == ['nan']:
             continue
@@ -124,8 +118,7 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
 
 def main():
     file_names  = get_file_names()
-    file_names = containing_string(file_names, 'Fumarate', 'ser')
-
+    #file_names = containing_string(file_names, 'Nicotinamide', 'ser')
     for file_name in file_names:
         print(f'Processing {file_name}')
         df = pd.read_csv(f'../Data/{ file_name}')
@@ -147,14 +140,14 @@ def main():
         # width lower bounds
         width_lower_bounds = np.full(n_positions, 0)
         # width upper bounds
-        width_upper_bounds = np.full(n_positions, np.inf)
+        width_upper_bounds = np.full(n_positions, 1e-1)
 
         # amplitude lower bounds
         amplitude_lower_bounds = np.full(n_positions, 0)
         # amplitude upper bounds
         amplitude_upper_bounds = np.full(n_positions, np.inf)
 
-        # shift lower bounds
+        # shift lower bounds, bounds not necessary since the shift is shared
         shift_lower_bounds = np.full(1, -np.inf)  # Single value, hence length 1
         # shift upper bounds
         shift_upper_bounds = np.full(1, np.inf)
@@ -165,18 +158,17 @@ def main():
         flattened_bounds = (lower, upper)
 
         # shift lower bounds fine-tune
-        shift_lower_bounds_fine = np.full(n_positions, -np.inf)
-        print('Amplitude lower bounds fine', amplitude_lower_bounds)
-        print('Shift lower bounds fine', shift_lower_bounds_fine)
+        print('Positions:', positions)
+        shift_lower_bounds_fine = np.array(positions) - 0.1
 
         # shift upper bounds fine-tune
-        shift_upper_bounds_fine = np.full(n_positions, np.inf)
+        shift_upper_bounds_fine = np.array(positions) + 0.1
+
+
         lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
         upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
 
         flattened_bounds_fine = (lower_fine, upper_fine)
-
-        print(flattened_bounds_fine)
 
         number_peaks = len(positions)
         y_fits = np.zeros((df.shape[0], df.shape[1]))
@@ -188,20 +180,31 @@ def main():
                 # perform fitting
                 x = df.iloc[:,0]
                 y = df.iloc[:,i]
+                # to increase fitting speed, increase tolerance
                 popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, *params),
                                     x, y, p0=[0] + [0.1]*len(positions) + [1000]*len(positions),
-                                    maxfev=5000, bounds=flattened_bounds)
+                                    maxfev=3000, bounds=flattened_bounds, ftol=1e-4, xtol=1e-4)
                 
                 # init parameters for fine tuning
                 positions_fine = popt[0] + positions
                 widths = popt[1:1+number_peaks]
                 amplitudes = popt[1+number_peaks:]
                 print('Fine tuning...')
+
+                shift_lower_bounds_fine = positions_fine - 0.1
+
+                # shift upper bounds fine-tune
+                shift_upper_bounds_fine = positions_fine + 0.1
+
+
+                lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
+                upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
+
+                flattened_bounds_fine = (lower_fine, upper_fine)
                 # Fine tune the fit
                 popt, pcov = curve_fit(grey_spectrum_fine_tune, x, y, p0= np.array([positions_fine, widths, amplitudes]).flatten(), maxfev=20000, bounds= flattened_bounds_fine)
                 y_fits[:,i-1] = grey_spectrum_fine_tune(x, *popt)
                 fit_params[i-1] = popt
-                print('Fitting values:', popt)
         
 
             except Exception:
@@ -210,7 +213,7 @@ def main():
                 traceback.print_exc()
                 print('Fitting failed.')
                 continue
-        output_direc = f'output/3rd_fit/{file_name}_output'
+        output_direc = f'output/4th_fit/{file_name}_output'
         plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
 
 
