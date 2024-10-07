@@ -1,19 +1,30 @@
 # space for structured(!) information about task, progress background info
-
+## to dos
+- flip scale as seen in fatimas paper
 ## Questions 24. 09.24
-- Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?
-- why are shifts a problem, when the spectra is always calibrated to water = 4.7ppm? Is skewing the only problem?
-- how exactly are the spectra calibrated/normalized? Each by itself, by average of whole time series?
+- Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
+- how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?
+- --> should be normalized one by one, if not check with Fatima
 
-- realations of peaks to each other, when there are several characteristic peaks for one metabolite
+- relations of peaks to each other, when there are several characteristic peaks for one metabolite
+- --> nicotinamite, peaks should have the same concentration
+- --->xy around 1/10th of 
 
-- when fourier transformed, is the data already smoothed?
-
-- different 'thresholds' for peaks --> why?
+- different 'thresholds' for peaks (e.g. nicotinamide d4) --> why? different number of measurements?? maybe
+-   
 - more peaks recognized than mentioned in the metadata --> how should we deal with them? Calculate as normal but leave unlabeled?
-
+- --> if truly there leave unlabeled
+  
 - How can we validate the model in the end?
-- 
+- --> evaluate fitting of lorentzian curve, constraint is that amplitude for metabolite is the same
+- --> dashboard --> visualization with original spectra, 'perfect'spectra with lorentzian curves and 'left over noise'
+   
+- when fourier transformed, is the data already smoothed? --> several measurements averaged thereby partly smoothed
+
+- Why are .ser files not in metadata.
+
+- concentration
+- --> set boundaries for integral, when it is around noise level (so far)?? sigma would be fine
 ## Questions 17.09.24
 
 ### technical background

@@ -17,6 +17,9 @@ fully connected layers are used for final classification or regression (metaboli
 Loss Function: I used Mean Squared Error (MSE) as the loss function for quantification.
 """
 
+
+
+
 # Define the CNN-GRU architecture
 class NMRQNet(nn.Module):
     def __init__(self, input_size, output_size):
@@ -149,7 +152,7 @@ if __name__ == '__main__':
         break  # Just to show one batch
 
     # Check if GPU is available, otherwise use CPU
-    device = 'cpu'
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
     # Create the model, loss function, and optimizer

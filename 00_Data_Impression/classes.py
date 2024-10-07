@@ -138,7 +138,7 @@ class PeakFinder:
         """
         mean = np.mean(y, axis=0)
         std = np.std(y)
-        q1 = np.percentile(y, 25)
+        q1 = np.percentile(y, 20)
 
         tresh = q1 
     
