@@ -1,11 +1,6 @@
 '''
-After peak fitting V2 we will perform a fine tuning according to version 1.
-
-Outcome:
-    The model semmed to perform less good as V1, since the peaks are sometimes shifted accross the hole world. More then in model 1.
-
-    -> Apllying bounding boxes to the fitting might be a good idea. But I will go back to teh first moel again and will try to improve the fitting there,
-       by finding apprpriate bounding boxes.
+This model is an improvement of model 4. 
+It will contain the assumption that alle the peaks for the same metabolite will have the same width and amplitude.
 '''
 
 import pandas as pd
@@ -49,7 +44,7 @@ def extract_ppm_all(meta_df, file_name):
         positions.append(float(react_substrat[i]))
   
     # add metabolite 1
-    for i in range(1, 6):
+    for i in range(1, 6 ):
         react_metabolite = str(meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
         if react_metabolite == ['nan']:
             continue
@@ -124,8 +119,7 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
 
 def main():
     file_names  = get_file_names()
-    file_names = containing_string(file_names, 'Fumarate', 'ser')
-
+    file_names = containing_string(file_names, 'Nicotinamide', 'ser')
     for file_name in file_names:
         print(f'Processing {file_name}')
         df = pd.read_csv(f'../Data/{ file_name}')
@@ -147,14 +141,14 @@ def main():
         # width lower bounds
         width_lower_bounds = np.full(n_positions, 0)
         # width upper bounds
-        width_upper_bounds = np.full(n_positions, np.inf)
+        width_upper_bounds = np.full(n_positions, 1e-1)
 
         # amplitude lower bounds
         amplitude_lower_bounds = np.full(n_positions, 0)
         # amplitude upper bounds
         amplitude_upper_bounds = np.full(n_positions, np.inf)
 
-        # shift lower bounds
+        # shift lower bounds, bounds not necessary since the shift is shared
         shift_lower_bounds = np.full(1, -np.inf)  # Single value, hence length 1
         # shift upper bounds
         shift_upper_bounds = np.full(1, np.inf)
@@ -165,43 +159,84 @@ def main():
         flattened_bounds = (lower, upper)
 
         # shift lower bounds fine-tune
-        shift_lower_bounds_fine = np.full(n_positions, -np.inf)
-        print('Amplitude lower bounds fine', amplitude_lower_bounds)
-        print('Shift lower bounds fine', shift_lower_bounds_fine)
+        print('Positions:', positions)
+        shift_lower_bounds_fine = np.array(positions) - 0.1
 
         # shift upper bounds fine-tune
-        shift_upper_bounds_fine = np.full(n_positions, np.inf)
+        shift_upper_bounds_fine = np.array(positions) + 0.1
+
+
         lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
         upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
 
         flattened_bounds_fine = (lower_fine, upper_fine)
 
-        print(flattened_bounds_fine)
-
         number_peaks = len(positions)
         y_fits = np.zeros((df.shape[0], df.shape[1]))
-        # the shift parameter will be shared between all peaks
-        fit_params = np.zeros((df.shape[1], number_peaks * 3))
-        for i in range(1, df.shape[1]):
+        # width and amplitude are shared for each metabolite peak, 
+        # number of peaks for each metabolite extracting from the names file
+        nr_ppm_pos = len(positions)
+        nr_widths_pos = len(positions)
+        nr_amplitudes_pos = len(positions)
+        number_reduced_arguments = 0
+        from copy import deepcopy
+        names_modified = deepcopy(names)
+        #               positions           widths              amplitudes
+        mapping_names = deepcopy(names) + list(set(names)) + list(set(names))
+        for i in range(1, 6):
+            '''
+            - First n(peak number) positions
+            - Next k width values
+            - Next k amplitude values
+            There are less width and amplitude values than positions, because they are shared between all peaks
+            '''
+            number_peaks = names.count('Metab{i}')
+            number_reduced_arguments += number_peaks + 1
+            nr_widths_pos -= number_peaks + 1 # 1 to have one shift left
+            nr_amplitudes_pos -= number_peaks + 1
+            # make a set of the names modifed list, but only apply the setting on the metabolites
+        
+        # also for substrates
+        number_peaks = names.count('ReacSubs')
+        number_reduced_arguments -= number_peaks + 1
+        nr_widths_pos -= number_peaks + 1
+        nr_amplitudes_pos -= number_peaks + 1
+
+
+
+        fit_params = np.zeros((df.shape[1], nr_ppm_pos + nr_widths_pos + nr_amplitudes_pos))
+        #fit_params = np.zeros((df.shape[1], number_peaks * 3))
+        for i in range(1,3):
             try:
                 print(f'Fitting column {i/df.shape[1]*100:.2f}%')
                 # perform fitting
                 x = df.iloc[:,0]
                 y = df.iloc[:,i]
-                popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, *params),
+                # to increase fitting speed, increase tolerance
+                popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, mapping_names ,*params),
                                     x, y, p0=[0] + [0.1]*len(positions) + [1000]*len(positions),
-                                    maxfev=5000, bounds=flattened_bounds)
+                                    maxfev=3000, bounds=flattened_bounds, ftol=1e-4, xtol=1e-4)
                 
                 # init parameters for fine tuning
                 positions_fine = popt[0] + positions
-                widths = popt[1:1+number_peaks]
-                amplitudes = popt[1+number_peaks:]
+                widths = popt[1:number_peaks]
+                amplitudes = popt[number_peaks:]
                 print('Fine tuning...')
+
+                shift_lower_bounds_fine = positions_fine - 0.1
+
+                # shift upper bounds fine-tune
+                shift_upper_bounds_fine = positions_fine + 0.1
+
+
+                lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
+                upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
+
+                flattened_bounds_fine = (lower_fine, upper_fine)
                 # Fine tune the fit
-                popt, pcov = curve_fit(grey_spectrum_fine_tune, x, y, p0= np.array([positions_fine, widths, amplitudes]).flatten(), maxfev=20000, bounds= flattened_bounds_fine)
+                popt, pcov = curve_fit(lambda x, *params: grey_spectrum_fine_tune(x, positions, mapping_names, *params), x, y, p0= np.array([positions_fine, widths, amplitudes]).flatten(), maxfev=20000, bounds= flattened_bounds_fine)
                 y_fits[:,i-1] = grey_spectrum_fine_tune(x, *popt)
                 fit_params[i-1] = popt
-                print('Fitting values:', popt)
         
 
             except Exception:
@@ -210,8 +245,10 @@ def main():
                 traceback.print_exc()
                 print('Fitting failed.')
                 continue
-        output_direc = f'output/3rd_fit/{file_name}_output'
+        output_direc = f'output/5th_fit/{file_name}_output'
         plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
+        # stop
+        sys.exit()
 
 
 def lorentzian(x, shift, gamma, A):
@@ -224,24 +261,31 @@ def lorentzian(x, shift, gamma, A):
     return A * gamma / ((x - shift)**2 + gamma**2)
 
 
-def grey_spectrum(x, positions,*params):
+def grey_spectrum(x, positions,mapping_names,*params):
     '''
     x is the independent variable array
     params should be a flattened list of shift, gamma, and A values
     '''
-    n = (len(params) - 1 ) // 2  # The number of peaks
     shift = params[0]            # Single shift parameter
-    gamma = params[1:n+1]        # Extract n gamma values
-    A = params[n+1:]             # Extract n A values
-
+    number_unique_substrates = len(set(mapping_names)) 
+    gamma = params[1:number_unique_substrates]        # Extract n gamma values
+    A = params[number_unique_substrates:]             # Extract n A values
+    n = len(positions)
 
     y = np.zeros(len(x))
+    k = 0
+    current_name = mapping_names[0]
     for i in range(n):
+        if mapping_names[i] != current_name:
+            k += 1
+            current_name = mapping_names[i]
+        # retrieve gamma and A values
+
         # Peak position is shared between all peaks
-        y += lorentzian(x, shift + positions[i], gamma[i], A[i])
+        y += lorentzian(x, shift + positions[i], gamma[k], A[k])
     return y
 
-def grey_spectrum_fine_tune(x, *params):
+def grey_spectrum_fine_tune(x,positions,mapping_names,*params):
     '''
     x is the independent variable array
     params should be a flattened list of x0, gamma, and A values
