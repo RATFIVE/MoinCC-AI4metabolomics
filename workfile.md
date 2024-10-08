@@ -5,6 +5,8 @@
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
 - how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?
 - --> should be normalized one by one, if not check with Fatima
+- ---> first peak is taken as reference
+- --> we can shift them
 
 - relations of peaks to each other, when there are several characteristic peaks for one metabolite
 - --> nicotinamite, peaks should have the same concentration
