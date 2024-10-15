@@ -1,6 +1,6 @@
 '''
-This model is an improvement of model 4. 
-It will contain the assumption that alle the peaks for the same metabolite will have the same width and amplitude.
+This model is an improvement of model 5. 
+Only the first the fittings are done. On the consecutive fittings the previous fitting parameters are used as initial guess.
 '''
 
 import pandas as pd
@@ -126,7 +126,7 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
 
 def main():
     file_names  = get_file_names()
-    file_names = containing_string(file_names, 'Fumarate', 'ser')
+    #file_names = containing_string(file_names, 'Nicotinamide', 'ser')
     for file_name in file_names:
         print(f'Processing {file_name}')
         df = pd.read_csv(f'../Data/{ file_name}')
@@ -209,7 +209,7 @@ def main():
         number_peaks = names.count('ReacSubs')
         nr_widths_pos -= number_peaks + 1
         nr_amplitudes_pos -= number_peaks + 1
-
+        first_fit = True
         fit_params = np.zeros((df.shape[1], 3*len(positions)))
         #fit_params = np.zeros((df.shape[1], number_peaks * 3))
         for i in range(1,df.shape[1]):
@@ -219,21 +219,18 @@ def main():
                 x = df.iloc[:,0]
                 y = df.iloc[:,i]
                 # to increase fitting speed, increase tolerance
-                popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, mapping_names ,*params),
+                if first_fit:
+                    popt, pcov = curve_fit(lambda x, *params: grey_spectrum(x, positions, mapping_names, *params),
                                     x, y, p0=[0] + [0.1]*len(list(dict.fromkeys(names))) + [1000]*len(list(dict.fromkeys(names))),
                                     maxfev=3000, ftol=1e-1, xtol=1e-1, bounds=flattened_bounds)
-                # init parameters for fine tuning
-                positions_fine = popt[0] + positions # das passt so, müsste immer noch funktionieren
-                widths = popt[1:len(list(set(names)))+1] # das muss angepasst werden
-                amplitudes = popt[len(list(set(names)))+1:]
-                # print('Fine tuning...')
-                # print('---------------------------------')
-                # print('Initial parameters:', popt)
-                # print('Positions:', positions_fine)
-                # print('Widths:', widths)
-                # print('Amplitudes:', amplitudes)
-                # print('Init Guess: ', np.concatenate([positions_fine, widths, amplitudes]))
-                # print('---------------------------------')
+                    first_fit = False
+                    # init parameters for fine tuning
+                    positions_fine = popt[0] + positions # das passt so, müsste immer noch funktionieren
+                    widths = popt[1:len(list(set(names)))+1] # das muss angepasst werden
+                    amplitudes = popt[len(list(set(names)))+1:]
+                else:
+                    
+
 
                 shift_lower_bounds_fine = positions_fine - 0.1
 
@@ -325,15 +322,13 @@ def grey_spectrum(x, positions,mapping_names,*params):
     k = 0
     current_name = mapping_names[0] # not 0, it must be the first name from second ot third part of the mapping_names
     for i in range(n):
-        # retrieve gamma and A values
-        # Peak position is shared between all peaks
         if mapping_names[i] != current_name:
             k += 1
             current_name = mapping_names[number_unique_substrates + i]
-        if k < number_unique_substrates:
-            y += lorentzian(x, shift + positions[i], gamma[k], A[k])
+        # retrieve gamma and A values
 
-    # stop code from execution
+        # Peak position is shared between all peaks
+        y += lorentzian(x, shift + positions[i], gamma[k], A[k])
     return y
 
 def grey_spectrum_fine_tune(x,positions,mapping_names,*params):
@@ -359,8 +354,7 @@ def grey_spectrum_fine_tune(x,positions,mapping_names,*params):
         if mapping_names[i] != current_name:
             k += 1
             current_name = mapping_names[n_reduced + i]
-        if k < n_reduced:
-            y += lorentzian(x, x0[i], gamma[k], A[k])
+        y += lorentzian(x, x0[i], gamma[k], A[k])
     return y
 
 
