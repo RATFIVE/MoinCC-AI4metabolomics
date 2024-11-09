@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 import math
 import numpy as np
+from scipy import interpolate
+
 
 
 class DataParser:
@@ -318,3 +320,96 @@ class LoadData:
     
 
 # ----------------------------------------------------------
+
+
+def interpolate_to_shape(x_original, y_original, spectrum_lenth=3000):
+    """_summary_
+
+    # Originaldaten
+    y_original = df.iloc[:, 1]
+    x_original = df.iloc[:, 0]
+
+    Args:
+        df (_type_): _description_
+    """
+
+
+    # Neue x-Werte (stellen Sie sicher, dass diese innerhalb des Bereichs von x_original liegen)
+    x_new = np.linspace(x_original.min(), x_original.max(), spectrum_lenth)
+
+    # Interpolierte Daten
+    interpolated_data = interpolate.interp1d(x_original, y_original, kind='linear')(x_new)
+    
+    df = pd.DataFrame({'x': x_new, 'y': interpolated_data})
+    return df
+
+def fill_df(df):
+    """If Data is not ranging from -2 to 10, fill the data with noise
+    
+    """
+    # renmame the columns
+    df.columns = ['x', 'y']
+    x = df.loc[:, 'x']
+    y = df.loc[:, 'y']
+
+
+
+    # Calculate the step size of the x values
+    x_diff = np.diff(x)
+    step = np.mean(x_diff)
+    
+    # Take sample range for the noise
+    x_range_lower = 20
+    x_range_upper = 100
+
+    # get sample data of the noise
+    x_sample = x[x_range_lower:x_range_upper]
+    y_sample = y[x_range_lower:x_range_upper]
+
+    # get the max and min values of the sample data
+    y_min, y_max = y_sample.min(), abs(y_sample.min())
+    x_min, x_max = x_sample.min(), abs(x_sample.min())
+
+    if x_min > -2:
+
+        # create values in n steps
+        x_new = np.arange(-2, x.iloc[0], step)
+        y_new = np.zeros_like(x_new)
+
+        # set the noise level
+        noise = np.random.normal(y_min, y_max, len(x_new))
+        
+        # smooth the noise with gaussian filter
+        # Berechne die Standardabweichung der y-Daten
+        sigma = len(y_new) / 100
+        noise = gaussian_filter1d(input=noise, sigma=sigma)
+
+        # replace y_new with noise
+        y_new = noise
+
+        data = pd.DataFrame({'x': x_new, 'y': y_new})
+        df = pd.concat([data, df], axis=0)
+        df.reset_index(drop=True, inplace=True)
+
+    if x_max < 10:
+    
+        # create values in n steps
+        x_new = np.arange(x.iloc[-1], 10, step)
+        y_new = np.zeros_like(x_new)
+
+        # set the noise level
+        noise = np.random.normal(y_min, y_max, len(x_new))
+
+        # smooth the noise with gaussian filter
+        # Berechne die Standardabweichung der y-Daten
+        sigma = len(y_new) / 100
+        noise = gaussian_filter1d(input=noise, sigma=sigma)
+
+        # replace y_new with noise
+        y_new = noise
+
+        data = pd.DataFrame({'x': x_new, 'y': y_new})
+        df = pd.concat([df, data], axis=0)
+        df.reset_index(drop=True, inplace=True)
+                
+    return df
