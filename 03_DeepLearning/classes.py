@@ -265,13 +265,13 @@ class LoadData:
         
 
         # Ensure substrat_shift is treated as a list
-        if isinstance(substrat_shift, (float, np.float64)):
+        if isinstance(substrat_shift, (float)):
             substrat_shift = [substrat_shift]
         else:
             substrat_shift = [clean_list(x) for x in substrat_shift.strip().split(',')]
         
         # Ensure substrat_water is treated as a list
-        if isinstance(substrat_water, (float, np.float64)):
+        if isinstance(substrat_water, (float)):
             substrat_water = [substrat_water]
         else:
             substrat_water = [clean_list(x) for x in list(substrat_water)]
