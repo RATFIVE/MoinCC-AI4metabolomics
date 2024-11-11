@@ -121,6 +121,7 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
         # Save the plot
         plt.savefig(f'{output_direc}/{file_name}_{i}.pdf')
         plt.close()
+        sys.exit()
 
 
 
@@ -212,7 +213,7 @@ def main():
 
         fit_params = np.zeros((df.shape[1], 3*len(positions)))
         #fit_params = np.zeros((df.shape[1], number_peaks * 3))
-        for i in range(1,df.shape[1]):
+        for i in range(1,2):
             try:
                 print(f'Fitting column {i/df.shape[1]*100:.2f}%')
                 # perform fitting
@@ -226,14 +227,14 @@ def main():
                 positions_fine = popt[0] + positions # das passt so, müsste immer noch funktionieren
                 widths = popt[1:len(list(set(names)))+1] # das muss angepasst werden
                 amplitudes = popt[len(list(set(names)))+1:]
-                # print('Fine tuning...')
-                # print('---------------------------------')
-                # print('Initial parameters:', popt)
-                # print('Positions:', positions_fine)
-                # print('Widths:', widths)
-                # print('Amplitudes:', amplitudes)
-                # print('Init Guess: ', np.concatenate([positions_fine, widths, amplitudes]))
-                # print('---------------------------------')
+                print('Fine tuning...')
+                print('---------------------------------')
+                print('Initial parameters:', popt)
+                print('Positions:', positions_fine)
+                print('Widths:', widths)
+                print('Amplitudes:', amplitudes)
+                print('Init Guess: ', np.concatenate([positions_fine, widths, amplitudes]))
+                print('---------------------------------')
 
                 shift_lower_bounds_fine = positions_fine - 0.1
 
