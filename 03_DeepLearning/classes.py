@@ -166,7 +166,7 @@ class PeakFinder:
         """
         # Finde Peaks in y 
         tresh = self.threshold(y)
-        tresh = 0
+        #tresh = 0
         peaks, prob = find_peaks(y, height=tresh)
         return peaks, prob, tresh
     
