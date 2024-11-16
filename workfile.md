@@ -76,7 +76,8 @@
   (- what is a healthy spectrum?? not labeling peaks but abnormalities)
 
 
-
+## New questions:
+- if every frame is normalized to water= 4.7 can there still be a shift of the peaks (>0.05)
 
 
 ---
