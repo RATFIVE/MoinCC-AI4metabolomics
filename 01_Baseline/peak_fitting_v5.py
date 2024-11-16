@@ -36,9 +36,7 @@ def extract_ppm_all(meta_df, file_name):
     positions = []
     names = []
 
-    # added substrat like acetone ppm
-    print(meta_df['Substrate_chemical shift (ppm)'])
-    react_substrat = str(meta_df['Substrate_chemical shift (ppm)'].iloc[0]).split(',')
+    react_substrat = str(meta_df['Substrate_ppm'].iloc[0]).split(',')
     for i in range(len(react_substrat)):
         names.append('ReacSubs')
         positions.append(float(react_substrat[i]))
@@ -54,11 +52,9 @@ def extract_ppm_all(meta_df, file_name):
             positions.append(float(react_metabolite[j]))
 
     # water ppm
-    positions.append(float(meta_df['Water_chemical shift (ppm)'].iloc[0]))
+    positions.append(float(meta_df['Water_ppm'].iloc[0]))
     names.append('Water')
 
-    print(positions)
-    print(names)
     return positions, names
 
 
@@ -105,38 +101,32 @@ def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_pa
             gamma = fit_params[i, len(positions) + j]
             A = fit_params[i, 2*len(positions) + j]
 
-            # print('---------------------------------')
-            # print('Shift:', shift)
-            # print('Gamma:', gamma)
-            # print('A:', A)
-            # print('---------------------------------')
-
             # Plot the individual Lorentzian for this peak
             plt.plot(x, lorentzian(x, shift, gamma, A), linestyle='--', color=colors[j % len(colors)], label=f'Peak {names[j]}')
 
-        #no also plot each individual
         # Add legend to avoid repetition
         plt.legend()
 
         # Save the plot
         plt.savefig(f'{output_direc}/{file_name}_{i}.pdf')
         plt.close()
-        sys.exit()
 
 
 
 def main():
     file_names  = get_file_names()
-    file_names = containing_string(file_names, 'Fumarate', 'ser')
+    file_names = containing_string(file_names, 'Gluc-d2', 'ser')
     for file_name in file_names:
         print(f'Processing {file_name}')
-        df = pd.read_csv(f'../Data/{ file_name}')
+        df = pd.read_csv(f'../Data/{file_name}')
         # meta path independet of the OS
-        meta_path = Path('..', 'Data', 'Data_description.xlsx')
+        meta_path = Path('..', 'Data', 'Data_description_main.xlsx')
         # meta_path = '../Data/Data_description.xlsx'
         meta_df = pd.read_excel(meta_path)
         # extract ppm lines and names
         positions, names = extract_ppm_all(meta_df, file_name)
+        print('Positions:', positions)
+        print('Names:', names)
         if len(positions) == 0:
             print(f'No ppm values found for {file_name}')
             continue
@@ -166,8 +156,7 @@ def main():
         upper = np.concatenate([shift_upper_bounds, width_upper_bounds, amplitude_upper_bounds])
         flattened_bounds = (lower, upper)
 
-        # shift lower bounds fine-tune
-        print('Positions:', positions)
+
         shift_lower_bounds_fine = np.array(positions) - 0.1
 
         # shift upper bounds fine-tune
@@ -190,6 +179,7 @@ def main():
         names_modified = deepcopy(names)
         #               positions           widths              amplitudes
         mapping_names = deepcopy(names) + list(dict.fromkeys(names)) + list(dict.fromkeys(names))
+        print('Mapping names: ', mapping_names) # need to have the same order as the parameters?
         # print('---------------------------------')  
         # print('Names:', names)
         # print('Mapping names:', mapping_names)
@@ -213,7 +203,7 @@ def main():
 
         fit_params = np.zeros((df.shape[1], 3*len(positions)))
         #fit_params = np.zeros((df.shape[1], number_peaks * 3))
-        for i in range(1,2):
+        for i in range(1,df.shape[1]):
             try:
                 print(f'Fitting column {i/df.shape[1]*100:.2f}%')
                 # perform fitting
@@ -227,14 +217,6 @@ def main():
                 positions_fine = popt[0] + positions # das passt so, müsste immer noch funktionieren
                 widths = popt[1:len(list(set(names)))+1] # das muss angepasst werden
                 amplitudes = popt[len(list(set(names)))+1:]
-                print('Fine tuning...')
-                print('---------------------------------')
-                print('Initial parameters:', popt)
-                print('Positions:', positions_fine)
-                print('Widths:', widths)
-                print('Amplitudes:', amplitudes)
-                print('Init Guess: ', np.concatenate([positions_fine, widths, amplitudes]))
-                print('---------------------------------')
 
                 shift_lower_bounds_fine = positions_fine - 0.1
 
@@ -248,7 +230,10 @@ def main():
                 flattened_bounds_fine = (lower_fine, upper_fine)
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: grey_spectrum_fine_tune(x, np.array(positions), np.array(mapping_names), *params),
-                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds= flattened_bounds_fine, ftol=1e-3, xtol=1e-3)
+                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds= flattened_bounds_fine, ftol=1e-5, xtol=1e-5)
+                
+                widths = popt[4:4+len(set(names))]
+                amplitudes = popt[4+len(set(names)):]
                 y_fits[:,i-1] = grey_spectrum_fine_tune(x,np.array(positions), np.array(mapping_names), *popt)
                 # parameter verbreitern, damit wieder len(position) positionen, breiten und höhen rauskommen
                 exp_pots = popt[:nr_ppm_pos]
@@ -260,28 +245,12 @@ def main():
                     if name != dummy:
                         k += 1
                         dummy = name
-                    # print('---------------------------------')
-                    # print('name', name)
-                    # print('dummy', dummy)
-                    # print('k', k)
-                    # print('Popt:', popt)
-                    # print('length positions', nr_ppm_pos)
-
-                    # print('length widths', nr_ppm_pos + len(set(names)) + k)
-                    # print('length amplitudes', nr_ppm_pos + len(set(names)) + k)
-                    # print('---------------------------------')
                     widths_final.append(popt[nr_ppm_pos + k])
                     amplitudes_final.append(popt[nr_ppm_pos + len(set(names)) + k])
+                
                 popt = np.concatenate([exp_pots, widths_final, amplitudes_final])
-#                print('Popt:', popt)
                 fit_params[i-1] = popt
-                    
-                # print('---------------------------------')
-                # print('fit_params:', fit_params[i-1])
-                # print('Popt: ',popt)
-                # fit_params[i-1] = popt
-                # print('---------------------------------')
-        
+
 
             except Exception:
                 # what is the error
@@ -289,9 +258,9 @@ def main():
                 traceback.print_exc()
                 print('Fitting failed.')
                 continue
+
         output_direc = f'output/5th_fit/{file_name}_output'
         plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
-        # stop
 
 
 def lorentzian(x, shift, gamma, A):
@@ -315,12 +284,6 @@ def grey_spectrum(x, positions,mapping_names,*params):
     A = params[number_unique_substrates+1:]             # Extract n A values
     n = len(positions)
 
-    # print('Mapping names:', mapping_names)
-    # print('Params:', params)
-    # print('Shift:', shift)
-    # print('Number unique substrates:', number_unique_substrates)
-    # print('Gamma:', gamma)
-    # print('A:', A)
 
     y = np.zeros(len(x))
     k = 0
@@ -330,7 +293,7 @@ def grey_spectrum(x, positions,mapping_names,*params):
         # Peak position is shared between all peaks
         if mapping_names[i] != current_name:
             k += 1
-            current_name = mapping_names[number_unique_substrates + i]
+            current_name = mapping_names[i]
         if k < number_unique_substrates:
             y += lorentzian(x, shift + positions[i], gamma[k], A[k])
 
@@ -359,7 +322,7 @@ def grey_spectrum_fine_tune(x,positions,mapping_names,*params):
     for i in range(n):
         if mapping_names[i] != current_name:
             k += 1
-            current_name = mapping_names[n_reduced + i]
+            current_name = mapping_names[i]
         if k < n_reduced:
             y += lorentzian(x, x0[i], gamma[k], A[k])
     return y
