@@ -41,7 +41,6 @@ def extract_ppm_all(meta_df, file_name):
         names.append('ReacSubs')
         positions.append(float(react_substrat[i]))
   
-    # add metabolite 1
     for i in range(1, 6):
         react_metabolite = str(meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
         if react_metabolite == ['nan']:
@@ -164,7 +163,7 @@ def main():
         flattened_bounds, flattened_bounds_fine = make_bounds(positions, names)
 
         number_peaks = len(positions)
-        y_fits = np.zeros((df.shape[0], df.shape[1]))
+        y_fits = np.zeros((df.shape[0], df.shape[1] - 1))
         # width and amplitude are shared for each metabolite peak, 
         # number of peaks for each metabolite extracting from the names file
         nr_ppm_pos = len(positions)
@@ -193,12 +192,13 @@ def main():
         nr_amplitudes_pos -= number_peaks + 1
         first_fit = True
 
-        fit_params = np.zeros((df.shape[1], 3*len(positions)))
+        fit_params = np.zeros((df.shape[1] - 1, 3*len(positions)))
 
         ############################
         # Fitting each frame       #
         ############################
-        for i in range(df.shape[1]):
+        print('Number of frames: ', df.shape[1])
+        for i in range(1,df.shape[1]):
             try: # try in case some data can not be fitted
                 print(f'Fitting column {i/df.shape[1]*100:.2f}%')
                 x = df.iloc[:,0]
@@ -228,13 +228,14 @@ def main():
                 # amplitude upper bounds
                 amplitude_upper_bounds = np.full(n_positions_reduced, np.inf)
 
-                lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
-                upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
+                if first_fit:
+                    lower_fine = np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds])
+                    upper_fine = np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds])
+                    flattened_bounds_fine = (lower_fine, upper_fine)
 
-                flattened_bounds_fine = (lower_fine, upper_fine)
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: grey_spectrum_fine_tune(x, np.array(positions), np.array(mapping_names), *params),
-                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds= flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
+                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-5, xtol=1e-5)
 
                 positions_fine = popt[:len(names)]
                 widths = popt[len(names):2*len(names)]
@@ -256,8 +257,6 @@ def main():
                 
                 popt = np.concatenate([exp_pots, widths_final, amplitudes_final])
                 fit_params[i-1] = popt
-            
-
 
             except Exception:
                 # what is the error
@@ -270,6 +269,16 @@ def main():
         plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
         #plot_single_difference(x, y_fits, positions, names, file_name, df, output_direc, fit_params)
         plot_time_dependce(fit_params, file_name, output_direc, names)
+        save_deep_learning_data(fit_params, names,positions,output_direc, file_name)
+
+def save_deep_learning_data(fit_params, names, positions, output_direc, file_name):
+    column_names = [f'{name}_pos_{pos}' for name, pos in zip(names, positions)] + [f'{name}_width_{pos}' for name, pos in zip(names, positions)] + [f'{name}_amp_{pos}' for name, pos in zip(names, positions)]
+    df_results = pd.DataFrame(fit_params, columns=column_names)
+
+    output_direc = '/'.join(output_direc.split('/')[:-1]) + '/fit_params/'
+    os.makedirs(output_direc, exist_ok=True)
+    df_results.to_json(f'{output_direc}{file_name}.json')
+
 
 def plot_single_difference(x, y_fits, positions, names, file_name, df, output_direc, fit_params):
     # plot the difference between the fit and the data
@@ -282,7 +291,6 @@ def plot_single_difference(x, y_fits, positions, names, file_name, df, output_di
         plt.legend()
         plt.savefig(f'{output_direc}/{file_name}_{i}_difference.png')
         plt.close()
-    
 
 def plot_time_dependce(fit_params, file_name, output_direc, names):
     # fit_paras is a 2d array, where the first dimension is the time and the second dimension is the fit parameters
