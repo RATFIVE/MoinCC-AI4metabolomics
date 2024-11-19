@@ -236,6 +236,7 @@ class LoadData:
         #display(data_description)
         return data_description
 
+
     def get_substrate_list(self, file: str):
         """
         Retrieves substrate information related to the specified file.
