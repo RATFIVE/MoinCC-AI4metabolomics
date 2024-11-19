@@ -28,3 +28,45 @@ The goal of this project is to create an application which automatically maps me
 13.12 MoinCC Projektabgabe mit Präsi
 19.12 Präsi FH
 22.12 Deadline Abgabe Dokument
+
+
+Fitting Outputs:
+**app/**
+- **README.md**  
+  | Documentation for the application.
+
+- **app.py**  
+  | Main script to run the application.
+
+- **.config**  
+  | Configuration file for application settings.
+
+- **curve_fitting.py**  
+  | Script handling the curve fitting algorithms.
+
+- **DataLoader.py**  
+  | Script for loading and processing data.
+
+- **output_dir/**  
+  | Directory containing all output results.
+
+  - **File_Name/** (A directory for each processed file)
+    |-- **fitted_spectra/**
+    |   |-- `file_name_1.csv`
+    |   |-- `file_name_2.csv`
+    |   |-- ...
+    |
+    |-- **difference_spectra/**
+    |   |-- `file_name_1.csv`
+    |   |-- `file_name_2.csv`
+    |   |-- ...
+    |
+    |-- **individual_curves/**
+    |   |-- `file_name_1.csv`
+    |
+    |-- `contour.csv`
+    |
+    |-- `file_spectra_params.csv`
+    |
+    |-- `fitted_spectra_params_error.csv`
+

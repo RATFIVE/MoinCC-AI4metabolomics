@@ -320,7 +320,7 @@ def unpack_params_errors(n_unique_peaks, number_peaks, names, popt, pcov):
 def main():
     
     file_names  = get_file_names()
-    file_names = containing_string(file_names, 'Nicotinamide') # debuging
+    #file_names = containing_string(file_names, 'Nicotinamide') # debuging
     for file_name in file_names:
         print(f'Processing {file_name}')
 
@@ -375,7 +375,7 @@ def main():
             
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: grey_spectrum_fine_tune(x, np.array(positions), np.array(mapping_names), *params),
-                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-3, xtol=1e-3)
+                                        x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
 
                 positions_fine = popt[:number_peaks]
                 widths = popt[number_peaks:number_peaks + n_unique_peaks]
