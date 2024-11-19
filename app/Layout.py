@@ -100,19 +100,35 @@ class StreamlitApp():
     def header(self):
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+        with col1:
+            st.divider()
+
         with col2:
             st.file_uploader("Upload the Metabolite Spectrum CSV")
+
+        with col3:
+            st.divider()
+            if st.button("Start Processing"):
+                st.session_state["processing_started"] = True
         main, about = st.tabs(['Main Page', 'About'])
-        self.main_page(main)
+
+        # Dynamically run main_page only if the button is clicked
+        if st.session_state.get("processing_started", False):
+            self.main_page(main)
         self.about_page(about)
-    
+        
     def main_page(self, main):
         with main:
-            self.panel1()
-            self.panel2()
-            self.panel3()
-            self.panel4()
-            self.panel5()
+            st.markdown("### Main Page Content")
+            # Show panels only if processing is started
+            if st.session_state.get("processing_started", False):
+                self.panel1()
+                self.panel2()
+                self.panel3()
+                self.panel4()
+                self.panel5()
+            else:
+                st.info("Click 'Start Processing' to see the analysis panels.")
         return None
 
     def about_page(self, about):
