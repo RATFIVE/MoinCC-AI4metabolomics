@@ -33,11 +33,9 @@ class StreamlitApp():
             2. ...
             3. ...
 
-            """
-                            )
-
-        
-
+            """)
+    
+                        
     def header(self):
         st.markdown(
             """
@@ -46,32 +44,24 @@ class StreamlitApp():
         )
         st.file_uploader("Upload a the Metabolite Spectrum CSV")
 
-    def columns(self):
-        col1, col2 = st.columns([2, 3])
-        
-        with col1:
-            st.markdown(f"""
-        ## Figure 
-        This plot shows {lorem.paragraph()}
-                        """)
-            
-        with col2:
-            #st.plotly_chart(self.fig1)
-            st.image(str(self.fig1), caption="Image", use_column_width=True)
-        
-        st.markdown(f"""
-                    ## Full Spectrum
+        main, about = st.tabs(['Main Page', 'About'])
 
-                    This Plot shows {lorem.paragraph()}
-                    """)
-        st.plotly_chart(self.fig2)
+        with main:
+            st.markdown('# Main')
+
+        with about:
+            st.markdown('# About')
+
+    
+        
+        
 
 
 
     def run(self):
         self.side_bar()
         self.header()
-        self.columns()
+        
 
 
 # ----------------------------------------------------------------------------------------------------
