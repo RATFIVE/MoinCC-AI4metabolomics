@@ -10,6 +10,7 @@ from pathlib import Path
 from PIL import Image
 import lorem
 from LoadData import *
+from panel3_contour_plot import *
 
 
 
@@ -20,6 +21,53 @@ loaddata = LoadData()
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
 class StreamlitApp():
+    """
+    A Streamlit-based application for visualizing and analyzing metabolite spectra and kinetics.
+
+    This application provides a user-friendly interface for uploading CSV files, visualizing
+    plots such as substrate plots, kinetic plots, contour plots, and reference plots, and 
+    navigating between panels for different types of analyses.
+
+    Attributes:
+        fig1 (str or plotly.graph_objects.Figure): Spectrum plot or its file path.
+        fig2 (str or plotly.graph_objects.Figure): Kinetic plot or its file path.
+        fig3 (str or plotly.graph_objects.Figure): Contour plot or its file path.
+        fig4 (str or plotly.graph_objects.Figure): Reference plot or its file path.
+        fig5 (str or plotly.graph_objects.Figure): Additional plot or its file path.
+    
+    Methods:
+        side_bar():
+            Creates a sidebar in the Streamlit app with instructions for usage.
+        
+        header():
+            Displays the application header and file uploader, and initializes navigation tabs.
+
+        main_page(main):
+            Manages the main content of the application, displaying different panels for analysis.
+
+        about_page(about):
+            Displays the "About" section of the application with descriptive text.
+
+        panel1():
+            Displays the content for Panel 1, focusing on the substrate plot.
+
+        panel2():
+            Displays the content for Panel 2, focusing on the kinetic plot.
+
+        panel3():
+            Displays the content for Panel 3, allowing for further exploration.
+
+        panel4():
+            Displays the content for Panel 4, offering additional visualizations or data.
+
+        panel5():
+            Displays the content for Panel 5, for extended analysis or reference.
+
+        run():
+            Executes the Streamlit application, starting from the header and displaying all panels.
+    """
+
+
 
     def __init__(self, 
                  fig1=None, 
@@ -83,20 +131,24 @@ class StreamlitApp():
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
             st.write("Content for Panel 1.")
+
         return None
 
     def panel2(self):
+        """ Kinetic Plot"""
         
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
             st.markdown('# Kinetic Plot')
-            st.image(self.fig1, caption="Your Image Caption", use_column_width=True)
+            st.image(self.fig2, caption="Your Image Caption", use_column_width=True)
 
         return None
 
     def panel3(self):
-        
+        """Contour Plot"""
         with st.expander("Panel 3 - Kinetic Plot", expanded=True):
             st.markdown('# Panel 3')
+            st.slider
+            st.plotly_chart(self.fig3)
             
         return None
     
@@ -104,6 +156,7 @@ class StreamlitApp():
         
         with st.expander("Panel 4", expanded=True):
             st.markdown('# Panel 4')
+
         return None
     
     def panel5(self):
@@ -138,10 +191,13 @@ if __name__ == '__main__':
     df = pd.read_csv(df_list[0])
     
 
-    example_image_path = str(Path(r'/Users/marco/Documents/MoinCC-AI4metabolomics/05_Streamlit/example/FA_20240228_2H_yeast_fumarate-d2_4.csv_output/FA_20240228_2H_yeast_fumarate-d2_4.csv_time_dependence.png'))
+   # example_image_path = str(Path(r'/Users/marco/Documents/MoinCC-AI4metabolomics/05_Streamlit/example/FA_20240228_2H_yeast_fumarate-d2_4.csv_output/FA_20240228_2H_yeast_fumarate-d2_4.csv_time_dependence.png'))
     
+    fig3 = ContourPlot(df=df)
+    fig3 = fig3.plot()
     # Run Streamlit App
-    app = StreamlitApp(fig1=example_image_path)
+    app = StreamlitApp(
+                       fig3=fig3)
     app.run()
 
 
