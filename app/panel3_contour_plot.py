@@ -21,12 +21,13 @@ class ContourPlot():
     def range(self):
         df_z = self.df.iloc[:, 1:]
          # Slider to select z-value range
-        z_min, z_max = st.slider(
-            "Select the range of values to display in the contour plot",
-            min_value=df_z.min().min(),  # Minimum value in the data
-            max_value=df_z.max().max(),  # Maximum value in the data
-            value=(df_z.min().min(), df_z.max().max())  # Default range
-            )
+        # z_min, z_max = st.slider(
+        #     "Select the range of values to display in the contour plot",
+        #     min_value=df_z.min().min(),  # Minimum value in the data
+        #     max_value=df_z.max().max(),  # Maximum value in the data
+        #     value=(df_z.min().min(), df_z.max().max())  # Default range
+        #     )
+        z_min, z_max = 10, 10
         
         return z_min, z_max
     #
