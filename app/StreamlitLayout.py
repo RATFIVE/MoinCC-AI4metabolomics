@@ -9,13 +9,13 @@ import psutil  # For checking running processes
 from pathlib import Path
 from PIL import Image
 import lorem
-from classes import *
-from example_pic import plot_picture
+from LoadData import *
+
 
 
 loaddata = LoadData()
 
-peakfinder = PeakFinder()
+
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
@@ -136,12 +136,12 @@ if __name__ == '__main__':
     metabolites = loaddata.get_metabolite_list(file)
     df_list = loaddata.load_data(file)
     df = pd.read_csv(df_list[0])
-    fig2 = plot_picture(df=df)
+    
 
     example_image_path = str(Path(r'/Users/marco/Documents/MoinCC-AI4metabolomics/05_Streamlit/example/FA_20240228_2H_yeast_fumarate-d2_4.csv_output/FA_20240228_2H_yeast_fumarate-d2_4.csv_time_dependence.png'))
     
     # Run Streamlit App
-    app = StreamlitApp(fig1=example_image_path, fig2=fig2)
+    app = StreamlitApp(fig1=example_image_path)
     app.run()
 
 
