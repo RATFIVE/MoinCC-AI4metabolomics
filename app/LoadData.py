@@ -20,7 +20,7 @@ class LoadData:
         """
         pass
 
-    def load_data(self, endswith:str):
+    def load_data_list(self, endswith:str):
         """
         Loads all files from the 'Data' directory that have the specified file extension.
 
@@ -149,3 +149,10 @@ class LoadData:
         
         return metabolites
     
+
+if __name__ == '__main__':
+
+    loaddata = LoadData()
+
+    df_list = loaddata.load_data_list('FA_20231123_2H Yeast_Fumarate-d2_12 .csv')
+    df = pd.read_csv(df_list[0])
