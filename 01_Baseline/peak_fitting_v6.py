@@ -84,122 +84,6 @@ def extract_ppm_all(meta_df, file_name):
 
     return positions, names
 
-
-def plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params, fit_params_error, time_points):
-    '''
-    Plot the fitted data and the original data for each frame. The peaks are also plotted.
-
-    Args:
-        x: x values
-        y_fits: fitted data
-        positions: positions of the peaks, position and names have the same order and length. positions are corresponding to each other.
-        names: names of the peaks, e.g. Metab1, Metab2, ...
-        file_name: name of the file
-        df: dataframe of the file
-        output_direc: output directory
-        fit_params: fitted parameters
-
-    Returns:
-        None
-    '''
-    # create output directory if it does not exist
-    if not os.path.exists(output_direc):
-        os.makedirs(output_direc)
-
-    # plot the fitted data and the original data for each frame
-    for i in range(y_fits.shape[1] - 1):
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y_fits[:, i], label='Fit') # plot the fitted data
-        plt.plot(df.iloc[:, 0], df.iloc[:, i + 1], label='Data')
-        
-        plt.xlabel('Chemical Shift (ppm)')
-        plt.ylabel('Intensity')
-        plt.title(f'NMR Spectrum of {file_name} at {time_points[i]}s')
-        
-        colors = [
-            (1.0, 0.0, 0.0),  # Red
-            (0.0, 1.0, 0.0),  # Green
-            (0.0, 0.0, 1.0),  # Blue
-            (1.0, 1.0, 0.0),  # Yellow
-            (1.0, 0.0, 1.0),  # Magenta
-            (0.0, 1.0, 1.0),  # Cyan
-            (0.5, 0.0, 0.5),  # Purple
-            (0.5, 0.5, 0.0),  # Olive
-            (0.0, 0.5, 0.5),  # Teal
-            (0.5, 0.5, 0.5),  # Gray
-            (0.75, 0.25, 0.0),  # Brown
-            (0.25, 0.75, 0.0),  # Lime Green
-            (0.0, 0.25, 0.75),  # Deep Blue
-            (0.75, 0.0, 0.25),  # Deep Red
-            (0.25, 0.0, 0.75)   # Indigo
-        ]
-
-        # Add vertical lines for the ppm and plot the individual Lorentzians
-        for j in range(len(positions)):
-            # Add vertical lines for ppm positions
-            #plt.axvline(x=positions[j], linestyle='--', color=colors[j % len(colors)], label=names[j])
-            # Extract fitted parameters for this peak
-
-            shift = fit_params[i, j]
-            gamma = fit_params[i, len(positions) + j]
-            A = fit_params[i, 2*len(positions) + j]
-
-
-
-
-            # write fit params also in the plot
-            pos = fit_params[i, j]
-            width = fit_params[i, len(positions) + j]
-            amplitude = fit_params[i, 2*len(positions) + j]
-            pos_error = fit_params_error[i, j]
-            width_error = fit_params_error[i, len(positions) + j]
-            amplitude_error = fit_params_error[i, 2*len(positions) + j]
-
-            # Add label to the plot, not used, because of too many labels
-            label = (f"{names[j]}:"
-                    f"$\\mathrm{{Center}} = {pos:.2f} \\pm {pos_error:.2f}$\n"
-                    f"$\\gamma = {width:.2f} \\pm {width_error:.2f}$\n"
-                    f"$A = {amplitude:.2f} \\pm {amplitude_error:.2f}$")
-
-            # Plot the individual Lorentzian for this peak
-            plt.plot(x, lorentzian(x, shift, gamma, A), linestyle='--', color=colors[j % len(colors)], label=f'{names[j]}')
-        # Add legend to avoid repetition
-        plt.legend()
-        plt.grid()
-        # Save the plot
-        plt.savefig(f'{output_direc}/{file_name}_{time_points[i]}s.png')
-        # get x and y limits
-        x_lim = plt.xlim()
-        y_lim = plt.ylim()
-        plt.close()
-
-        # also plot the difference between the fit and the data, use
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y_fits[:, i] - df.iloc[:, i + 1], label='Difference')
-        plt.xlabel('Chemical Shift (ppm)')
-        plt.ylabel('Intensity')
-        plt.title(f'Difference between fit and data of {file_name} at {time_points[i]}s')
-        plt.grid()
-        plt.legend()
-        # set x and y limits
-        plt.xlim(x_lim)
-        plt.ylim(y_lim)
-        plt.savefig(f'{output_direc}/{file_name}_{time_points[i]}s_difference.png')
-        plt.close()
-
-        # plot only fit
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y_fits[:, i], label='Fit') # plot the fitted data
-        plt.xlabel('Chemical Shift (ppm)')
-        plt.ylabel('Intensity')
-        plt.title(f'NMR Spectrum of {file_name} at {time_points[i]}s')
-        plt.grid()
-        plt.legend()
-        plt.savefig(f'{output_direc}/{file_name}_{time_points[i]}s_fit.png')
-        plt.close()
-    
-
-
 def make_bounds(positions, names, mode, positions_fine = None):
     if mode == 'first':
         # Assume positions is already defined
@@ -229,9 +113,9 @@ def make_bounds(positions, names, mode, positions_fine = None):
         return flattened_bounds
     
     elif mode == 'fine':
-        shift_lower_bounds_fine = positions_fine - 0.15
+        shift_lower_bounds_fine = positions_fine - 0.05
         # shift upper bounds fine-tun
-        shift_upper_bounds_fine = positions_fine + 0.15
+        shift_upper_bounds_fine = positions_fine + 0.05
         n_positions_reduced = len(set(names))
         width_lower_bounds = np.full(n_positions_reduced, 0)
         # width upper bounds
@@ -318,9 +202,8 @@ def unpack_params_errors(n_unique_peaks, number_peaks, names, popt, pcov):
     return np.concatenate([popt[:number_peaks], widths_final, amplitudes_final]), np.concatenate([error[:number_peaks], widths_final_error, amplitudes_final_error])
 
 def main():
-    
     file_names  = get_file_names()
-    #file_names = containing_string(file_names, 'Nicotinamide') # debuging
+    file_names = containing_string(file_names, 'Nicotinamide') # debuging
     for file_name in file_names:
         print(f'Processing {file_name}')
 
@@ -329,12 +212,14 @@ def main():
         meta_df = get_meta_data(Path('..', 'Data', 'Data_description_main.xlsx'))
         positions, names = extract_ppm_all(meta_df, file_name)
 
-        time_points = np.arange(0, df.shape[1] - 1) * meta_df[meta_df['File'] == file_name]['TRtotal[s]'].iloc[0]
+        #time_points = np.arange(0, df.shape[1] - 1) * meta_df[meta_df['File'] == file_name]['TRtotal[s]'].iloc[0]
+        time_points = np.arange(0, df.shape[1] - 1) 
         fit_params = np.zeros((df.shape[1] - 1, 3*len(positions)))
         fit_params_error = np.zeros((df.shape[1] - 1, 3*len(positions)))
         y_fits = np.zeros((df.shape[0], df.shape[1] - 1))
 
-        output_direc = f'output/6th_fit/{file_name}_output'
+        output_direc = 'output_dir' + f'/{file_name}_output/'
+        os.makedirs(output_direc, exist_ok=True)
 
         if len(positions) == 0:
             print(f'No ppm values found for {file_name}')
@@ -386,39 +271,73 @@ def main():
 
                 # unpack the parameters and errors
                 fit_params[i-1], fit_params_error[i-1] = unpack_params_errors(n_unique_peaks, number_peaks, names, popt, pcov)
+                
 
             except RuntimeError:
                 print(f'Could not fit time frame number {i}. Skipping...')
+            # save fit parameters to json
 
-        plot_single(x, y_fits, positions, names, file_name, df, output_direc, fit_params, fit_params_error, time_points)
-        plot_time_dependence(fit_params, file_name, output_direc, names, fit_params_error, time_points)
+        df_fit_params, fit_params_error_df = save_fit_params(fit_params, fit_params_error, names, positions, output_direc)
+        save_y_fits(x, y_fits, file_name, output_direc)
+        save_individual_fits(x, df_fit_params, names, positions,output_direc)
+        save_difference_spectra(x, y_fits, df, output_direc)
+        save_integrate_peaks(fit_params, names, fit_params_error, output_direc)
+        sys.exit()
 
-def plot_time_dependence(fit_params, file_name, output_direc, names, fit_params_error, time_points):
-    """
-    Plot the intensity of the peaks over time.
 
-    Args:
-        fit_params: fitted parameters
-        file_name: name of the file
-        output_direc: output directory
-        names: list of all names
-        fit_params_error: errors of the fitted parameters
-        time_points: time points
-    """
-    df_integrated, df_integrated_error = integrate_peaks(fit_params, names, fit_params_error)
-    plt.figure(figsize=(10, 6))
-    # iterate over columns 
-    for col_name in df_integrated.columns:
-        plt.errorbar(time_points,df_integrated[col_name], label=col_name, yerr=df_integrated_error[col_name])
-    plt.xlabel('Time in s')
-    plt.ylabel('Intensity')
-    plt.grid()
-    plt.title(f'Intensity of peaks over time of {file_name}')
-    plt.tight_layout()
-    plt.legend()
-    plt.savefig(f'{output_direc}/{file_name}_time_dependence.png')
+def save_difference_spectra(x, y_fits, df, output_direc):
+    df_differences = pd.DataFrame({'x': x})
+    # Collect differences in a dictionary
+    differences = {str(i): y_fits[:, i] - df.iloc[:, i + 1] for i in range(df.shape[1] - 1)}
 
-def integrate_peaks(fit_params, names, fit_params_error):
+    # Convert dictionary to DataFrame and concatenate with df_differences
+    new_columns = pd.DataFrame(differences)
+
+    # Efficiently combine with existing DataFrame
+    df_differences = pd.concat([df_differences, new_columns], axis=1)
+
+    df_differences.set_index('x', inplace=True)
+
+    df_differences.to_csv(f'{output_direc}difference_spectra.csv')
+
+def save_individual_fits(x, df_fit_params, names, positions, output_direc):
+    output_direc = output_direc + 'individual_fits/'
+    os.makedirs(output_direc, exist_ok=True)
+    for i_file in range(df_fit_params.shape[0]):
+        df_individual_fits = pd.DataFrame({'x': x})
+        df_individual_fits.set_index('x', inplace=True)
+        # get for each substrate the position, width and amplitude
+        for i, name in enumerate(names):
+            shift = df_fit_params[f'{name}_pos_{positions[i]}'].iloc[i_file]
+            gamma = df_fit_params[f'{name}_width_{positions[i]}'].iloc[i_file]
+            A = df_fit_params[f'{name}_amp_{positions[i]}'].iloc[i_file]
+            fit = lorentzian(x, shift, gamma, A)
+            df_individual_fits[f'{name}_{positions[i]}'] = np.array(fit)
+        df_individual_fits.to_csv(f'{output_direc}individual_fit_{i_file}.csv')
+
+
+def save_y_fits(x, y_fits, file_name, output_direc):
+    os.makedirs(output_direc, exist_ok=True)
+    fits_df = pd.DataFrame(y_fits, columns=[f'fit_{i}' for i in range(y_fits.shape[1] )])
+    fits_df['x'] = x
+    fits_df.set_index('x', inplace=True)
+    fits_df.to_csv(f'{output_direc}{file_name}_fitted_spectra.csv')
+
+def save_fit_params(fit_params, fit_params_error, names, positions, output_direc):
+    column_names = [f'{name}_pos_{pos}' for name, pos in zip(names, positions)] + [f'{name}_width_{pos}' for name, pos in zip(names, positions)] + [f'{name}_amp_{pos}' for name, pos in zip(names, positions)]
+    fit_params_df = pd.DataFrame(fit_params, columns=column_names)
+    fit_params_df['Time'] = np.arange(fit_params.shape[0])
+    fit_params_df.set_index('Time', inplace=True)
+    fit_params_error_df = pd.DataFrame(fit_params_error, columns=column_names)
+    fit_params_error_df['Time'] = np.arange(fit_params.shape[0])
+    fit_params_error_df.set_index('Time', inplace=True)
+    os.makedirs(output_direc, exist_ok=True)
+    fit_params_df.to_csv(f'{output_direc}/fit_params.csv')
+    fit_params_error_df.to_csv(f'{output_direc}/fit_params_error.csv')
+    return fit_params_df, fit_params_error_df
+
+
+def save_integrate_peaks(fit_params, names, fit_params_error, output_direc):
     """
     Integrate the peaks over time. The integral of the peak is the peak height. Multiple peaks of the same substance are summed up.
 
@@ -437,7 +356,6 @@ def integrate_peaks(fit_params, names, fit_params_error):
     already_integrated = []
     for name in list(set(names)):
         mask = np.array(names) == name
-        print(mask)
         if name not in already_integrated:
             for i in range(fit_params.shape[0]):
                 integrated_values[i, list(set(names)).index(name)] = np.sum(fit_params[i][2*len(names):][mask])
@@ -445,8 +363,13 @@ def integrate_peaks(fit_params, names, fit_params_error):
         already_integrated.append(name)
 
     df_integrated = pd.DataFrame(integrated_values, columns=list(set(names)))
+    df_integrated['Time'] = np.arange(fit_params.shape[0])
+    df_integrated.set_index('Time', inplace=True)
     df_integrated_error = pd.DataFrame(integrated_values_error, columns=list(set(names)))
-    return df_integrated, df_integrated_error
+    df_integrated_error['Time'] = np.arange(fit_params.shape[0])
+    df_integrated_error.set_index('Time', inplace=True)
+    df_integrated.to_csv(f'{output_direc}/integrated_peaks.csv')
+    df_integrated_error.to_csv(f'{output_direc}/integrated_peaks_error.csv')
     
 def lorentzian(x, shift, gamma, A):
     '''
