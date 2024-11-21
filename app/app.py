@@ -10,6 +10,7 @@ loaddata = LoadData()
 
 df_list = loaddata.load_data_list('FA_20231123_2H Yeast_Fumarate-d2_12 .csv')
 df = pd.read_csv(df_list[0])
+print(df)
 
 
 

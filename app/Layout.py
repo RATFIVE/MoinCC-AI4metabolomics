@@ -113,7 +113,7 @@ class StreamlitApp():
         main, about = st.tabs(['Main Page', 'About'])
 
         # Dynamically run main_page only if the button is clicked
-        if st.session_state.get("processing_started", False):
+        if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
             self.main_page(main)
         self.about_page(about)
         
@@ -121,7 +121,7 @@ class StreamlitApp():
         with main:
             st.markdown("### Main Page Content")
             # Show panels only if processing is started
-            if st.session_state.get("processing_started", False):
+            if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
                 self.panel1()
                 self.panel2()
                 self.panel3()
@@ -164,7 +164,7 @@ class StreamlitApp():
         with st.expander("Panel 3 - Kinetic Plot", expanded=True):
             st.markdown('# Panel 3')
             st.slider
-            st.plotly_chart(self.fig3)
+            #st.plotly_chart(self.fig3)
             
         return None
     
