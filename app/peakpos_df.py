@@ -37,7 +37,7 @@ class SpectraAnalysis:
         data_normalized.columns = data.columns
         return data_normalized
 
-    def peak_identify(self, data_normalized, expected_peaks, initial_threshold=85, max_shift=0.15):
+    def peak_identify(self, data_normalized, expected_peaks, initial_threshold=85, max_shift=0.5): #max_shift maybe
         """Identifizierung von Peaks und Zuordnung zu erwarteten Peaks"""
         spectra_data = data_normalized.iloc[:, 1:]
         chem_shifts = data_normalized.iloc[:, 0]
