@@ -64,9 +64,8 @@ Fitting Outputs:
     |-- **individual_curves/**
     |   |-- `file_name_1.csv`
     |
-    |-- `contour.csv`
-    |
     |-- `file_spectra_params.csv`
     |
     |-- `fitted_spectra_params_error.csv`
-
+    |
+    |-- `integral_spectra_over_time.csv`
