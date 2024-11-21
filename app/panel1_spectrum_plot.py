@@ -18,17 +18,11 @@ def iterate_directory(target_dirname, target_filename):
             # Überprüfen, ob das aktuelle Verzeichnis das Zielverzeichnis ist
             if dir == target_dirname:
                 full_dir_path = os.path.join(root, dir)
-                #print(f"Found directory: {full_dir_path}")
                 for root, dirs, files in os.walk(full_dir_path):
                     for file in files:
+                        # Überprüfen ob die datei die Target datei ist
                         if file == target_filename:
-                            #print(f"Found file: {file}")
-                            #print(f"Root: {root}")
-                            #print(f"Directories: {dirs}")
-                            #print(f"Files: {file}")
                             full_file_path = os.path.join(root, file)
-                            #print(f'Full filepaht: {full_file_path}')
-                # Wenn das Zielverzeichnis gefunden wurde, müssen wir nicht weiter suchen
                 break
     return full_file_path
 
