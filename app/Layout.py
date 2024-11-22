@@ -67,8 +67,6 @@ class StreamlitApp():
             Executes the Streamlit application, starting from the header and displaying all panels.
     """
 
-
-
     def __init__(self, 
                  fig1=None, 
                  fig2=None,
