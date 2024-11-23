@@ -85,6 +85,20 @@ class StreamlitApp():
         self.fig5 = fig5
         st.session_state['processing_started'] = False
 
+    def upload_file(self, upload_title):
+        uploaded_file = st.file_uploader(upload_title)
+        if uploaded_file is not None:
+            # Temporäre Datei speichern
+            with open(os.path.join(uploaded_file.name), "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            path = os.path.join(uploaded_file.name)
+            st.success(f"File uploaded successfully: {path}")
+        else:
+            path = None
+
+        return path
+
+
     def side_bar(self):
         st.sidebar.title('How to')
         
@@ -100,13 +114,14 @@ class StreamlitApp():
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+        col1, col2, col3 = st.columns([0.2, 0.8, 0.2])
         with col1:
             st.divider()
 
         with col2:
-            self.meta_fp = st.text_input('Metadata File Path')
-            self.data_fp = st.text_input('Data File Path')
+            self.meta_fp = self.upload_file('Metadata File Path')
+            self.data_fp = self.upload_file('Data File Path')
+            
 
         with col3:
             st.divider()
