@@ -170,9 +170,10 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
-            raw_plot, lorentz_plot = panel1_main()
+            raw_plot, lorentz_plot, noise_plot = panel1_main()
             st.plotly_chart(raw_plot)
             st.plotly_chart(lorentz_plot)
+            st.plotly_chart(noise_plot)
 
         return None
 
