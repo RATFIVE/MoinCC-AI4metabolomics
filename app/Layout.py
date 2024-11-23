@@ -15,6 +15,8 @@ from peak_fitting_v6 import PeakFitting
 import matplotlib.pyplot as plt
 from Process4Panels import Process4Panels
 import plotly.express as px
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
 
 loaddata = LoadData()
@@ -85,19 +87,6 @@ class StreamlitApp():
         self.fig5 = fig5
         st.session_state['processing_started'] = False
 
-    def upload_file(self, upload_title):
-        uploaded_file = st.file_uploader(upload_title)
-        if uploaded_file is not None:
-            # Temporäre Datei speichern
-            with open(os.path.join(uploaded_file.name), "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            path = os.path.join(uploaded_file.name)
-            st.success(f"File uploaded successfully: {path}")
-        else:
-            path = None
-
-        return path
-
 
     def side_bar(self):
         st.sidebar.title('How to')
@@ -111,6 +100,9 @@ class StreamlitApp():
         )    
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
+
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA _20240215_2H_Yeast_Pyruvate-d3_3.csv'
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
@@ -119,8 +111,9 @@ class StreamlitApp():
             st.divider()
 
         with col2:
-            self.meta_fp = self.upload_file('Metadata File Path')
-            self.data_fp = self.upload_file('Data File Path')
+
+            self.meta_fp = st.text_input('Metadata File Path')
+            self.data_fp = st.text_input('Data File Path')
             
 
         with col3:
