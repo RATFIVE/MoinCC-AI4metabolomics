@@ -11,7 +11,10 @@ from PIL import Image
 import lorem
 from LoadData import *
 from panel3_contour_plot import *
-
+from peak_fitting_v6 import PeakFitting
+import matplotlib.pyplot as plt
+from Process4Panels import Process4Panels
+import plotly.express as px
 
 
 loaddata = LoadData()
@@ -67,8 +70,6 @@ class StreamlitApp():
             Executes the Streamlit application, starting from the header and displaying all panels.
     """
 
-
-
     def __init__(self, 
                  fig1=None, 
                  fig2=None,
@@ -82,8 +83,7 @@ class StreamlitApp():
         self.fig3 = fig3
         self.fig4 = fig4
         self.fig5 = fig5
-
-
+        st.session_state['processing_started'] = False
 
     def side_bar(self):
         st.sidebar.title('How to')
@@ -94,17 +94,19 @@ class StreamlitApp():
             2. Use the buttons to navigate panels
             3. Explore the analysis
             """
-        )
-        
-
+        )    
+# /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx
+# /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
     def header(self):
+        # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
         with col1:
             st.divider()
 
         with col2:
-            st.file_uploader("Upload the Metabolite Spectrum CSV")
+            self.meta_fp = st.text_input('Metadata File Path')
+            self.data_fp = st.text_input('Data File Path')
 
         with col3:
             st.divider()
@@ -113,15 +115,26 @@ class StreamlitApp():
         main, about = st.tabs(['Main Page', 'About'])
 
         # Dynamically run main_page only if the button is clicked
-        if st.session_state.get("processing_started", False):
+        if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
             self.main_page(main)
         self.about_page(about)
         
     def main_page(self, main):
+        # perform peak fitting
+        fitter = PeakFitting(self.data_fp, self.meta_fp)
+        fitter.fit()
+        # Create data for the panels
+        processor = Process4Panels(self.data_fp)
+        processor.save_sum_spectra()
+        processor.save_substrate_individual()
+        processor.save_difference()
+        processor.save_kinetics()
+
+
         with main:
             st.markdown("### Main Page Content")
-            # Show panels only if processing is started
-            if st.session_state.get("processing_started", False):
+
+            if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
                 self.panel1()
                 self.panel2()
                 self.panel3()
@@ -143,11 +156,11 @@ class StreamlitApp():
 
     # -------- Panels with Expanders --------------------
     def panel1(self):
-        
+        # read in results from fitting
+        sum_fit_fp = Path('output', f'{os.path.basename(self.data_fp)}_output', 'sum_fit.csv')
+        sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
-            st.write("Content for Panel 1.")
-
         return None
 
     def panel2(self):
@@ -155,7 +168,7 @@ class StreamlitApp():
         
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
             st.markdown('# Kinetic Plot')
-            st.image(self.fig2, caption="Your Image Caption", use_column_width=True)
+            #st.image(self.fig2, caption="Your Image Caption", use_column_width=True)
 
         return None
 
@@ -164,7 +177,7 @@ class StreamlitApp():
         with st.expander("Panel 3 - Kinetic Plot", expanded=True):
             st.markdown('# Panel 3')
             st.slider
-            st.plotly_chart(self.fig3)
+            #st.plotly_chart(self.fig3)
             
         return None
     
@@ -196,7 +209,7 @@ class StreamlitApp():
 
 
 
-
+'''
 if __name__ == '__main__':
 
 
@@ -214,6 +227,6 @@ if __name__ == '__main__':
     # Run Streamlit App
     app = StreamlitApp(
                        fig3=fig3)
-    app.run()
+    app.run()'''
 
 

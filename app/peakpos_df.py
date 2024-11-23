@@ -31,7 +31,7 @@ class SpectraAnalysis:
         peak_pos = self.peakfit_sum(spectra_data, chem_shifts, 85)
         water = 4.7
         closest_peak = min(peak_pos, key=lambda x: abs(x - water))
-
+        
         data_normalized = pd.DataFrame(chem_shifts.copy() + (4.7 - closest_peak))
         data_normalized = pd.concat([data_normalized, data.iloc[:, 1:]], axis=1)
         data_normalized.columns = data.columns
