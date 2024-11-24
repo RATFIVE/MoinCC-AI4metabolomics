@@ -88,7 +88,7 @@ class Process4Panels:
         #print(self.data)
         print(self.sum_df.shape)
         diff_df = pd.concat(diff_columns, axis=1)
-        diff_df.columns = [str(i) for i in range(1, self.sum_df.shape[1])]
+        diff_df.columns = [str(i) for i in range(0, self.sum_df.shape[1]-1)]
         differences = pd.concat([differences, diff_df], axis=1)
         differences.to_csv(Path(self.output_dir) / 'differences.csv', index=False)
     
@@ -111,14 +111,15 @@ class Process4Panels:
                 # row i and columns k
                 kinetics[i,k] = sum(amplitudes.iloc[indices].values)
         kinetics = pd.DataFrame(kinetics, columns = substances)
+        kinetics['time'] = np.arange(0, kinetics.shape[0])
         kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
 
 
-#processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv')
-#processer.save_sum_spectra()
-#processer.save_substrate_individual()
-#processer.save_difference()
-#processer.save_kinetics()
+processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv')
+processer.save_sum_spectra()
+processer.save_substrate_individual()
+processer.save_difference()
+processer.save_kinetics()
 
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv

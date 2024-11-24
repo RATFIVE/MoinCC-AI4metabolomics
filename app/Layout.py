@@ -17,6 +17,7 @@ from Process4Panels import Process4Panels
 import plotly.express as px
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
+from panel1_spectrum_plot import main as panel1_main
 
 
 loaddata = LoadData()
@@ -112,8 +113,8 @@ class StreamlitApp():
 
         with col2:
 
-            self.meta_fp = st.text_input('Metadata File Path')
-            self.data_fp = st.text_input('Data File Path')
+            self.meta_fp = st.text_input('Metadata File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
+            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv')
             
 
         with col3:
@@ -169,6 +170,11 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
+            raw_plot, lorentz_plot, noise_plot = panel1_main()
+            st.plotly_chart(raw_plot)
+            st.plotly_chart(lorentz_plot)
+            st.plotly_chart(noise_plot)
+
         return None
 
     def panel2(self):
