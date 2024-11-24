@@ -189,7 +189,8 @@ class StreamlitApp():
             st.plotly_chart(fig)
 
         return None
-    @st.cache_data(experimental_allow_widgets=True)
+    
+    
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Kinetic Plot", expanded=True):
