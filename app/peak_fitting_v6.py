@@ -10,6 +10,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from copy import deepcopy
 from tqdm import tqdm
+import sys
+import matplotlib.pyplot as plt
 
 class PeakFitting:
     def __init__(self, fp_file, fp_meta):
@@ -153,7 +155,7 @@ class PeakFitting:
         # iterate over all time points
         for i in tqdm(range(self.number_time_points), desc= self.file_name):
             try: # try in case some data can not be fitted
-                y = self.df.iloc[:,i]
+                y = self.df.iloc[:,i+1]
                 # to increase fitting speed, increase tolerance 
                 if first_fit:
                     popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum(x,*params),
@@ -172,7 +174,8 @@ class PeakFitting:
 
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum_fine_tune(x, *params),
-                                        self.x, y, p0= np.concatenate([positions_fine, widths, amplitudes]), maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
+                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
+
                 positions_fine = popt[:self.number_peaks]
                 widths = popt[self.number_peaks:self.number_peaks + self.number_substances]
                 amplitudes = popt[self.number_peaks + self.number_substances:]
@@ -187,8 +190,6 @@ class PeakFitting:
         # save results
         self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
         self.fitting_params_error.to_csv(self.output_direc + 'fitting_params_error.csv')
-
-
     
     def lorentzian(self, x, shift, gamma, A):
         '''
@@ -249,11 +250,11 @@ class PeakFitting:
                 y += self.lorentzian(x, x0[i], gamma[k], A[k])
         return y
 
-#input_file = '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240108_2H_yeast_Nicotinamide-d4 _11.csv'
-#meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+input_file = '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240108_2H_yeast_Nicotinamide-d4 _11.csv'
+meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
 
-#pf = PeakFitting(input_file, meta_file)
-#pf.fit()
+pf = PeakFitting(input_file, meta_file)
+pf.fit()
 
 
 # Error Handling: Are filepathe existing?

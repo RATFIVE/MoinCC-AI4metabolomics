@@ -121,7 +121,6 @@ class SpectraAnalysis:
             'section': col_sect
         })
 
-
         peaks_data = {'Found Peaks': [], 'Other Peaks': []}
         for i in range(num_sections):
             section_length = len(sections[i].columns) - 1  # -1 to ignore the chemical shift column
