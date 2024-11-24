@@ -15,6 +15,9 @@ from peak_fitting_v6 import PeakFitting
 import matplotlib.pyplot as plt
 from Process4Panels import Process4Panels
 import plotly.express as px
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+from panel1_spectrum_plot import main as panel1_main
 
 
 loaddata = LoadData()
@@ -85,6 +88,7 @@ class StreamlitApp():
         self.fig5 = fig5
         st.session_state['processing_started'] = False
 
+
     def side_bar(self):
         st.sidebar.title('How to')
         
@@ -97,16 +101,21 @@ class StreamlitApp():
         )    
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
+
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA _20240215_2H_Yeast_Pyruvate-d3_3.csv'
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+        col1, col2, col3 = st.columns([0.2, 0.8, 0.2])
         with col1:
             st.divider()
 
         with col2:
-            self.meta_fp = st.text_input('Metadata File Path')
-            self.data_fp = st.text_input('Data File Path')
+
+            self.meta_fp = st.text_input('Metadata File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
+            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv')
+            
 
         with col3:
             st.divider()
@@ -161,6 +170,11 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
+            raw_plot, lorentz_plot, noise_plot = panel1_main()
+            st.plotly_chart(raw_plot)
+            st.plotly_chart(lorentz_plot)
+            st.plotly_chart(noise_plot)
+
         return None
 
     def panel2(self):
