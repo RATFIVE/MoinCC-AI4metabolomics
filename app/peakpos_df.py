@@ -110,7 +110,7 @@ class SpectraAnalysis:
 
         # Find peaks for each section
         for df_section in sections:
-            found, other = self.peak_identify(df_section, expected_peaks, compound_names)
+            found, other = self.peak_identify(df_section, expected_peaks)
             found_lists.append(found)
             other_lists.append(other)
 
