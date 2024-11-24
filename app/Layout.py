@@ -114,7 +114,7 @@ class StreamlitApp():
         with col2:
 
             self.meta_fp = st.text_input('Metadata File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
-            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv')
+            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv')
             
 
         with col3:
@@ -170,7 +170,7 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
-            raw_plot, lorentz_plot, noise_plot = panel1_main()
+            raw_plot, lorentz_plot, noise_plot = panel1_main(file_path=self.data_fp, frame=2)
             st.plotly_chart(raw_plot)
             st.plotly_chart(lorentz_plot)
             st.plotly_chart(noise_plot)
