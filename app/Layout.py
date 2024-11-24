@@ -105,7 +105,7 @@ class StreamlitApp():
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
 
 # '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
-# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA _20240215_2H_Yeast_Pyruvate-d3_3.csv'
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240207_2H_yeast_Fumarate-d2_5.csv'
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
@@ -115,8 +115,8 @@ class StreamlitApp():
 
         with col2:
 
-            self.meta_fp = st.text_input('Metadata File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
-            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240207_2H_yeast_Fumarate-d2_5.csv')
+            self.meta_fp = st.text_input('Metadata File Path', )
+            self.data_fp = st.text_input('Data File Path', )
             
 
         with col3:
