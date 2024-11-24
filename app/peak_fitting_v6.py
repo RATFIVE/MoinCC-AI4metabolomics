@@ -88,7 +88,7 @@ class PeakFitting:
 
     def make_bounds(self, mode, positions_fine = None,
                     shift_bounds = (-np.inf, np.inf),width_bounds = (0, 1e-1), amplitude_bounds = (0, np.inf),
-                    shift_bounds_fine = (- 0.05, 0.05), width_bounds_fine = (0, 2e-1), amplitude_bounds_fine = (0, np.inf)):
+                    shift_bounds_fine = (- 0.05, 0.05), width_bounds_fine = (0, 5e-1), amplitude_bounds_fine = (0, np.inf)):
         if mode == 'first':
             shift_lower_bounds = np.full(1, shift_bounds[0])  # shifting the whole spectrum
             shift_upper_bounds = np.full(1, shift_bounds[1])
@@ -109,7 +109,7 @@ class PeakFitting:
             amplitude_lower_bounds = np.full(self.number_substances, amplitude_bounds_fine[0])
             # amplitude upper bounds
             amplitude_upper_bounds = np.full(self.number_substances, amplitude_bounds_fine[1])
-        
+
             return (np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds]), np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds]))
 
 
@@ -250,11 +250,10 @@ class PeakFitting:
                 y += self.lorentzian(x, x0[i], gamma[k], A[k])
         return y
 
-input_file = '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240108_2H_yeast_Nicotinamide-d4 _11.csv'
-meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+#input_file = '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240108_2H_yeast_Nicotinamide-d4 _11.csv'
+#meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
 
-pf = PeakFitting(input_file, meta_file)
-pf.fit()
-
+#pf = PeakFitting(input_file, meta_file)
+#pf.fit()
 
 # Error Handling: Are filepathe existing?
