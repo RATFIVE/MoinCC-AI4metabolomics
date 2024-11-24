@@ -177,13 +177,14 @@ def plot_noise(df, lorentz_array, frame):
     return fig
     
 
-def sum_fit_plot(file_name, frame):
+def sum_fit_plot(file_name, frame, xmin, xmax):
     sum_fit_path = iterate_directory(target_dirname=file_name + '_output',
                       target_filename=f'sum_fit{frame}.csv')
     
     df = pd.read_csv(sum_fit_path)
 
     x = df['x']
+    
 
     columns = df.columns
     columns = columns.drop('x')
@@ -193,11 +194,17 @@ def sum_fit_plot(file_name, frame):
     for col in columns:
         fig.add_trace(go.Scatter(x=x, y=df[col], name=col))
     
-    #fig.show()
+    fig.update_layout(
+        title='Lorenzian Plot',
+        xaxis_title='X',
+        yaxis_title='Intensity',
+        yaxis=dict(range=[xmin, xmax]),  # y-Achsenbereich festlegen
+        showlegend=False
+    )
 
     return fig
 
-def diff_plot(file_name, frame):
+def diff_plot(file_name, frame, xmin, xmax):
     diff_file_path = iterate_directory(target_dirname=file_name + '_output',
                       target_filename='differences.csv')
     
@@ -207,20 +214,22 @@ def diff_plot(file_name, frame):
 
     df = df.iloc[:, [0, frame]]
     x = df.iloc[:, 0]
-
+    
     y = df.iloc[:, 1]
+
+    xmin = y.min() - 5*y.mean()
 
     fig = go.Figure()
 
     fig.add_trace(go.Scatter(x=x, y=y, name='Diff'))
+    fig.update_layout(
+        title='Noise',
+        xaxis_title='X',
+        yaxis_title='Intensity',
+        yaxis=dict(range=[xmin, xmax]),  # y-Achsenbereich festlegen
+        showlegend=False
+    )
     return fig
-    
-
-        
-        
-
-    
-
     
     
 
@@ -238,17 +247,18 @@ def main(file_path='/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_202311
     #file_name = 'FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv'
     data_list = loaddata.load_data_list(file_name)
     df_raw = pd.read_csv(data_list[0])
-    xmin = df_raw.iloc[:, 0].min()
-    xmax = df_raw.iloc[:, 0].max()
+    xmin = df_raw.iloc[:, frame].min()
+    xmax = df_raw.iloc[:, frame].max()
 
     fig1 = plot_raw(df_raw, frame)
     
 
     
-    fig2 = sum_fit_plot(file_name=file_name, frame=frame)
+    fig2 = sum_fit_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
 
-    fig3 = diff_plot(file_name=file_name, frame=frame)
+    fig3 = diff_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
 
+    
     return (fig1, fig2, fig3)
     
     
