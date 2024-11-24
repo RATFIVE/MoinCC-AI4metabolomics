@@ -176,6 +176,49 @@ def plot_noise(df, lorentz_array, frame):
     
     return fig
     
+
+def sum_fit_plot(file_name, frame):
+    sum_fit_path = iterate_directory(target_dirname=file_name + '_output',
+                      target_filename=f'sum_fit{frame}.csv')
+    
+    df = pd.read_csv(sum_fit_path)
+
+    x = df['x']
+
+    columns = df.columns
+    columns = columns.drop('x')
+    
+
+    fig = go.Figure()
+    for col in columns:
+        fig.add_trace(go.Scatter(x=x, y=df[col], name=col))
+    
+    #fig.show()
+
+    return fig
+
+def diff_plot(file_name, frame):
+    diff_file_path = iterate_directory(target_dirname=file_name + '_output',
+                      target_filename='differences.csv')
+    
+    df = pd.read_csv(diff_file_path)
+    #print(df)
+    #print(df.columns)
+
+    df = df.iloc[:, [0, frame]]
+    x = df.iloc[:, 0]
+
+    y = df.iloc[:, 1]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(x=x, y=y, name='Diff'))
+    return fig
+    
+
+        
+        
+
     
 
     
@@ -187,65 +230,28 @@ def streamlit(fig1, fig2, fig3):
     st.plotly_chart(fig3)
 
 
-def main():
-    frame = 2
-    file_name = 'FA_20231109_2H_yeast_Gluc-d2_5.ser.csv'
+def main(file_path='/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv',
+         frame=2):
+    
+    file_name = file_path.split('/')[-1]
+    #print(file_name)
+    #file_name = 'FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv'
     data_list = loaddata.load_data_list(file_name)
     df_raw = pd.read_csv(data_list[0])
     xmin = df_raw.iloc[:, 0].min()
     xmax = df_raw.iloc[:, 0].max()
+
     fig1 = plot_raw(df_raw, frame)
     
-    # for plot 2
-    fit_params = iterate_directory(
-                      target_dirname=file_name + '_output', 
-                      target_filename='fitting_params.csv')
+
     
-    df = pd.read_csv(fit_params)
+    fig2 = sum_fit_plot(file_name=file_name, frame=frame)
 
-
-    substrates = loaddata.get_substrate_list(file_name)
-    
-    print(substrates)
-
-    metabolites = loaddata.get_metabolite_list(file_name)
-    print(metabolites)
-
-    fig_lorentz = go.Figure()
-
-    for number in substrates:
-        extracted_df = extract_reacsubs_columns(df, number)
-        columns = extracted_df.columns
-
-        plot_df = extracted_df.iloc[frame, :]
-        fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
-
-    for number in metabolites:
-        extracted_df = extract_reacsubs_columns(df,number)
-        columns = extracted_df.columns
-
-        plot_df = extracted_df.iloc[frame, :]
-        fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
-
-    # for Noise Plot
-    lorentz_list = []
-    for number in substrates + metabolites:
-        extracted_df = extract_reacsubs_columns(df, number)
-        columns = extracted_df.columns
-        df_lorentz = extracted_df.iloc[frame, :]
-        length = df_raw.shape[0]
-        y = get_lorentz(df=df_lorentz, columns=columns, xmin=xmin, xmax=xmax, length=length)
-        lorentz_list.append(y)
-    lorentz_array = np.vstack(lorentz_list)
-    
-    fig3 = plot_noise(df_raw, lorentz_array, frame)
-    
-    
-
-
-    #streamlit(fig1, fig2, fig3)
+    fig3 = diff_plot(file_name=file_name, frame=frame)
 
     return (fig1, fig2, fig3)
+    
+    
     
 
 
@@ -259,3 +265,55 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+  # # for plot 2
+    # fit_params = iterate_directory(
+    #                   target_dirname=file_name + '_output', 
+    #                   target_filename='fitting_params.csv')
+    
+    # df = pd.read_csv(fit_params)
+
+
+    # substrates = loaddata.get_substrate_list(file_name)
+    
+    # print(substrates)
+
+    # metabolites = loaddata.get_metabolite_list(file_name)
+    # print(metabolites)
+
+    # fig_lorentz = go.Figure()
+
+    # for number in substrates:
+    #     extracted_df = extract_reacsubs_columns(df, number)
+    #     columns = extracted_df.columns
+
+    #     plot_df = extracted_df.iloc[frame, :]
+    #     fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
+
+    # for number in metabolites:
+    #     extracted_df = extract_reacsubs_columns(df,number)
+    #     columns = extracted_df.columns
+
+    #     plot_df = extracted_df.iloc[frame, :]
+    #     fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
+
+    # # for Noise Plot
+    # lorentz_list = []
+    # for number in substrates + metabolites:
+    #     extracted_df = extract_reacsubs_columns(df, number)
+    #     columns = extracted_df.columns
+    #     df_lorentz = extracted_df.iloc[frame, :]
+    #     length = df_raw.shape[0]
+    #     y = get_lorentz(df=df_lorentz, columns=columns, xmin=xmin, xmax=xmax, length=length)
+    #     lorentz_list.append(y)
+    # lorentz_array = np.vstack(lorentz_list)
+    
+    # fig3 = plot_noise(df_raw, lorentz_array, frame)
+    
+    
+
+
+    #streamlit(fig1, fig2, fig3)
+
+    # return (fig1, fig2, fig3)
