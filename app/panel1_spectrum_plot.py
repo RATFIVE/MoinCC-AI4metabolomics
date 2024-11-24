@@ -252,8 +252,6 @@ def main(file_path='/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_202311
 
     fig1 = plot_raw(df_raw, frame)
     
-
-    
     fig2 = sum_fit_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
 
     fig3 = diff_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
