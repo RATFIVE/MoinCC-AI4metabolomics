@@ -33,10 +33,12 @@ class SpectraAnalysis:
         water = 4.7
         closest_peak = min(peak_pos, key=lambda x: abs(x - water))
         
-        data_normalized = pd.DataFrame(self.chem_shifts.copy() + (4.7 - closest_peak))
+        norm_shift = (4.7 - closest_peak)
+
+        data_normalized = pd.DataFrame(self.chem_shifts.copy() + norm_shift)
         data_normalized = pd.concat([data_normalized, self.data.iloc[:, 1:]], axis=1)
         data_normalized.columns = self.data.columns
-        return data_normalized
+        return data_normalized, norm_shift
 
     def peak_identify(self, data_normalized, initial_threshold=85, max_shift=0.5): #max_shift maybe
         """Identifizierung von Peaks und Zuordnung zu erwarteten Peaks"""
@@ -85,7 +87,7 @@ class SpectraAnalysis:
             df: Dtaframe with found peaks
         """
         #normalize data
-        df = self.normalize_water()
+        df, norm_shift = self.normalize_water()
     
         # Split into section with at least 20 columns each
         cols_to_divide = len(df.columns)-1 #-1 because first column is chemical shift
@@ -115,7 +117,11 @@ class SpectraAnalysis:
             found_lists.append(found)
             other_lists.append(other)
 
-        
+        #'unnormalize' the values
+        for i in range(len(found_lists)):
+            found_lists[i] = [x - norm_shift for x in found_lists[i]]
+            other_lists[i] = [x - norm_shift for x in other_lists[i]]
+
         #create final dataframe
         final_df = pd.DataFrame({
             'Column': df.columns[1:],  # Exclude the chemical shift from the final DataFrame columns
@@ -123,10 +129,12 @@ class SpectraAnalysis:
         })
 
         peaks_data = {'Found Peaks': [], 'Other Peaks': []}
+
         for i in range(num_sections):
             section_length = len(sections[i].columns) - 1  # -1 to ignore the chemical shift column
             peaks_data['Found Peaks'].extend([found_lists[i]] * section_length)
             peaks_data['Other Peaks'].extend([other_lists[i]] * section_length)
+
 
         final_df['Found Peaks'] = peaks_data['Found Peaks']
         final_df['Other Peaks'] = peaks_data['Other Peaks']
