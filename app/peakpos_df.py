@@ -3,53 +3,54 @@ import numpy as np
 
 
 class SpectraAnalysis:
-    def __init__(self):
-        pass
+    def __init__(self, data, expected_peaks):
+        self.data = data
+        self.expected_peaks = expected_peaks
+        self.spectra_data = data.iloc[:, 1:]
+        self.chem_shifts = data.iloc[:, 0]
 
-    def peakfit_sum(self, spectra_data, chem_shifts, threshold):
+    def peakfit_sum(self, threshold):
         """Summen der Spektren und Rückgabe einer Liste gefundener Peaks"""
-        sum_of_spectra = np.sum(spectra_data, axis=1)
+        sum_of_spectra = np.sum(self.spectra_data, axis=1)
         threshold = np.percentile(sum_of_spectra, threshold)
 
-        first_derivative = np.gradient(sum_of_spectra, chem_shifts)
-        second_derivative = np.gradient(first_derivative, chem_shifts)
-        third_derivative = np.gradient(second_derivative, chem_shifts)
-        fourth_derivative = np.gradient(third_derivative, chem_shifts)
+        first_derivative = np.gradient(sum_of_spectra, self.chem_shifts)
+        second_derivative = np.gradient(first_derivative, self.chem_shifts)
+        third_derivative = np.gradient(second_derivative, self.chem_shifts)
+        fourth_derivative = np.gradient(third_derivative, self.chem_shifts)
 
         sign_change = np.diff(np.sign(third_derivative)) != 0
         peak_mask = (sum_of_spectra > threshold) & (second_derivative < 0) & (fourth_derivative > 0)
         peak_mask[1:] &= sign_change
 
-        peak_pos = chem_shifts[peak_mask].tolist()
+        peak_pos = self.chem_shifts[peak_mask].tolist()
         return peak_pos
 
-    def normalize_water(self, data):
+    def normalize_water(self):
         """Anpassung der Daten basierend auf dem Wasser-Peak"""
-        spectra_data = data.iloc[:, 1:]
-        chem_shifts = data.iloc[:, 0]
-
-        peak_pos = self.peakfit_sum(spectra_data, chem_shifts, 85)
+    
+        peak_pos = self.peakfit_sum(threshold = 85)
         water = 4.7
         closest_peak = min(peak_pos, key=lambda x: abs(x - water))
         
-        data_normalized = pd.DataFrame(chem_shifts.copy() + (4.7 - closest_peak))
-        data_normalized = pd.concat([data_normalized, data.iloc[:, 1:]], axis=1)
-        data_normalized.columns = data.columns
+        data_normalized = pd.DataFrame(self.chem_shifts.copy() + (4.7 - closest_peak))
+        data_normalized = pd.concat([data_normalized, self.data.iloc[:, 1:]], axis=1)
+        data_normalized.columns = self.data.columns
         return data_normalized
 
-    def peak_identify(self, data_normalized, expected_peaks, initial_threshold=85, max_shift=0.5): #max_shift maybe
+    def peak_identify(self, data_normalized, initial_threshold=85, max_shift=0.5): #max_shift maybe
         """Identifizierung von Peaks und Zuordnung zu erwarteten Peaks"""
         spectra_data = data_normalized.iloc[:, 1:]
         chem_shifts = data_normalized.iloc[:, 0]
 
-        found = [None] * len(expected_peaks)
+        found = [None] * len(self.expected_peaks)
         other = []
         threshold = initial_threshold
 
         while None in found or len(other) <= len(found):
-            detected_peaks = self.peakfit_sum(spectra_data, chem_shifts, threshold)
+            detected_peaks = self.peakfit_sum(threshold)
             for peak in detected_peaks:
-                distances = [abs(peak - expected_peak) for expected_peak in expected_peaks]
+                distances = [abs(peak - expected_peak) for expected_peak in self.expected_peaks]
                 min_distance = min(distances)
                 index = distances.index(min_distance)
 
@@ -65,12 +66,12 @@ class SpectraAnalysis:
             if threshold < 0 or None not in found or len(other) > len(found):
                 break
 
-        print("Found Peaks: ", found)
-        print("Other Peaks: ", other)
+        #print("Found Peaks: ", found)
+        #print("Other Peaks: ", other)
 
         return found, other
 
-    def peak_df(self, data, expected_peaks, min_cols_per_section=20):
+    def peak_df(self, min_cols_per_section=20):
         """Normalizes the given data to chem_shift(water) = 4.7 
         splits spectra into sections over time
         identifies peaks in summed up sections
@@ -84,7 +85,7 @@ class SpectraAnalysis:
             df: Dtaframe with found peaks
         """
         #normalize data
-        df = self.normalize_water(data)
+        df = self.normalize_water()
     
         # Split into section with at least 20 columns each
         cols_to_divide = len(df.columns)-1 #-1 because first column is chemical shift
@@ -110,7 +111,7 @@ class SpectraAnalysis:
 
         # Find peaks for each section
         for df_section in sections:
-            found, other = self.peak_identify(df_section, expected_peaks)
+            found, other = self.peak_identify(data_normalized = df_section)
             found_lists.append(found)
             other_lists.append(other)
 
