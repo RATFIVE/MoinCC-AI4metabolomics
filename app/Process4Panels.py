@@ -111,6 +111,7 @@ class Process4Panels:
                 # row i and columns k
                 kinetics[i,k] = sum(amplitudes.iloc[indices].values)
         kinetics = pd.DataFrame(kinetics, columns = substances)
+        kinetics['time'] = np.arange(0, kinetics.shape[0])
         kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
 
 
