@@ -148,22 +148,26 @@ class StreamlitApp():
     def about_page(self, about):
         with about:
             st.markdown(f"""
-                        # Instructions:
+                        ### Instructions:
 
-                        ## Step 1: 
+                        #### Step 1: 
                         - Select the Metafile Path
                         - Select the Substrate File Path
                         - Select the Reference File Path
 
-                        ## Step 2:
+                        #### Step 2:
                         - Click Start Processing
 
-                        ## Step 3:
+                        #### Step 3:
                         ### Substrate Plot
                         - Use Sliders to slect the Frame, to investigate
                         
-                        ### Contour Plot
+                        ##### Contour Plot
                         - Use Slider to selct the depth in % 
+
+
+                        #### Reference Plot
+                        - Enjoy
 
                         
                         
