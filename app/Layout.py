@@ -27,6 +27,11 @@ loaddata = LoadData()
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
+meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
+data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240207_2H_yeast_Fumarate-d2_5.csv')
+referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+
+
 class StreamlitApp():
     """
     A Streamlit-based application for visualizing and analyzing metabolite spectra and kinetics.
@@ -91,6 +96,7 @@ class StreamlitApp():
 # '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240207_2H_yeast_Fumarate-d2_5.csv'
 
 
+
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
@@ -99,9 +105,9 @@ class StreamlitApp():
             st.divider()
 
         with col2:
-            self.meta_fp = st.text_input('Metadata File Path', '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
-            self.data_fp = st.text_input('Data File Path','/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv' )
-            self.referece_fp = st.text_input('Reference File Path', '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+            self.meta_fp = st.text_input('Metadata File Path', meta_fp)
+            self.data_fp = st.text_input('Data File Path', data_fp)
+            self.referece_fp = st.text_input('Reference File Path', referece_fp)
         
         with col3:
             st.divider()
