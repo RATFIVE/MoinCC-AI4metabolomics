@@ -80,15 +80,14 @@ class StreamlitApp():
                  fig1=None, 
                  fig2=None,
                  fig3=None,
-                 fig4=None,
-                 fig5=None
+                 fig4=None
                  ):
         
         self.fig1 = fig1
         self.fig2 = fig2
         self.fig3 = fig3
         self.fig4 = fig4
-        self.fig5 = fig5  
+
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
 
@@ -114,7 +113,7 @@ class StreamlitApp():
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
 
-        main, about = st.tabs(['Main Page', 'About'])
+        main, about = st.tabs(['Main Page', 'Instructions'])
 
         # Dynamically run main_page only if the button is clicked
         if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
@@ -122,6 +121,7 @@ class StreamlitApp():
                 st.session_state["file_name"] = self.data_fp
                 self.process_data()
             self.main_page(main)
+            self.about_page(about)
         
     def main_page(self, main):
         with main:
@@ -130,7 +130,7 @@ class StreamlitApp():
                 self.panel1()
                 self.panel2()
                 self.panel3()
-                self.panel5()
+                self.panel4()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
@@ -148,9 +148,24 @@ class StreamlitApp():
     def about_page(self, about):
         with about:
             st.markdown(f"""
-                        # About
+                        # Instructions:
 
-                        This is a descrption of {lorem.paragraph(), lorem.paragraph()}
+                        ## Step 1: 
+                        - Select the Metafile Path
+                        - Select the Substrate File Path
+                        - Select the Reference File Path
+
+                        ## Step 2:
+                        - Click Start Processing
+
+                        ## Step 3:
+                        ### Substrate Plot
+                        - Use Sliders to slect the Frame, to investigate
+                        
+                        ### Contour Plot
+                        - Use Slider to selct the depth in % 
+
+                        
                         
                         """)
         return None
@@ -181,18 +196,19 @@ class StreamlitApp():
     
     def panel3(self):
         """Contour Plot"""
-        with st.expander("Panel 3 - Kinetic Plot", expanded=True):
-            st.markdown('# Panel 3')
+        with st.expander("Panel 3 - Contour Plot", expanded=True):
+            st.markdown('# Kinetic Plot')
             panel_3_obj = ContourPlot(self.data_fp)
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
-            st.pyplot(contourplot)
+            st.pyplot(contourplot, clear_figure=True)
 
-    def panel5(self):
+    def panel4(self):
         
-        with st.expander("Panel 5", expanded=True):
-            st.markdown('# Panel 5')
+        with st.expander("Panel 5 - Reference Plot", expanded=True):
+            st.markdown('# Reference Plot')
+            st.write('In Progess...')
 
     
     def run(self):
