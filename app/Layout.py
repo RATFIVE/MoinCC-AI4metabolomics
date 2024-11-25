@@ -162,7 +162,7 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             # add a slider to select the frame
-            st.session_state['time_frame'] = st.slider('Select the frame', min_value=0, max_value=sum_fit.shape[0]-1, value=1)
+            st.session_state['time_frame'] = st.slider('Select the frame', min_value=0, max_value=sum_fit.shape[1]-1, value=1)
             st.markdown('# Substrate Plot')
             panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
