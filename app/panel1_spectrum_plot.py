@@ -7,321 +7,66 @@ from LoadData import *
 #from Layout import StreamlitApp
 import streamlit as st
 
-loaddata = LoadData()
 
-
-# Lorentz-Funktion definieren
-def lorentzian(x, pos, width, amp):
-    return amp * (width / ((x - pos)**2 + width**2))
-
-def iterate_directory(target_dirname, target_filename):
-    
-
-    output_dir = Path(os.path.join(os.getcwd(), 'output'))
-    
-    for root, dirs, files in os.walk(output_dir):
-        for dir in dirs:
-            
-            # Überprüfen, ob das aktuelle Verzeichnis das Zielverzeichnis ist
-            if dir == target_dirname:
-                
-                full_dir_path = os.path.join(root, dir)
-                
-                for root, dirs, files in os.walk(full_dir_path):
-                    for file in files:
-                        
-                        # Überprüfen ob die datei die Target datei ist
-                        if file == target_filename:
-                            
-                            full_file_path = os.path.join(root, file)
-                break
-    return full_file_path
-
-
-# Dynamische Extraktion der Spalten
-def extract_reacsubs_columns(df,number):
-    pos_col = f'pos_{number}'
-    width_col = f'width_{number}'
-    amp_col = f'amp_{number}'
-
-    # Überprüfen, ob die Spalten im DataFrame vorhanden sind
-    for col in df.columns:
-        if pos_col in col:
-            pos_col = col
-        if width_col in col:
-            width_col = col
-        if amp_col in col:
-            amp_col = col
-           
-    extracted_df = df[[pos_col, width_col, amp_col]]
-    
-    return extracted_df
- 
-def plot_raw(df, i):
-
-    # get the x and y of the i-th spectrum
-    df = df.iloc[:, [0, i]]
-
-    # get the x data
-    x = df.iloc[:, 0]
-
-    # get the spectrum as y
-    y = df.iloc[:, 1]
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='Raw'))
-
-    fig.update_layout(
-        title='Spectrum',
-        xaxis_title='X',
-        yaxis_title='Intensity',
-        showlegend=False
-    )
-
-    return fig
-
-def get_lorentz(df, columns, xmin, xmax, length):
-    for col in columns:
-        if 'pos' in col:
-            pos = df[col]
-        if 'width' in col:
-            width = df[col]
-            
-        if 'amp' in col:
-            amp = df[col]
-            
-
-    # X-Werte für den Plot
-    x = np.linspace(xmin, xmax, length)
-
-    # Berechnen der Lorentz-Funktion für jeden Satz von Parametern
-
-    y = lorentzian(x, pos, width, amp)
-
-    return y
-
-    
-
-def plot_lorentz(df, fig, columns, xmin, xmax):
-    for col in columns:
-        if 'pos' in col:
-            pos = df[col]
-        if 'width' in col:
-            width = df[col]
-            
-        if 'amp' in col:
-            amp = df[col]
-    
-    # X-Werte für den Plot
-    x = np.linspace(xmin, xmax, 1000)
-
-    # Berechnen der Lorentz-Funktion für jeden Satz von Parametern
-
-    y = lorentzian(x, pos, width, amp)
-
-    
-
-    # Lorentz-Kurve hinzufügen
-    fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name='Lorentzian'))
-
-    # Layout der Figur anpassen
-    fig.update_layout(
-        title='Lorentzians',
-        xaxis_title='X',
-        yaxis_title='Intensity',
-        showlegend=False
-    )
-
-    # Plot anzeigen
-    #fig.show()
-    return fig
-
-def plot_noise(df, lorentz_array, frame):
-        # get the x and y of the i-th spectrum
-    df = df.iloc[:, [0, frame]]
-
-    # get the x data
-    x = df.iloc[:, 0]
-    y = np.zeros_like(x) 
-
-    # get the spectrum as y
-    raw = df.iloc[:, 1].values
-    
-
-    #print(raw)
-
-    y_max_array = np.maximum.reduce(lorentz_array, axis=0)
-    #print(y_max)
-
-    noise = raw - y_max_array
-
-    y_min = min(raw)
-    y_max = max(raw)
-
-    fig = go.Figure()
-
-    # Rauschkurve hinzufügen
-    fig.add_trace(go.Scatter(x=x, y=noise, mode='lines', name='Noise'))
-    #fig.add_trace(go.Scatter(x=x, y=raw, mode='lines', name='raw'))
-    #fig.add_trace(go.Scatter(x=x, y=y_max_array, mode='lines', name='lorenz'))
-
-    # Layout der Figur anpassen und y-Achsenbereich festlegen
-    fig.update_layout(
-        title='Noise Plot',
-        xaxis_title='X',
-        yaxis_title='Noise',
-        yaxis=dict(range=[y_min, y_max])  # y-Achsenbereich festlegen
-    )
-    
-    return fig
-    
-
-def sum_fit_plot(file_name, frame, xmin, xmax):
-    sum_fit_path = iterate_directory(target_dirname=file_name + '_output',
-                      target_filename=f'sum_fit{frame}.csv')
-    
-    df = pd.read_csv(sum_fit_path)
-
-    x = df['x']
-    
-
-    columns = df.columns
-    columns = columns.drop('x')
-    
-
-    fig = go.Figure()
-    for col in columns:
-        fig.add_trace(go.Scatter(x=x, y=df[col], name=col))
-    
-    fig.update_layout(
-        title='Lorenzian Plot',
-        xaxis_title='X',
-        yaxis_title='Intensity',
-        yaxis=dict(range=[xmin, xmax]),  # y-Achsenbereich festlegen
-        showlegend=False
-    )
-
-    return fig
-
-def diff_plot(file_name, frame, xmin, xmax):
-    diff_file_path = iterate_directory(target_dirname=file_name + '_output',
-                      target_filename='differences.csv')
-    
-    df = pd.read_csv(diff_file_path)
-    #print(df)
-    #print(df.columns)
-
-    df = df.iloc[:, [0, frame]]
-    x = df.iloc[:, 0]
-    
-    y = df.iloc[:, 1]
-
-    xmin = y.min() - 5*y.mean()
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(x=x, y=y, name='Diff'))
-    fig.update_layout(
-        title='Noise',
-        xaxis_title='X',
-        yaxis_title='Intensity',
-        yaxis=dict(range=[xmin, xmax]),  # y-Achsenbereich festlegen
-        showlegend=False
-    )
-    return fig
-    
-    
-
-def streamlit(fig1, fig2, fig3):
-    st.plotly_chart(fig1)
-    st.plotly_chart(fig2)
-    st.plotly_chart(fig3)
-
-
-def main(file_path='/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv',
-         frame=2):
-    
-    file_name = file_path.split('/')[-1]
-    #print(file_name)
-    #file_name = 'FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv'
-    data_list = loaddata.load_data_list(file_name)
-    df_raw = pd.read_csv(data_list[0])
-    xmin = df_raw.iloc[:, frame].min()
-    xmax = df_raw.iloc[:, frame].max()
-
-    fig1 = plot_raw(df_raw, frame)
-    
-    fig2 = sum_fit_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
-
-    fig3 = diff_plot(file_name=file_name, frame=frame, xmin=xmin, xmax=xmax)
-
-    
-    return (fig1, fig2, fig3)
-    
-    
-    
-
-
-
-    
+class Panel1SpectrumPlot():
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.file_name = os.path.basename(file_path)
         
-    
-            
+        self.data = pd.read_csv(file_path)
+        self.sum_data = pd.read_csv(Path('output', f'{self.file_name}_output', 'sum_fit.csv'))
+        self.differences = pd.read_csv(Path('output', f'{self.file_name}_output', 'differences.csv'))
 
-    
+        # read in also data for the fitting
+        self.individual_fits = [pd.read_csv(f) for f in Path('output', f'{self.file_name}_output', 'substance_fits').iterdir()]
 
-if __name__ == '__main__':
-    main()
-
-
-  # # for plot 2
-    # fit_params = iterate_directory(
-    #                   target_dirname=file_name + '_output', 
-    #                   target_filename='fitting_params.csv')
-    
-    # df = pd.read_csv(fit_params)
-
-
-    # substrates = loaddata.get_substrate_list(file_name)
-    
-    # print(substrates)
-
-    # metabolites = loaddata.get_metabolite_list(file_name)
-    # print(metabolites)
-
-    # fig_lorentz = go.Figure()
-
-    # for number in substrates:
-    #     extracted_df = extract_reacsubs_columns(df, number)
-    #     columns = extracted_df.columns
-
-    #     plot_df = extracted_df.iloc[frame, :]
-    #     fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
-
-    # for number in metabolites:
-    #     extracted_df = extract_reacsubs_columns(df,number)
-    #     columns = extracted_df.columns
-
-    #     plot_df = extracted_df.iloc[frame, :]
-    #     fig2 = plot_lorentz(plot_df, fig_lorentz, columns, xmin, xmax)
-
-    # # for Noise Plot
-    # lorentz_list = []
-    # for number in substrates + metabolites:
-    #     extracted_df = extract_reacsubs_columns(df, number)
-    #     columns = extracted_df.columns
-    #     df_lorentz = extracted_df.iloc[frame, :]
-    #     length = df_raw.shape[0]
-    #     y = get_lorentz(df=df_lorentz, columns=columns, xmin=xmin, xmax=xmax, length=length)
-    #     lorentz_list.append(y)
-    # lorentz_array = np.vstack(lorentz_list)
-    
-    # fig3 = plot_noise(df_raw, lorentz_array, frame)
-    
+    def plot(self, frame):
+        # for consistent y axis
+        self.min_y = self.data.iloc[:,1:].min().min()
+        self.max_y = self.data.iloc[:,1:].max().max()
+        
+        fig1 = self.plot_raw(frame)
+        fig2 = self.plot_sum_fit(frame)
+        fig3 = self.plot_diff(frame)
+        return (fig1, fig2, fig3)
     
 
+    def plot_raw(self, frame):
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.data.iloc[:,0], y=self.data.iloc[:,frame], mode='lines', name='Raw'))
+        fig.update_layout(
+            title='Spectrum',
+            xaxis_title='X',
+            yaxis_title='Intensity',
+            showlegend=True,
+            yaxis=dict(range=[self.min_y, self.max_y])
+        )        
+        return fig
+    
+    def plot_diff(self, frame):
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.differences.iloc[:,0], y=self.differences.iloc[:,frame], mode='lines', name='Diff'))
+        fig.update_layout(
+            title='Noise',
+            xaxis_title='X',
+            yaxis_title='Intensity',
+            showlegend=True,
+            yaxis=dict(range=[self.differences.iloc[:,frame].min(), self.max_y])
+        )
+        return fig
 
-    #streamlit(fig1, fig2, fig3)
+    def plot_sum_fit(self, frame):
+        frame_data = self.individual_fits[frame]
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], y=self.sum_data.iloc[:,frame], mode='lines', name='Sum Fit'))
+        for i in range(1, len(frame_data.columns)):
+            fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], y=frame_data.iloc[:,i], mode='lines', name=f'Substance {i}'))
+        fig.update_layout(
+            title='Sum Fit',
+            xaxis_title='X',
+            yaxis_title='Intensity',
+            showlegend=True,
+            yaxis=dict(range=[self.min_y, self.max_y])
+        )
+        return fig
 
-    # return (fig1, fig2, fig3)

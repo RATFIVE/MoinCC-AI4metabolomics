@@ -174,7 +174,7 @@ class PeakFitting:
 
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum_fine_tune(x, *params),
-                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
+                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-5, xtol=1e-5)
 
                 positions_fine = popt[:self.number_peaks]
                 widths = popt[self.number_peaks:self.number_peaks + self.number_substances]
