@@ -147,7 +147,7 @@ class PeakFitting:
 
         return np.concatenate([popt[:self.number_peaks], widths_final, amplitudes_final]), np.concatenate([error[:self.number_peaks], widths_final_error, amplitudes_final_error])
 
-    def fit(self):
+    def fit(self, save_csv = True):
         # bounds for the first fitting, which corresponds to the first frame
         flattened_bounds = self.make_bounds(mode='first')
 
@@ -188,8 +188,12 @@ class PeakFitting:
                 print(f'Could not fit time frame number {i}. Skipping...')
         
         # save results
-        self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
-        self.fitting_params_error.to_csv(self.output_direc + 'fitting_params_error.csv')
+        if save_csv == True:
+            self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
+            self.fitting_params_error.to_csv(self.output_direc + 'fitting_params_error.csv')
+        else:
+            return self.fitting_params
+
     
     def lorentzian(self, x, shift, gamma, A):
         '''
