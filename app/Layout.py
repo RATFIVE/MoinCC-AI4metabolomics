@@ -131,15 +131,15 @@ class StreamlitApp():
         self.about_page(about)
         
     def main_page(self, main):
-        # perform peak fitting
-        #fitter = PeakFitting(self.data_fp, self.meta_fp)
-        #fitter.fit()
-        # Create data for the panels
-        #processor = Process4Panels(self.data_fp)
-        #processor.save_sum_spectra()
-        #processor.save_substrate_individual()
-        #processor.save_difference()
-        #processor.save_kinetics()
+        #perform peak fitting
+        fitter = PeakFitting(self.data_fp, self.meta_fp)
+        fitter.fit()
+        #Create data for the panels
+        processor = Process4Panels(self.data_fp)
+        processor.save_sum_spectra()
+        processor.save_substrate_individual()
+        processor.save_difference()
+        processor.save_kinetics()
 
 
         with main:
