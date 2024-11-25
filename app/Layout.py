@@ -18,6 +18,8 @@ import plotly.express as px
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from panel1_spectrum_plot import main as panel1_main
+from panel2_kinetic_plot import KineticPlot
+from panel3_contour_plot import main as panel3_main
 
 
 loaddata = LoadData()
@@ -103,7 +105,7 @@ class StreamlitApp():
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
 
 # '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
-# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA _20240215_2H_Yeast_Pyruvate-d3_3.csv'
+# '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240207_2H_yeast_Fumarate-d2_5.csv'
     def header(self):
         # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
@@ -113,8 +115,8 @@ class StreamlitApp():
 
         with col2:
 
-            self.meta_fp = st.text_input('Metadata File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
-            self.data_fp = st.text_input('Data File Path', '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20231109_2H_yeast_Gluc-d2_5.ser.csv')
+            self.meta_fp = st.text_input('Metadata File Path', )
+            self.data_fp = st.text_input('Data File Path', )
             
 
         with col3:
@@ -129,10 +131,10 @@ class StreamlitApp():
         self.about_page(about)
         
     def main_page(self, main):
-        # perform peak fitting
+        #perform peak fitting
         fitter = PeakFitting(self.data_fp, self.meta_fp)
         fitter.fit()
-        # Create data for the panels
+        #Create data for the panels
         processor = Process4Panels(self.data_fp)
         processor.save_sum_spectra()
         processor.save_substrate_individual()
@@ -170,7 +172,7 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             st.markdown('# Substrate Plot')
-            raw_plot, lorentz_plot, noise_plot = panel1_main()
+            raw_plot, lorentz_plot, noise_plot = panel1_main(file_path=self.data_fp, frame=2)
             st.plotly_chart(raw_plot)
             st.plotly_chart(lorentz_plot)
             st.plotly_chart(noise_plot)
@@ -182,21 +184,36 @@ class StreamlitApp():
         
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
             st.markdown('# Kinetic Plot')
-            #st.image(self.fig2, caption="Your Image Caption", use_column_width=True)
+            plot = KineticPlot(self.data_fp)
+            fig = plot.plot() 
+            st.plotly_chart(fig)
 
         return None
-
+    
+    
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Kinetic Plot", expanded=True):
             st.markdown('# Panel 3')
-            st.slider
-            #st.plotly_chart(self.fig3)
+            file = self.data_fp.split('/')[-1]
+            df_list = loaddata.load_data_list(file)
+            df_z = pd.read_csv(df_list[0])
+
+             #Slider to select z-value range
+             
+            z_min, z_max = st.slider(
+                "Select the range",
+                min_value=df_z.min().min(),  # Minimum value in the data
+                max_value=df_z.max().max(),  # Maximum value in the data
+                value=(df_z.min().min(), df_z.max().max())  # Default range
+            )
+
+            self.fig3 = panel3_main(file_path=self.data_fp, zmin=z_min, zmax=z_max)
+            st.pyplot(self.fig3)
             
         return None
     
     def panel4(self):
-        
         with st.expander("Panel 4", expanded=True):
             st.markdown('# Panel 4')
 
