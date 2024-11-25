@@ -10,7 +10,15 @@ class SpectraAnalysis:
         self.chem_shifts = data.iloc[:, 0]
 
     def peakfit_sum(self, threshold):
-        """Summen der Spektren und Rückgabe einer Liste gefundener Peaks"""
+        """sums up all spectra and returns list of found peaks above threshold percentile
+
+        Args:
+            spectra_data(DataFrame): extracted intensitys from DataFrame data
+            chem_shifts(list): extracted from DataFrame data
+        
+        Returns:
+            peak_pos(list): list with found peak positions
+        """
         sum_of_spectra = np.sum(self.spectra_data, axis=1)
         threshold = np.percentile(sum_of_spectra, threshold)
 
@@ -27,8 +35,17 @@ class SpectraAnalysis:
         return peak_pos
 
     def normalize_water(self):
-        """Anpassung der Daten basierend auf dem Wasser-Peak"""
-    
+        """shifts chem_shift values based on summed up spectra, so water peak is normalized to 4.7
+
+        Args:
+            spectra_data(DataFrame): extracted intensitys from DataFrame data
+            chem_shifts(list): extracted from DataFrame data
+        
+        Returns:
+            data_normalized(DataFrame): DataFrame with normalized Data   
+            norm_shift(Float): value by which chem_shift was shifted
+
+        """    
         peak_pos = self.peakfit_sum(threshold = 85)
         water = 4.7
         closest_peak = min(peak_pos, key=lambda x: abs(x - water))
@@ -41,7 +58,21 @@ class SpectraAnalysis:
         return data_normalized, norm_shift
 
     def peak_identify(self, data_normalized, initial_threshold=85, max_shift=0.5): #max_shift maybe
-        """Identifizierung von Peaks und Zuordnung zu erwarteten Peaks"""
+        """Searches for peaks and adds them to list based on expected values. 
+        Threshold is continually lowered until all expected peaks are found or more unknown peaks are found than expected
+        
+        Args:
+
+            self.expected_peaks(list): chem shift values of expected peaks
+            data_normalized(DataFrame): data normalized, result of function normalize_water
+            initial_threshold(int): Default:85
+            max_shift: maximum value that chem_shift can be shifted from expected peakposition for identification
+
+        Returns:
+
+            found(list): list of actual peak positions in order of expected peaks
+            other(list): list of unidentified found peaks
+        """
         spectra_data = data_normalized.iloc[:, 1:]
         chem_shifts = data_normalized.iloc[:, 0]
 
@@ -84,7 +115,9 @@ class SpectraAnalysis:
             min_cols_per_section (int, optional): minimum number if spectra that are summed up to find peaks. Defaults to 20.
 
         Returns:
-            df: Dtaframe with found peaks
+            final_df(DataFrame): Dtaframe with found peak positions
+            final_df['Found Peaks'] : list of actual peak positions in order of expected peaks
+            peaks_data['Other Peaks']: list of unidentified found peaks
         """
         #normalize data
         df, norm_shift = self.normalize_water()
