@@ -10,7 +10,15 @@ class SpectraAnalysis:
         self.chem_shifts = data.iloc[:, 0]
 
     def peakfit_sum(self, threshold):
-        """Summen der Spektren und Rückgabe einer Liste gefundener Peaks"""
+        """sums up all spectra and returns list of found peaks above threshold percentile
+
+        Args:
+            spectra_data(DataFrame): extracted intensitys from DataFrame data
+            chem_shifts(list): extracted from DataFrame data
+        
+        Returns:
+            peak_pos(list): list with found peak positions
+        """
         sum_of_spectra = np.sum(self.spectra_data, axis=1)
         threshold = np.percentile(sum_of_spectra, threshold)
 
@@ -27,8 +35,17 @@ class SpectraAnalysis:
         return peak_pos
 
     def normalize_water(self):
-        """Anpassung der Daten basierend auf dem Wasser-Peak"""
-    
+        """shifts chem_shift values based on summed up spectra, so water peak is normalized to 4.7
+
+        Args:
+            spectra_data(DataFrame): extracted intensitys from DataFrame data
+            chem_shifts(list): extracted from DataFrame data
+        
+        Returns:
+            data_normalized(DataFrame): DataFrame with normalized Data   
+            norm_shift(Float): value by which chem_shift was shifted
+
+        """    
         peak_pos = self.peakfit_sum(threshold = 85)
         water = 4.7
         closest_peak = min(peak_pos, key=lambda x: abs(x - water))
@@ -40,19 +57,34 @@ class SpectraAnalysis:
         data_normalized.columns = self.data.columns
         return data_normalized, norm_shift
 
-    def peak_identify(self, data_normalized, initial_threshold=85, max_shift=0.5): #max_shift maybe
-        """Identifizierung von Peaks und Zuordnung zu erwarteten Peaks"""
+    def peak_identify(self, data_normalized, reference_peaks, initial_threshold=85, max_shift=0.02): #max_shift maybe
+        """Searches for peaks and adds them to list based on expected values. 
+        Threshold is continually lowered until all expected peaks are found or more unknown peaks are found than expected
+        
+        Args:
+
+            self.expected_peaks(list): chem shift values of expected peaks
+            data_normalized(DataFrame): data normalized, result of function normalize_water
+            reference_peaks(list) = usually self.expected_peaks
+            initial_threshold(int, optional): starting percentile above which peaks are recognizedDefaults to 85
+            max_shift(Float): maximum value that chem_shift can be shifted from expected peakposition for identification
+
+        Returns:
+
+            found(list): list of actual peak positions in order of expected peaks
+            other(list): list of unidentified found peaks
+        """
         spectra_data = data_normalized.iloc[:, 1:]
         chem_shifts = data_normalized.iloc[:, 0]
 
-        found = [None] * len(self.expected_peaks)
+        found = [None] * len(reference_peaks)
         other = []
         threshold = initial_threshold
 
         while None in found or len(other) <= len(found):
             detected_peaks = self.peakfit_sum(threshold)
             for peak in detected_peaks:
-                distances = [abs(peak - expected_peak) for expected_peak in self.expected_peaks]
+                distances = [abs(peak - expected_peak) for expected_peak in reference_peaks]
                 min_distance = min(distances)
                 index = distances.index(min_distance)
 
@@ -67,24 +99,33 @@ class SpectraAnalysis:
             threshold -= 2
             if threshold < 0 or None not in found or len(other) > len(found):
                 break
+        
+        # replace remaining unfound peak positions with expected chem_shift value 
+        for i, peak in enumerate(found):
+            if peak is None:
+                found[i] = reference_peaks[i]  
 
         #print("Found Peaks: ", found)
         #print("Other Peaks: ", other)
 
         return found, other
 
-    def peak_df(self, min_cols_per_section=20):
+    def peak_df(self, min_cols_per_section=20, max_shift = None):
         """Normalizes the given data to chem_shift(water) = 4.7 
         splits spectra into sections over time
         identifies peaks in summed up sections
 
         Args:
-            data (dataFrame): spectrum data; 1.column with chemical shift, athers with intensity
+            data(dataFrame): spectrum data; 1.column with chemical shift, athers with intensity
             expected_peaks (list): list of chem_shifts of expected peaks
             min_cols_per_section (int, optional): minimum number if spectra that are summed up to find peaks. Defaults to 20.
+            max_shift(Float, optional) = max shift in chem_shift of peaks between section. If not given, calculated based on assumption of max total shift during experiment =1. 
+                Can be increased if later appearing peaks are wrongly identified.
 
         Returns:
-            df: Dtaframe with found peaks
+            final_df(DataFrame): Dtaframe with found peak positions
+            final_df['Found Peaks'] : list of actual peak positions in order of expected peaks
+            peaks_data['Other Peaks']: list of unidentified found peaks
         """
         #normalize data
         df, norm_shift = self.normalize_water()
@@ -108,14 +149,21 @@ class SpectraAnalysis:
             start_col = end_col
             col_sect.extend([f"{section + 1}"] * (cols_per_section + extra)) #column entries for final dataframe
 
+        reference_peaks = self.expected_peaks
         found_lists = []
         other_lists = []
 
-        # Find peaks for each section
+        #create maximum shift based on assumption, that peaks may shift up to 0.1 during whole experiment. 
+        # (1.5 to account for uneven distribution of pH-shifts)
+        if max_shift == None:
+            max_shift = 0.15 / num_sections 
+        
+        # Find peaks for each section,max_shift concerning previously found position if exist
         for df_section in sections:
-            found, other = self.peak_identify(data_normalized = df_section)
+            found, other = self.peak_identify(data_normalized = df_section, reference_peaks = reference_peaks, max_shift= max_shift)
             found_lists.append(found)
             other_lists.append(other)
+            reference_peaks = found
 
         #'unnormalize' the values
         for i in range(len(found_lists)):
