@@ -14,11 +14,11 @@ fitting_params = f'/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Pr
 def lorentzian(x, shift, gamma, A):
     return A * gamma / ((x - shift)**2 + gamma**2)
 
-data = pd.read_csv(data_fp)
-sum_data = pd.read_csv(sum_fp)
-individual_data = pd.read_csv(individual)
-differences = pd.read_csv(differences)
-fitting_params = pd.read_csv(fitting_params)
+data = pd.read_csv(data_fp, header = 0)
+sum_data = pd.read_csv(sum_fp, header = 0)
+individual_data = pd.read_csv(individual, header = 0)
+differences = pd.read_csv(differences, header = 0)
+fitting_params = pd.read_csv(fitting_params, header = 0)
 
 x = data.iloc[:, 0]
 y = data.iloc[:, 1]

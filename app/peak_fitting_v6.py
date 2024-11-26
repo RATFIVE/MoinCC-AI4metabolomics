@@ -30,7 +30,6 @@ class PeakFitting:
         self.df = pd.read_csv(fp_file)
         self.meta_df = pd.read_excel(fp_meta)
 
-
         self.number_time_points = self.df.shape[1] - 1
         self.time_points = np.arange(0, self.number_time_points) 
         self.x = self.df.iloc[:,0]
@@ -256,10 +255,9 @@ class PeakFitting:
         return y
 
 # FA_20240207_2H_yeast_Fumarate-d2_5.csv
-input_file = '../Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv'
-meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+#input_file = '../Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv'
+#meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
 ###
-pf = PeakFitting(input_file, meta_file)
-pf.fit()
-
+#pf = PeakFitting(input_file, meta_file)
+#pf.fit()
 # Error Handling: Are filepathe existing?

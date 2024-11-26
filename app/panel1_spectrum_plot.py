@@ -84,7 +84,9 @@ class Panel1SpectrumPlot():
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
                                  mode='lines', name='Sum Fit'))
         for i in range(1, len(frame_data.columns)):
-            fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], y=frame_data.iloc[:,i], mode='lines', name=f'Substance {i}'))
+            fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], y=frame_data.iloc[:,i], mode='lines', name=frame_data.columns[i]))
+
+            
         fig.update_layout(
             title='Sum Fit',
             xaxis_title='Chemical Shift [ppm]',
@@ -100,4 +102,3 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         return fig
-
