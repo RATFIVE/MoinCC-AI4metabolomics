@@ -1,6 +1,12 @@
 # space for structured(!) information about task, progress background info
 ## to dos
-- flip scale as seen in fatimas paper
+- Reference Plot (Meike)
+- x Axis aline (Marco)
+- Fit Bug fix (Tom)
+- Description ()
+- Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
+- Nur einmal Start Process klicken und Daten einlesen, dann nur plots (future optimierung)
+- flip scale as seen in fatimas paper (done)
 ## Questions 24. 09.24
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
 - how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?

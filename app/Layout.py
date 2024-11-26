@@ -27,6 +27,11 @@ loaddata = LoadData()
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
+meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
+data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv')
+referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+
+
 class StreamlitApp():
     """
     A Streamlit-based application for visualizing and analyzing metabolite spectra and kinetics.
@@ -75,20 +80,20 @@ class StreamlitApp():
                  fig1=None, 
                  fig2=None,
                  fig3=None,
-                 fig4=None,
-                 fig5=None
+                 fig4=None
                  ):
         
         self.fig1 = fig1
         self.fig2 = fig2
         self.fig3 = fig3
         self.fig4 = fig4
-        self.fig5 = fig5  
+
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx
 # /home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv
 
 # '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
 # '/Users/marco/Documents/MoinCC-AI4metabolomics/Data/FA_20240207_2H_yeast_Fumarate-d2_5.csv'
+
 
 
     def header(self):
@@ -99,16 +104,16 @@ class StreamlitApp():
             st.divider()
 
         with col2:
-            self.meta_fp = st.text_input('Metadata File Path', '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx')
-            self.data_fp = st.text_input('Data File Path','/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv' )
-            self.referece_fp = st.text_input('Reference File Path', '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+            self.meta_fp = st.text_input('Metadata File Path', meta_fp)
+            self.data_fp = st.text_input('Data File Path', data_fp)
+            self.referece_fp = st.text_input('Reference File Path', referece_fp)
         
         with col3:
             st.divider()
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
 
-        main, about = st.tabs(['Main Page', 'About'])
+        main, about = st.tabs(['Main Page', 'Instructions'])
 
         # Dynamically run main_page only if the button is clicked
         if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
@@ -116,6 +121,7 @@ class StreamlitApp():
                 st.session_state["file_name"] = self.data_fp
                 self.process_data()
             self.main_page(main)
+            self.about_page(about)
         
     def main_page(self, main):
         with main:
@@ -124,7 +130,7 @@ class StreamlitApp():
                 self.panel1()
                 self.panel2()
                 self.panel3()
-                self.panel5()
+                self.panel4()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
@@ -142,9 +148,28 @@ class StreamlitApp():
     def about_page(self, about):
         with about:
             st.markdown(f"""
-                        # About
+                        ### Instructions:
 
-                        This is a descrption of {lorem.paragraph(), lorem.paragraph()}
+                        #### Step 1: 
+                        - Select the Metafile Path
+                        - Select the Substrate File Path
+                        - Select the Reference File Path
+
+                        #### Step 2:
+                        - Click Start Processing
+
+                        #### Step 3:
+                        ### Substrate Plot
+                        - Use Sliders to slect the Frame, to investigate
+                        
+                        ##### Contour Plot
+                        - Use Slider to selct the depth in % 
+
+
+                        #### Reference Plot
+                        - Enjoy
+
+                        
                         
                         """)
         return None
@@ -156,7 +181,7 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             # add a slider to select the frame
-            st.session_state['time_frame'] = st.slider('Select the frame', min_value=0, max_value=sum_fit.shape[0]-1, value=1)
+            st.session_state['time_frame'] = st.slider('Select the frame', min_value=0, max_value=sum_fit.shape[1]-1, value=1)
             st.markdown('# Substrate Plot')
             panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
@@ -175,18 +200,19 @@ class StreamlitApp():
     
     def panel3(self):
         """Contour Plot"""
-        with st.expander("Panel 3 - Kinetic Plot", expanded=True):
-            st.markdown('# Panel 3')
+        with st.expander("Panel 3 - Contour Plot", expanded=True):
+            st.markdown('# Contour Plot')
             panel_3_obj = ContourPlot(self.data_fp)
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
-            st.pyplot(contourplot)
+            st.pyplot(contourplot, clear_figure=True)
 
-    def panel5(self):
+    def panel4(self):
         
-        with st.expander("Panel 5", expanded=True):
-            st.markdown('# Panel 5')
+        with st.expander("Panel 4 - Reference Plot", expanded=True):
+            st.markdown('# Reference Plot')
+            st.write('In Progess...')
 
     
     def run(self):
