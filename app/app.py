@@ -3,6 +3,7 @@ import panel3_contour_plot as p3cp
 from pathlib import Path
 import pandas as pd
 from LoadData import *
+import streamlit as st
 
 
 
@@ -23,6 +24,8 @@ from LoadData import *
 
 
 def main():
+    st.session_state.clear()
+   # st.rerun()
     app = Layout.StreamlitApp()#fig2=example_image_path,
                               #fig3=fig3)
     app.run()

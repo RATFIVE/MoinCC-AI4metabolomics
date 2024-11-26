@@ -1,12 +1,14 @@
 # space for structured(!) information about task, progress background info
-## to dos
+## To Dos
 - Reference Plot (Meike)
-- x Axis aline (Marco)
+- (done) x Axis aline (Marco)
 - Fit Bug fix (Tom)
-- Description ()
-- Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
+- Description (?)
+- Wenn output dir schon vorhanden, dann soll beim drücken von Process Start nicht nochmal die komplette Datei ausgeführt werden (Marco)
+- Wenn die Datei nicht vorhanden ist soll kein Error sondern eine Nachricht erscheinen (Marco)
+- (done) Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
 - Nur einmal Start Process klicken und Daten einlesen, dann nur plots (future optimierung)
-- flip scale as seen in fatimas paper (done)
+- (done) flip scale as seen in fatimas paper
 ## Questions 24. 09.24
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
 - how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?
