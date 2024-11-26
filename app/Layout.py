@@ -11,11 +11,12 @@ from PIL import Image
 import lorem
 from LoadData import *
 from panel3_contour_plot import *
-from peak_fitting_v6 import PeakFitting
+from peak_fitting_v7 import PeakFitting
 import matplotlib.pyplot as plt
 from Process4Panels import Process4Panels
 import plotly.express as px
-from tkinter import Tk
+from tkinter import *
+from tkinter import filedialog
 from tkinter.filedialog import askopenfilename
 from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
@@ -23,13 +24,30 @@ from panel3_contour_plot import ContourPlot
 
 
 
-
-
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
-data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20231122_2H_yeast_acetone-d6_3.csv')
+data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _6.csv')
+# FA_20240207_2H_yeast_Fumarate-d2_5.csv
+# FA_20231122_2H_yeast_acetone-d6_3.csv
 referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+
+
+
+# Function to open a file dialog and get the file path
+def select_csv_file():
+    """load data path
+
+    Returns:
+        dir_path (str): directory path
+    """
+    root = Tk()
+    file_path = filedialog.askdirectory()
+    #dir_path = r'/Users/marco/Documents/UKSH/Data/Banzhaf_Marco_1996-09-03_B.MA._2/2024-04-11'
+    root.destroy()
+    if file_path == '':
+        return None
+    return file_path
 
 class StreamlitApp():
     """
@@ -44,7 +62,7 @@ class StreamlitApp():
         fig2 (str or plotly.graph_objects.Figure): Kinetic plot or its file path.
         fig3 (str or plotly.graph_objects.Figure): Contour plot or its file path.
         fig4 (str or plotly.graph_objects.Figure): Reference plot or its file path.
-        fig5 (str or plotly.graph_objects.Figure): Additional plot or its file path.
+
     
     Methods:
         side_bar():
@@ -104,18 +122,23 @@ class StreamlitApp():
         with col2:
             self.meta_fp = st.text_input('Metadata File Path', meta_fp)
             self.data_fp = st.text_input('Data File Path', data_fp)
+
+            select_file_button = st.button(label='Select CSV', )
+            if select_file_button:
+                self.data_fp = select_csv_file()
+                st.write(self.data_fp)
+
+            
+
             self.referece_fp = st.text_input('Reference File Path', referece_fp)
         
         with col3:
             st.divider()
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
-                try:
-                    self.process_data()
-                except:
-                    st.write('Please select a file.')
-               
+                self.process_data()
 
+        # Plit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
         # Dynamically run main_page only if the button is clicked
@@ -132,7 +155,7 @@ class StreamlitApp():
             if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
                 self.panel1()
                 self.panel2()
-                self.panel3()
+                self.panel3()  
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
@@ -149,6 +172,7 @@ class StreamlitApp():
 
     def about_page(self, about):
         with about:
+            # Text which will be shown in the Instruction 
             st.markdown(f"""
                         ### Instructions:
 
@@ -171,33 +195,46 @@ class StreamlitApp():
                         #### Reference Plot
                         - Enjoy
 
-                        
-                        
+
                         """)
         return None
 
     # -------- Panels with Expanders --------------------
     def panel1(self):
         # read in results from fitting
-        sum_fit_fp = Path('output', f'{os.path.basename(self.data_fp)}_output', 'sum_fit.csv')
-        sum_fit = pd.read_csv(sum_fit_fp)
+        try:
+            sum_fit_fp = Path('output', f'{os.path.basename(self.data_fp)}_output', 'sum_fit.csv')
+        
+            sum_fit = pd.read_csv(sum_fit_fp)
+        except:
+            # Show this text message if there the Output Data is no available.
+            st.markdown("""
+                        <span style="color:red; font-size:72px;">Please Press 'Start Processing !'</span>
+                        """, unsafe_allow_html=True)
+
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             # add a slider to select the frame
-            st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
-            st.markdown('# Substrate Plot')
-            panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-            raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
-            st.plotly_chart(raw_plot, use_container_width=True)
-            st.plotly_chart(lorentz_plot, use_container_width=True)
-            st.plotly_chart(noise_plot, use_container_width=True)
-
+            try:
+                st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
+                st.markdown('# Substrate Plot')
+                panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
+                raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
+                st.plotly_chart(raw_plot, use_container_width=True)
+                st.plotly_chart(lorentz_plot, use_container_width=True)
+                st.plotly_chart(noise_plot, use_container_width=True)
+            except:
+                pass
+            
     def panel2(self):
         """ Kinetic Plot"""
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
-            st.markdown('# Kinetic Plot')
-            plot = KineticPlot(self.data_fp)
-            fig = plot.plot() 
-            st.plotly_chart(fig, use_container_width=True)
+            try:
+                st.markdown('# Kinetic Plot')
+                plot = KineticPlot(self.data_fp)
+                fig = plot.plot() 
+                st.plotly_chart(fig, use_container_width=True)
+            except:
+                pass
     
     def panel3(self):
         """Contour Plot"""

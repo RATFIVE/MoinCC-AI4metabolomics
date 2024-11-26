@@ -30,8 +30,6 @@ class Panel1SpectrumPlot():
             for f in ind_file_names
         ]
 
-        print(ind_file_names)
-
     def plot(self, frame):
         # for consistent y axis
         self.min_y = self.data.iloc[:,1:].min().min()
@@ -89,7 +87,7 @@ class Panel1SpectrumPlot():
         return fig
 
     def plot_sum_fit(self, frame):
-        frame_data = self.individual_fits[frame]
+        frame_data = self.individual_fits[frame -1 ]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0][::-1],           # To Change direction of x axis from low to high 
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
