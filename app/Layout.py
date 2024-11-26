@@ -28,7 +28,11 @@ loaddata = LoadData()
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
+<<<<<<< HEAD
 data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _3.csv')
+=======
+data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20231122_2H_yeast_acetone-d6_3.csv')
+>>>>>>> 44524817be7baf457aeb48e164d374f2e9ccd6fe
 referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
 
 class StreamlitApp():
@@ -96,7 +100,6 @@ class StreamlitApp():
 
 
     def header(self):
-        # init se
         st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.2, 0.8, 0.2])
         with col1:
@@ -111,6 +114,8 @@ class StreamlitApp():
             st.divider()
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
+                self.process_data()
+               
 
         main, about = st.tabs(['Main Page', 'Instructions'])
 
@@ -118,7 +123,7 @@ class StreamlitApp():
         if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
             if not st.session_state.get("file_name", self.data_fp):
                 st.session_state["file_name"] = self.data_fp
-                self.process_data()
+                
             self.main_page(main)
             self.about_page(about)
         
