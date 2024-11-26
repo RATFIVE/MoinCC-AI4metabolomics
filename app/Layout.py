@@ -28,7 +28,7 @@ loaddata = LoadData()
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
-data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240207_2H_yeast_Fumarate-d2_5.csv')
+data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240124_2H_yeast_Nicotinamide-d4 _5.csv')
 referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
 
 

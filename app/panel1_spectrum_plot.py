@@ -45,7 +45,13 @@ class Panel1SpectrumPlot():
             title='Spectrum',
             xaxis_title='Chemical Shift [ppm]',
             yaxis_title='Intensity',
-            showlegend=True,
+            showlegend=False,
+            legend=dict(
+                x=0.95,
+                y=0.9,
+                xanchor='center',
+                yanchor='middle'
+            ),
             yaxis=dict(range=[self.min_y, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)              # To Change direction of x axis from low to high 
         )        
@@ -61,6 +67,12 @@ class Panel1SpectrumPlot():
             xaxis_title='Chemical Shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
+            legend=dict(
+                x=0.95,
+                y=0.9,
+                xanchor='center',
+                yanchor='middle'
+            ),
             yaxis=dict(range=[self.differences.iloc[:,frame].min(), self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
@@ -79,6 +91,12 @@ class Panel1SpectrumPlot():
             xaxis_title='Chemical Shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
+            legend=dict(
+                x=0.95,
+                y=0.9,
+                xanchor='center',
+                yanchor='middle'
+            ),
             yaxis=dict(range=[self.min_y, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
