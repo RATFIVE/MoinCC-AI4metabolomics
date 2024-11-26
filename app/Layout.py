@@ -201,7 +201,7 @@ class StreamlitApp():
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Contour Plot", expanded=True):
-            st.markdown('# Kinetic Plot')
+            st.markdown('# Contour Plot')
             panel_3_obj = ContourPlot(self.data_fp)
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
@@ -210,7 +210,7 @@ class StreamlitApp():
 
     def panel4(self):
         
-        with st.expander("Panel 5 - Reference Plot", expanded=True):
+        with st.expander("Panel 4 - Reference Plot", expanded=True):
             st.markdown('# Reference Plot')
             st.write('In Progess...')
 
