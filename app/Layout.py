@@ -22,17 +22,13 @@ from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 
 
-loaddata = LoadData()
+
 
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
-<<<<<<< HEAD
-data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _3.csv')
-=======
 data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20231122_2H_yeast_acetone-d6_3.csv')
->>>>>>> 44524817be7baf457aeb48e164d374f2e9ccd6fe
 referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
 
 class StreamlitApp():
@@ -114,7 +110,10 @@ class StreamlitApp():
             st.divider()
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
-                self.process_data()
+                try:
+                    self.process_data()
+                except:
+                    st.write('Please select a file.')
                
 
         main, about = st.tabs(['Main Page', 'Instructions'])
@@ -134,7 +133,6 @@ class StreamlitApp():
                 self.panel1()
                 self.panel2()
                 self.panel3()
-                self.panel4()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
@@ -185,7 +183,7 @@ class StreamlitApp():
         sum_fit = pd.read_csv(sum_fit_fp)
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             # add a slider to select the frame
-            st.session_state['time_frame'] = st.slider('Select the frame', min_value=0, max_value=sum_fit.shape[1]-1, value=1)
+            st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
             st.markdown('# Substrate Plot')
             panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
@@ -210,10 +208,6 @@ class StreamlitApp():
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
             st.pyplot(contourplot, clear_figure=True)
-
-    def panel5(self):
-        with st.expander("Panel 5", expanded=True):
-            st.markdown('# Panel 5')
 
     
     def run(self):

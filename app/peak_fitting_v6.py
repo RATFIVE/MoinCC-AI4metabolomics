@@ -3,6 +3,7 @@ This model is an improvement of model 5.
 Only the first the fittings are done. On the consecutive fittings the previous fitting parameters are used as initial guess.
 '''
 
+
 import pandas as pd
 import os
 import numpy as np

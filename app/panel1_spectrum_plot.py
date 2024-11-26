@@ -14,12 +14,23 @@ class Panel1SpectrumPlot():
         self.file_path = file_path
         self.file_name = os.path.basename(file_path)
         
-        self.data = pd.read_csv(file_path, header = True)
-        self.sum_data = pd.read_csv(Path('output', f'{self.file_name}_output', 'sum_fit.csv'), header = True)
-        self.differences = pd.read_csv(Path('output', f'{self.file_name}_output', 'differences.csv'), header = True)
+        self.data = pd.read_csv(file_path, header = 0)
+        self.sum_data = pd.read_csv(Path('output', f'{self.file_name}_output', 'sum_fit.csv'), header = 0)
+        self.differences = pd.read_csv(Path('output', f'{self.file_name}_output', 'differences.csv'), header = 0)
         
-        # read in also data for the fitting
-        self.individual_fits = [pd.read_csv(f, header = True) for f in Path('output', f'{self.file_name}_output', 'substance_fits').iterdir()]
+        # Read in and sort files numerically by the number in their names
+        ind_file_names = sorted(
+            os.listdir(Path('output', f'{self.file_name}_output', 'substance_fits')),
+            key=lambda x: int(x.split('_fit')[1].split('.csv')[0])  # Extract number for sorting
+        )
+
+        # Load the CSV files in the sorted order
+        self.individual_fits = [
+            pd.read_csv(Path('output', f'{self.file_name}_output', 'substance_fits', f), header=0)
+            for f in ind_file_names
+        ]
+
+        print(ind_file_names)
 
     def plot(self, frame):
         # for consistent y axis
@@ -72,7 +83,7 @@ class Panel1SpectrumPlot():
                 xanchor='center',
                 yanchor='middle'
             ),
-            yaxis=dict(range=[self.differences.iloc[:,frame].min(), self.max_y]),
+            yaxis=dict(range=[self.differences.iloc[:,frame].min()*20, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         return fig
