@@ -1,9 +1,9 @@
 # space for structured(!) information about task, progress background info
-## to dos
+## To Dos
 - Reference Plot (Meike)
 - (done) x Axis aline (Marco)
 - Fit Bug fix (Tom)
-- Description ()
+- Description (?)
 - Wenn output dir schon vorhanden, dann soll beim drücken von Process Start nicht nochmal die komplette Datei ausgeführt werden (Marco)
 - Wenn die Datei nicht vorhanden ist soll kein Error sondern eine Nachricht erscheinen (Marco)
 - (done) Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
