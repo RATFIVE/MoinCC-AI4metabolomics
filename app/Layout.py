@@ -111,8 +111,8 @@ class StreamlitApp():
             st.divider()
             if st.button("Start Processing"):
                 st.session_state["processing_started"] = True
-            
-                
+                self.process_data()
+               
 
         main, about = st.tabs(['Main Page', 'Instructions'])
 
@@ -120,7 +120,7 @@ class StreamlitApp():
         if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
             if not st.session_state.get("file_name", self.data_fp):
                 st.session_state["file_name"] = self.data_fp
-                self.process_data()
+                
             self.main_page(main)
             self.about_page(about)
         
