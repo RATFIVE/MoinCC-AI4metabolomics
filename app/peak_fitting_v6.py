@@ -88,7 +88,7 @@ class PeakFitting:
 
     def make_bounds(self, mode, positions_fine = None,
                     shift_bounds = (-np.inf, np.inf),width_bounds = (0, 3e-1), amplitude_bounds = (0, np.inf),
-                    shift_bounds_fine = (- 0.3, 0.3), width_bounds_fine = (0, 3e-1), amplitude_bounds_fine = (0, np.inf)):
+                    shift_bounds_fine = (- 0.1, 0.1), width_bounds_fine = (0, 3e-1), amplitude_bounds_fine = (0, np.inf)):
         if mode == 'first':
             shift_lower_bounds = np.full(1, shift_bounds[0])  # shifting the whole spectrum
             shift_upper_bounds = np.full(1, shift_bounds[1])
@@ -147,7 +147,7 @@ class PeakFitting:
 
         return np.concatenate([popt[:self.number_peaks], widths_final, amplitudes_final]), np.concatenate([error[:self.number_peaks], widths_final_error, amplitudes_final_error])
 
-    def fit(self):
+    def fit(self, save_csv = True):
         # bounds for the first fitting, which corresponds to the first frame
         flattened_bounds = self.make_bounds(mode='first')
 
@@ -174,7 +174,7 @@ class PeakFitting:
 
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum_fine_tune(x, *params),
-                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-4, xtol=1e-4)
+                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-6, xtol=1e-6)
 
                 positions_fine = popt[:self.number_peaks]
                 widths = popt[self.number_peaks:self.number_peaks + self.number_substances]
@@ -190,8 +190,12 @@ class PeakFitting:
                 print(f'Could not fit time frame number {i}. Skipping...')
         
         # save results
-        self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
-        self.fitting_params_error.to_csv(self.output_direc + 'fitting_params_error.csv')
+        if save_csv == True:
+            self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
+            self.fitting_params_error.to_csv(self.output_direc + 'fitting_params_error.csv')
+        else:
+            return self.fitting_params
+
     
     def lorentzian(self, x, shift, gamma, A):
         '''
@@ -250,10 +254,11 @@ class PeakFitting:
             if k < self.number_substances:
                 y += self.lorentzian(x, x0[i], gamma[k], A[k])
         return y
-# FA_20240207_2H_yeast_Fumarate-d2_5.csv
-input_file = '../Data/FA_20240517_2H_yeast_Nicotinamide-d4 _3.csv'
-meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
 
+# FA_20240207_2H_yeast_Fumarate-d2_5.csv
+input_file = '../Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv'
+meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
+###
 pf = PeakFitting(input_file, meta_file)
 pf.fit()
 

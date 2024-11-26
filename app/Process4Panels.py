@@ -11,7 +11,6 @@ class Process4Panels:
         self.file_name = os.path.basename(data_file_path)
         self.output_dir = Path('output', self.file_name + '_output')
         self.fitting_params_fp = Path(str(self.output_dir), 'fitting_params.csv')
-        print(self.fitting_params_fp)
         self.fitting_params_err_fp = Path(str(self.output_dir), 'fitting_params_error.csv')
 
         # read in necessary data
@@ -48,6 +47,7 @@ class Process4Panels:
         x = self.data.iloc[:,0]
         output_path = Path(str(self.output_dir), 'substance_fits')
         os.makedirs(str(output_path), exist_ok=True)
+
         for i, row in enumerate(self.fitting_params.iterrows()):
             n_peaks = int((len(row[1]) - 1) / 3)
             names = row[1].index[1:]  # This remains the same because `index` is used for column labels
@@ -78,10 +78,8 @@ class Process4Panels:
     def save_difference(self):
         # Extract the x-axis data
         x = self.data.iloc[:, 0]
-
         # Initialize differences DataFrame with x as the first column
         differences = pd.DataFrame({'x': x})
-
         # Compute differences for each column and concatenate
         diff_columns = [self.data.iloc[:, i] - self.sum_df.iloc[:, i] for i in range(1, self.sum_df.shape[1])]
         #print(diff_columns)
@@ -114,7 +112,7 @@ class Process4Panels:
         kinetics['time'] = np.arange(0, kinetics.shape[0])
         kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
 
-#processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240108_2H_yeast_Nicotinamide-d4 _11.csv')
+#processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
 #processer.save_sum_spectra()
 #processer.save_substrate_individual()
 #processer.save_difference()
