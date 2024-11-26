@@ -70,9 +70,10 @@ class PeakFitting:
         names = []
 
         react_substrat = str(self.meta_df['Substrate_ppm'].iloc[0]).split(',')
-        for i in range(len(react_substrat)):
-            names.append('ReacSubs')
-            positions.append(float(react_substrat[i]))
+        if react_substrat != ['nan']:
+            for i in range(len(react_substrat)):
+                names.append('ReacSubs')
+                positions.append(float(react_substrat[i]))
 
         for i in range(1, 6):
             react_metabolite = str(self.meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
