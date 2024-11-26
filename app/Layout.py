@@ -164,7 +164,6 @@ class StreamlitApp():
             st.plotly_chart(lorentz_plot, use_container_width=True)
             st.plotly_chart(noise_plot, use_container_width=True)
 
-
     def panel2(self):
         """ Kinetic Plot"""
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
@@ -184,10 +183,8 @@ class StreamlitApp():
             st.pyplot(contourplot)
 
     def panel5(self):
-        
         with st.expander("Panel 5", expanded=True):
             st.markdown('# Panel 5')
-
     
     def run(self):
         self.header()
