@@ -64,7 +64,7 @@ class PeakFitting:
 
         if self.meta_df.shape[0] == 0: #no metabolites listed --> only water present
             print(f'No metadata found for {self.file_name}')
-            return [], []
+        
 
         positions = []
         names = []
