@@ -61,28 +61,32 @@ class PeakFitting:
             names: list of all names of the ppm values
         """
         self.meta_df = self.meta_df[self.meta_df['File'].astype(str).str.upper() == str(self.file_name).upper()]
-        if self.meta_df.shape[0] == 0:
-            print(f'No metadata found for {self.file_name}')
-            return [], []
-        positions = []
-        names = []
+        if self.meta_df.shape[0] == 0: #no metabolites listed --> only water present
+            print(f'No metadata or metabolites found for {self.file_name}')
+            positions = [4.7]
+            names =[water]
+            #return [], []
 
-        react_substrat = str(self.meta_df['Substrate_ppm'].iloc[0]).split(',')
-        for i in range(len(react_substrat)):
-            names.append('ReacSubs')
-            positions.append(float(react_substrat[i]))
-    
-        for i in range(1, 6):
-            react_metabolite = str(self.meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
-            if react_metabolite == ['nan']:
-                continue
-            for j in range(len(react_metabolite)):
-                names.append(f'Metab{i}')
-                positions.append(float(react_metabolite[j]))
+        else: #if there is metabolites listed
+            positions = []
+            names = []
 
-        # water ppm
-        positions.append(float(self.meta_df['Water_ppm'].iloc[0]))
-        names.append('Water')
+            react_substrat = str(self.meta_df['Substrate_ppm'].iloc[0]).split(',')
+            for i in range(len(react_substrat)):
+                names.append('ReacSubs')
+                positions.append(float(react_substrat[i]))
+        
+            for i in range(1, 6):
+                react_metabolite = str(self.meta_df[f'Metabolite_{i}_ppm'].iloc[0]).split(',')
+                if react_metabolite == ['nan']:
+                    continue
+                for j in range(len(react_metabolite)):
+                    names.append(f'Metab{i}')
+                    positions.append(float(react_metabolite[j]))
+
+            # water ppm
+            positions.append(float(self.meta_df['Water_ppm'].iloc[0]))
+            names.append('Water')
 
         return positions, names
 
