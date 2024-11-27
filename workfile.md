@@ -9,12 +9,46 @@
 - (done) Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
 - Nur einmal Start Process klicken und Daten einlesen, dann nur plots (future optimierung)
 - (done) flip scale as seen in fatimas paper
+
+# Notes from 27.11.
+- Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
+- optinal group (select many) the lorenzian (P1 Marco)
+- Save the figures as pdf (P2 Marco)
+
+- Kinetic Plot, Dots instead of line (without a mean line) (P1 Tom)
+- Shifted frames by one  (P2 Meike)
+- Caracterize how similar the noise is. (Mean, std of all the noise frames) (P2 Meike)
+- Line width of the lorenzians should not change (maybe 10%) constrain of for the fitting (P3 Tom)
+- Print the reference value (P1 Meike)
+- time with s, min h? Time Step instead of time (P1 Meike)
+- reference factor mit in die anderen plots (P3 all)
+- Font is too small (P1 Marco)
+- Capitalisation in the labels (P1 Marco)
+- Use the same label names on e.g y axis  (P1 Marco)
+- file name of sum_fit should be fitted (P1 Tom)
+- put time to the beginning (in kenitcs.csv) (P1 Tom)
+- add kinetics in mol - another .csv file (P1 Meike)
+- add constant to fitting (P2 Tom)
+- Button to select also meta file and reference file (P1 Marco)
+- Start Processing at the end of selecting  (P1 Marco)
+- Process bar after pressing the button (P2 Tom/Marco)
+- Select the model  (P1 Tom/Marco)
+- Wirte a README (P3 )
+- write instructions (P1 Marco)
+- performance (Matplotlib, Plotly, Session_state) (P3 All)
+- Beide Modell zusammen ist aktuell mit bug (P1 Tom)
+
+
+
+
 ## Questions 24. 09.24
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
 - how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?
 - --> should be normalized one by one, if not check with Fatima
 - ---> first peak is taken as reference
 - --> we can shift them
+
+
 
 - relations of peaks to each other, when there are several characteristic peaks for one metabolite
 - --> nicotinamite, peaks should have the same concentration
