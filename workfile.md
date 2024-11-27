@@ -9,12 +9,42 @@
 - (done) Fiting Logic optimieren, session_state speichert die Pfade auch beim schließen der Datei (Marco)
 - Nur einmal Start Process klicken und Daten einlesen, dann nur plots (future optimierung)
 - (done) flip scale as seen in fatimas paper
+
+# Notes from 27.11.
+- Putting everything in one plot (One Plot but with offset) Sleect between stacked and overlayed
+- Save the figures as pdf
+- Stacked but select on the legend which one to show
+- Kinetic Plot, Dots instead of line (without a mean line)
+- Shifted frames by one 
+- Caracterize how similar the noise is. (Mean, std of all the noise frames)
+- Line width of the lorenzians should not change (maybe 10%) constrain of for the fitting
+- Print the reference value
+- time with s, min h?
+- Font is too small
+- Capitalisation in the labels
+- Use the same label names on e.g y axis 
+- file name of sum_fit should be fitted
+- put time to the beginning (in kenitcs.csv)
+- add kinetics in mol
+
+- Button to select also meta file and reference file
+- Start Processing at the end of selecting 
+- Process bar after pressing the button
+- Select the model
+- Wirte a README
+- write instructions
+
+
+
+
 ## Questions 24. 09.24
 - Do external conditions cause the same shift for each metabolite? Skewing of the spectra also possible?Is skewing the only problem?
 - how exactly are the spectra calibrated/normalized? Each by itself or by average of whole time series, where do deviations originate from?
 - --> should be normalized one by one, if not check with Fatima
 - ---> first peak is taken as reference
 - --> we can shift them
+
+
 
 - relations of peaks to each other, when there are several characteristic peaks for one metabolite
 - --> nicotinamite, peaks should have the same concentration
