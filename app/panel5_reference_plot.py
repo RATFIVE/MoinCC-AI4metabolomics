@@ -1,22 +1,65 @@
-#3 subplots for one timeframe, switch timeframes with buttons
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import pandas as pd
-from scipy.optimize import curve_fit
-
-class ReferencePlot:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.df = pd.read_csv(file_path)
+import matplotlib.pyplot as plt
+import re
+import peak_fitting_v6
 
 
-class FitReference:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.df = pd.read_csv(file_path)
 
-    def lorentzian(self, x, shift, gamma, A):
-        return A * gamma / ((x - shift)**2 + gamma**2)
+class Reference():
+    def __init__(self, fp_file, fp_meta):
+        self.data = pd.read_csv(fp_file)
+        self.chem_shifts = self.data.iloc[:,0]
+        self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
+        self.fitting_params = self.LorentzianFit.fit(save_csv= False)
     
-    def fit_reference(self):
-        self.fitting_results = pd.DataFrame()
+    def ReferenceValue(self):
+        #get referenz concentration from meta data
+        mmol = re.findall(r'[0-9\.]+', self.LorentzianFit.meta_df.iloc[0]['Substrate_mM_added'])
+        mmol = float(mmol[0])
+
+        if mmol:
+            print(mmol)  
+        else:
+            print("mMol value couldn't be extracted from Substrate_mM_added ")
+
+        #calculate ref_factor
+        ref_factor = mmol / self.fitting_params['Water_amp_4.7'].mean()
+
+        return ref_factor
+
+    def plot_water_amplitude(self):
+
+        fig, ax = plt.subplots()
+        ax.plot(self.fitting_params['Water_amp_4.7'])
+        ax.set_xlabel('time')  
+        ax.set_ylabel('integral value water peak')
+        
+        plt.show()
+        
+        return fig #, ax  
+     
+    
+    def plot(self, i):
+        
+        spectra_data = self.data.iloc[:,i+1]
+        
+        fig, ax = plt.subplots()
+        
+        # actual curve
+        ax.plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
+        
+        # Lorentzian
+        y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
+                                                 shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
+                                                 gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
+                                                 A= self.fitting_params.iloc[i]['Water_amp_4.7'])
+        ax.plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
+        
+        ax.set_xlabel('Chemical Shifts')
+        ax.set_ylabel('Intensity')
+        ax.legend()
+        
+        plt.show()
+        
+        return fig #, ax 
+        
