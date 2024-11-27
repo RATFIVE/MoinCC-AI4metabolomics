@@ -11,6 +11,7 @@ class Reference():
         self.chem_shifts = self.data.iloc[:,0]
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
+        self.reference_value = self.ReferenceValue()
     
     def ReferenceValue(self):
         #get referenz concentration from meta data
