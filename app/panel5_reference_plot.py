@@ -72,6 +72,7 @@ class Reference():
 
         # amplitude
         ax[0].plot(self.fitting_params['Water_amp_4.7'])
+        ax[0].axhline(y=self.fitting_params['Water_amp_4.7'].mean(), color='grey', linestyle='--')
         ax[0].set_title('Integral of water over time')
         ax[0].set_xlabel('time') 
         ax[0].set_ylabel('integral value water peak')
