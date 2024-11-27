@@ -28,39 +28,75 @@ class Reference():
 
         return ref_factor
 
-    def plot_water_amplitude(self):
+    # def plot_water_amplitude(self):
 
-        fig, ax = plt.subplots()
-        ax.plot(self.fitting_params['Water_amp_4.7'])
-        ax.set_xlabel('time')  
-        ax.set_ylabel('integral value water peak')
+    #     fig, ax = plt.subplots()
+    #     ax.plot(self.fitting_params['Water_amp_4.7'])
+    #     ax.set_xlabel('time')  
+    #     ax.set_ylabel('integral value water peak')
         
-        plt.show()
+    #     plt.show()
         
-        return fig #, ax  
+    #     return fig #, ax  
      
     
+    # def plot_lorentzian(self, i):
+        
+    #     spectra_data = self.data.iloc[:,i+1]
+        
+    #     fig, ax = plt.subplots()
+        
+    #     # actual curve
+    #     ax.plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
+        
+    #     # Lorentzian
+    #     y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
+    #                                              shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
+    #                                              gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
+    #                                              A= self.fitting_params.iloc[i]['Water_amp_4.7'])
+    #     ax.plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
+        
+    #     ax.set_xlabel('Chemical Shifts')
+    #     ax.set_ylabel('Intensity')
+    #     ax.legend()
+        
+    #     plt.show()
+        
+    #     return fig #, ax 
+    
     def plot(self, i):
-        
         spectra_data = self.data.iloc[:,i+1]
-        
-        fig, ax = plt.subplots()
-        
-        # actual curve
-        ax.plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
+
+
+        fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+
+        # amplitude
+        ax[0].plot(self.fitting_params['Water_amp_4.7'])
+        ax[0].set_title('Integral of water over time')
+        ax[0].set_xlabel('time') 
+        ax[0].set_ylabel('integral value water peak')
+
+        #axs[0].legend()
+
+        # Seond plot
+        #actual curve
+        ax[1].plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
         
         # Lorentzian
         y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
                                                  shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
                                                  gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
                                                  A= self.fitting_params.iloc[i]['Water_amp_4.7'])
-        ax.plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
+        ax[1].plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
         
-        ax.set_xlabel('Chemical Shifts')
-        ax.set_ylabel('Intensity')
-        ax.legend()
         
-        plt.show()
-        
-        return fig #, ax 
-        
+        ax[1].set_xlabel('Chemical Shifts')
+        ax[1].set_ylabel('Intensity')
+        ax[1].set_title(f'Lorentzian fit for time step: {i}')
+        ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
+        ax[1].legend()
+        plt.tight_layout()
+        # flip plot by 30 degrees
+    
+        return fig   
+    

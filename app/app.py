@@ -24,7 +24,7 @@ import streamlit as st
 
 
 def main():
-    st.session_state.clear()
+    #st.session_state.clear()
    # st.rerun()
     app = Layout.StreamlitApp()#fig2=example_image_path,
                               #fig3=fig3)
