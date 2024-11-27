@@ -11,28 +11,32 @@
 - (done) flip scale as seen in fatimas paper
 
 # Notes from 27.11.
-- Putting everything in one plot (One Plot but with offset) Sleect between stacked and overlayed
-- Save the figures as pdf
-- Stacked but select on the legend which one to show
-- Kinetic Plot, Dots instead of line (without a mean line)
-- Shifted frames by one 
-- Caracterize how similar the noise is. (Mean, std of all the noise frames)
-- Line width of the lorenzians should not change (maybe 10%) constrain of for the fitting
-- Print the reference value
-- time with s, min h?
-- Font is too small
-- Capitalisation in the labels
-- Use the same label names on e.g y axis 
-- file name of sum_fit should be fitted
-- put time to the beginning (in kenitcs.csv)
-- add kinetics in mol
+- Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
+- optinal group (select many) the lorenzian (P1 Marco)
+- Save the figures as pdf (P2 Marco)
 
-- Button to select also meta file and reference file
-- Start Processing at the end of selecting 
-- Process bar after pressing the button
-- Select the model
-- Wirte a README
-- write instructions
+- Kinetic Plot, Dots instead of line (without a mean line) (P1 Tom)
+- Shifted frames by one  (P2 Meike)
+- Caracterize how similar the noise is. (Mean, std of all the noise frames) (P2 Meike)
+- Line width of the lorenzians should not change (maybe 10%) constrain of for the fitting (P3 Tom)
+- Print the reference value (P1 Meike)
+- time with s, min h? Time Step instead of time (P1 Meike)
+- reference factor mit in die anderen plots (P3 all)
+- Font is too small (P1 Marco)
+- Capitalisation in the labels (P1 Marco)
+- Use the same label names on e.g y axis  (P1 Marco)
+- file name of sum_fit should be fitted (P1 Tom)
+- put time to the beginning (in kenitcs.csv) (P1 Tom)
+- add kinetics in mol - another .csv file (P1 Meike)
+- add constant to fitting (P2 Tom)
+- Button to select also meta file and reference file (P1 Marco)
+- Start Processing at the end of selecting  (P1 Marco)
+- Process bar after pressing the button (P2 Tom/Marco)
+- Select the model  (P1 Tom/Marco)
+- Wirte a README (P3 )
+- write instructions (P1 Marco)
+- performance (Matplotlib, Plotly, Session_state) (P3 All)
+- Beide Modell zusammen ist aktuell mit bug (P1 Tom)
 
 
 
