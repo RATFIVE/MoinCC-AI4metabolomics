@@ -11,7 +11,7 @@ from PIL import Image
 import lorem
 from LoadData import *
 from panel3_contour_plot import *
-from peak_fitting_v7 import PeakFitting
+from peak_fitting_v6 import PeakFitting
 import matplotlib.pyplot as plt
 from Process4Panels import Process4Panels
 import plotly.express as px
@@ -21,6 +21,7 @@ from tkinter.filedialog import askopenfilename
 from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
+from panel5_reference_plot import Reference
 
 
 
@@ -30,7 +31,7 @@ meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
 data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _6.csv')
 # FA_20240207_2H_yeast_Fumarate-d2_5.csv
 # FA_20231122_2H_yeast_acetone-d6_3.csv
-referece_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240729_2H_yeast_Reference standard_PBS+Yeast.ser.csv')
+reference_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240806_2H_yeast_Reference_standard_PBS.ser.csv')
 
 
 
@@ -42,7 +43,7 @@ def select_csv_file():
         dir_path (str): directory path
     """
     root = Tk()
-    file_path = filedialog.askdirectory()
+    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
     #dir_path = r'/Users/marco/Documents/UKSH/Data/Banzhaf_Marco_1996-09-03_B.MA._2/2024-04-11'
     root.destroy()
     if file_path == '':
@@ -121,33 +122,44 @@ class StreamlitApp():
 
         with col2:
             self.meta_fp = st.text_input('Metadata File Path', meta_fp)
-            self.data_fp = st.text_input('Data File Path', data_fp)
-
-            select_file_button = st.button(label='Select CSV', )
-            if select_file_button:
-                self.data_fp = select_csv_file()
-                st.write(self.data_fp)
 
             
+            sub_col1, sub_col2 = st.columns([0.10, 0.90])
+            with sub_col1:
+                st.write('')
+                select_file_button = st.button(label='Select CSV', )
+                if select_file_button:
+                    self.data_fp = select_csv_file()
+                    st.session_state["file_name"] = self.data_fp
+                    with sub_col2:
+                        #st.warning(self.data_fp)
+                        st.info(self.data_fp)
 
-            self.referece_fp = st.text_input('Reference File Path', referece_fp)
+            self.reference_fp = st.text_input('Reference File Path', reference_fp)
         
+        if "file_name" in st.session_state and st.session_state["file_name"]:
+            self.data_fp = st.session_state["file_name"]
+        else:
+            st.warning("No file selected or key does not exist.")
+
+            
         with col3:
             st.divider()
             if st.button("Start Processing"):
+                st.write(f"Processing data from: {self.data_fp}")
                 st.session_state["processing_started"] = True
                 self.process_data()
 
         # Plit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
+
         # Dynamically run main_page only if the button is clicked
-        if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
-            if not st.session_state.get("file_name", self.data_fp):
-                st.session_state["file_name"] = self.data_fp
-                
-            self.main_page(main)
-            self.about_page(about)
+        if 'processing_started' in st.session_state:
+            if st.session_state["processing_started"]: # Set to false if it should open after pressing the button
+                if st.session_state["file_name"] is not None:
+                    self.main_page(main)
+        self.about_page(about)
         
     def main_page(self, main):
         with main:
@@ -156,6 +168,7 @@ class StreamlitApp():
                 self.panel1()
                 self.panel2()
                 self.panel3()  
+                self.panel4()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
@@ -245,7 +258,20 @@ class StreamlitApp():
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
             st.pyplot(contourplot, clear_figure=True)
+    def panel4(self):
+        """Reference Plot"""
+        with st.expander("Panel 4 - Reference", expanded=True):
+            st.markdown('Reference')
+            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+            
+            i = st.slider('Select the frame2', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
 
+            reference_plot = Reference_obj.plot(i = i)
+            st.pyplot(reference_plot)
+
+
+          
+  
     
     def run(self):
         self.header()

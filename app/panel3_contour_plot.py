@@ -13,8 +13,8 @@ class ContourPlot():
 
         # Generate x and y ranges
         x = np.arange(self.Z.shape[1])  # Columns correspond to x
-        y = np.arange(self.Z.shape[0])  # Rows correspond to y
-
+        y = self.df.iloc[:,0]  # Rows correspond to y
+        
         # Create the meshgrid
         self.X, self.Y = np.meshgrid(x, y)
            
@@ -38,6 +38,8 @@ class ContourPlot():
             vmin=zmin * self.Z.max(),
             vmax=zmax * self.Z.max()
         )
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Chemical Shift [ppm]')
         ax.grid(True)
         return fig
 

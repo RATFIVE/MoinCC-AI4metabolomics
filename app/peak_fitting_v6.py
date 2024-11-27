@@ -60,6 +60,9 @@ class PeakFitting:
             positions: list of all ppm values
             names: list of all names of the ppm values
         """
+        print('file_name', self.file_name)
+        print('meta_df', self.meta_df)
+        print('data', self.df)
         self.meta_df = self.meta_df[self.meta_df['File'].astype(str).str.upper() == str(self.file_name).upper()]
 
         if self.meta_df.shape[0] == 0: #no metabolites listed --> only water present
@@ -68,8 +71,11 @@ class PeakFitting:
 
         positions = []
         names = []
-
+        print(self.meta_df['Substrate_ppm'])
+        print('Meta: ', self.meta_df)
+        print('')
         react_substrat = str(self.meta_df['Substrate_ppm'].iloc[0]).split(',')
+        print('React subst: ', react_substrat)
         if react_substrat != ['nan']:
             for i in range(len(react_substrat)):
                 names.append('ReacSubs')
