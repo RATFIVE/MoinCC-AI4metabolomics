@@ -109,8 +109,8 @@ class Reference():
         plt.tight_layout()
 
         # Save the figure as a PDF
-        # ax[1].savefig(f'ReferenceFitted_{self.basename}.pdf', format='pdf')
-        # ax[0].savefig(f'WaterPeak_{self.basename}.pdf', format='pdf')
+        fig.savefig(f'Reference_{self.basename}.pdf', format='pdf')
+        
     
         return fig   
     

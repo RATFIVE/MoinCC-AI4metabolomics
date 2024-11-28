@@ -26,6 +26,8 @@ from panel5_reference_plot import Reference
 
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
+# Custom CSS to change font size of buttons and other widgets
+
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
 data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _6.csv')
@@ -208,7 +210,7 @@ class StreamlitApp():
             st.divider()
 
 
-        # Plit into Main and Instruction Tabs
+        # Slit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
 

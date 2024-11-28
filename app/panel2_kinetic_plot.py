@@ -22,8 +22,11 @@ class KineticPlot:
         )
 
         fig.update_layout(
-            title='Kinetic Plot',
-            xaxis_title='Time step in a.u.',
+            title=dict(
+                text='Kinetic Plot',
+                font=dict(size=30)  # Font size for the title
+            ),
+            xaxis_title='Time step',
             yaxis_title='Intensity',
             showlegend=True,
             font=dict(
@@ -37,7 +40,14 @@ class KineticPlot:
                 xanchor='center',
                 yanchor='middle'
             ),
-                                  # To Change direction of x axis from low to high 
+            yaxis=dict(
+                titlefont=dict(size=24),          # Font size for y-axis title
+                tickfont=dict(size=18)            # Font size for y-axis ticks
+            ),
+            xaxis=dict(
+                titlefont=dict(size=24),          # Font size for x-axis title
+                tickfont=dict(size=18)            # Font size for x-axis ticks
+            )
         )
         # Save the fig as pdf
         pio.write_image(fig, f'Kinetic_{self.basename}.pdf', format='pdf')

@@ -34,7 +34,7 @@ class Panel1SpectrumPlot():
 
     def plot(self, frame):
         # for consistent y axis
-        self.min_y = self.data.iloc[:,1:].min().min()
+        self.min_y = self.data.iloc[:,1:].min().min() + self.data.iloc[:,1:].min().min()
         self.max_y = self.data.iloc[:,1:].max().max()
         # for constant x axis
         self.min_x = self.data.iloc[:, 0].min()
@@ -59,24 +59,30 @@ class Panel1SpectrumPlot():
             fig.add_trace(trace, row=1, col=1)
 
         fig.update_layout(
-            title='Spectrum',
+            title=dict(
+                text='Spectrum',
+                font=dict(size=30)  # Font size for the title
+            ),
             xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
-            font=dict(
-                #family="Courier New, monospace",  # Font family
-                size=32,                          # Font size
-            ),
-            #width=1000,
-            #height=900,
             legend=dict(
                 x=0.95,
                 y=0.9,
                 xanchor='center',
                 yanchor='middle'
             ),
-            yaxis=dict(range=[self.min_y, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),
+            yaxis=dict(
+                range=[self.min_y, self.max_y],
+                titlefont=dict(size=24),          # Font size for y-axis title
+                tickfont=dict(size=18)            # Font size for y-axis ticks
+            ),
+            xaxis=dict(
+                range=[self.max_x, self.min_x],
+                dtick=0.5,
+                titlefont=dict(size=24),          # Font size for x-axis title
+                tickfont=dict(size=18)            # Font size for x-axis ticks
+            )
                           # To Change direction of x axis from low to high 
         )
     
@@ -130,6 +136,8 @@ class Panel1SpectrumPlot():
             yaxis=dict(range=[self.differences.iloc[:,frame].min()*20, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
+
+        print(f'FIg_FilePath: {self.file_path}')
         # Save the fig as pdf
         pio.write_image(fig, f'Noise_{self.file_name}.pdf', format='pdf')  
         return fig
@@ -158,11 +166,6 @@ class Panel1SpectrumPlot():
             xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
-            font=dict(
-                #family="Courier New, monospace",  # Font family
-                size=32,                          # Font size
-                #color="RebeccaPurple"             # Font color
-            ),
             legend=dict(
                 x=0.95,
                 y=0.9,
