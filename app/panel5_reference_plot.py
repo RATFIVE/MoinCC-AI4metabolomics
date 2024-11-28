@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import peak_fitting_v6
+import os
 
 
 
@@ -12,6 +13,7 @@ class Reference():
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
+        self.basename = os.path.basename(fp_file)
     
     def ReferenceValue(self):
         #get referenz concentration from meta data
@@ -105,7 +107,10 @@ class Reference():
         ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
         ax[1].legend()
         plt.tight_layout()
-        
+
+        # Save the figure as a PDF
+        ax[1].savefig(f'ReferenceFitted_{self.basename}.pdf', format='pdf')
+        ax[0].savefig(f'WaterPeak_{self.basename}.pdf', format='pdf')
     
         return fig   
     
