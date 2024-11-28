@@ -15,6 +15,14 @@ class Panel1SpectrumPlot():
     def __init__(self, file_path):
         self.file_path = file_path
         self.file_name = os.path.basename(file_path)
+        self.plot_dir = Path('output', self.file_name + '_output', 'plots')
+        self.spectrum_pdf = Path(self.plot_dir, f'Spectrum_{self.file_name}')
+        self.noise_pdf = Path(self.plot_dir, f'Noise{self.file_name}')
+        self.fitted_pdf = Path(self.plot_dir, f'Fitted_{self.file_name}')
+
+        # Ensure the plot directory exists 
+        os.makedirs(self.plot_dir, exist_ok=True)
+        
         
         self.data = pd.read_csv(file_path, header = 0)
         self.sum_data = pd.read_csv(Path('output', f'{self.file_name}_output', 'sum_fit.csv'), header = 0)
@@ -85,7 +93,7 @@ class Panel1SpectrumPlot():
             )
                           # To Change direction of x axis from low to high 
         )
-    
+
         return fig
 
     def plot_raw(self, frame):
@@ -112,7 +120,7 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)              # To Change direction of x axis from low to high 
         )    
         # Save the fig as pdf
-        pio.write_image(fig, f'Spectrum_{self.file_name}.pdf', format='pdf')   
+        self.save_fig(fig, self.spectrum_pdf)  
         return fig
     
     def plot_diff(self, frame):
@@ -137,9 +145,9 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
 
-        print(f'FIg_FilePath: {self.file_path}')
+        
         # Save the fig as pdf
-        pio.write_image(fig, f'Noise_{self.file_name}.pdf', format='pdf')  
+        self.save_fig(fig, self.noise_pdf) 
         return fig
 
     def plot_sum_fit(self, frame):
@@ -151,13 +159,15 @@ class Panel1SpectrumPlot():
                                  name='Sum Fit',
                                  #legendgroup='Group3'
                                  ))
-        
+        colors = ['blue', 'green', 'red', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
         for i in range(1, len(frame_data.columns)):
+            color = colors[(i - 1) % len(colors)]
             fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], 
                                      y=frame_data.iloc[:,i], 
                                      mode='lines', 
                                      name=frame_data.columns[i],
                                      #legendgroup='Group4'
+                                     line=dict(color=color)
                                      ))
 
             
@@ -176,7 +186,13 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         # Save the fig as pdf
-        pio.write_image(fig, f'Fitted_{self.file_name}.pdf', format='pdf') 
+        self.save_fig(fig, self.fitted_pdf)
         return fig
+    
+    def save_fig(self, fig, name):
+        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido')
+        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido') 
+        
+
 
    
