@@ -11,6 +11,7 @@ class Reference():
         self.chem_shifts = self.data.iloc[:,0]
         self.LorentzianFit = peak_fitting_v7.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
+        self.reference_value = self.ReferenceValue()
     
     def ReferenceValue(self):
         #get referenz concentration from meta data
@@ -71,13 +72,23 @@ class Reference():
 
         # amplitude
         ax[0].plot(self.fitting_params['Water_amp_4.7'])
+        ax[0].axhline(y=self.fitting_params['Water_amp_4.7'].mean(), color='grey', linestyle='--')
         ax[0].set_title('Integral of water over time')
         ax[0].set_xlabel('Time step in a.u.') 
         ax[0].set_ylabel('Integral value of lorenzian fit')
 
+        # annotation
+        ax[0].annotate(f'Calculated Convergence Factor = {self.reference_value:.3f}', 
+                       xy=(1.05, 0.85), xycoords='axes fraction', 
+                       xytext=(-20, 20), 
+                       textcoords='offset points',
+                       fontsize = 8, 
+                       ha='right', 
+                       va='top')
+
         #axs[0].legend()
 
-        # Seond plot
+        # Second plot
         #actual curve
         ax[1].plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
         
@@ -95,7 +106,7 @@ class Reference():
         ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
         ax[1].legend()
         plt.tight_layout()
-        # flip plot by 30 degrees
+        
     
         return fig   
     
