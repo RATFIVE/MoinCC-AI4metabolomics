@@ -261,10 +261,10 @@ class StreamlitApp():
     def panel4(self):
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
-            st.markdown('Reference')
+            st.markdown('# Reference')
             Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
             
-            i = st.slider('Select the frame2', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
+            i = st.slider('Select the frame for the reference spectrum', min_value=1, max_value= Reference_obj.data.shape[1], value=1) 
 
             reference_plot = Reference_obj.plot(i = i)
             st.pyplot(reference_plot)

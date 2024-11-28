@@ -14,7 +14,7 @@ class KineticPlot:
     def plot(self):
         fig = px.line(
             self.kin_df,
-            x='time',
+            x='time step',
             y=self.kin_df.columns[:-1],  # Select all columns except 'time' for y
             labels={'value': 'Value', 'variable': 'Series'},
             title=f"Kinetic Plot of {self.basename}"
