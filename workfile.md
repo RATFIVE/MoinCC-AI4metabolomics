@@ -11,7 +11,7 @@
 - (done) flip scale as seen in fatimas paper
 
 # Notes from 27.11.
-- Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
+- [DONE] Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
 - optinal group (select many) the lorenzian (P1 Marco)
 - Save the figures as pdf (P2 Marco)
 
@@ -29,10 +29,10 @@
 - put time to the beginning (in kenitcs.csv) (P1 Tom)
 - add kinetics in mol - another .csv file (P1 Meike)
 - [DONE] add constant to fitting (P2 Tom)
-- Button to select also meta file and reference file (P1 Marco)
+- [DONE] Button to select also meta file and reference file (P1 Marco)
 - [DONE] Start Processing at the end of selecting  (P1 Marco)
 - Process bar after pressing the button (P2 Tom/Marco)
-- Select the model  (P1 Tom/Marco)
+- [DONE] Select the model  (P1 Tom/Marco)
 - Wirte a README (P3 )
 - write instructions (P1 Marco)
 - performance (Matplotlib, Plotly, Session_state) (P3 All)
