@@ -21,6 +21,7 @@ from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
+
 #from peak_fitting_v7 import PeakFitting
 
 
@@ -178,6 +179,7 @@ class StreamlitApp():
         if 'meta_file' in st.session_state:
             self.meta_fp = st.session_state['meta_file']
             with sub_col2:
+                    st.write('')
                     st.info(self.meta_fp)
         else:
             st.warning("No meta file selected or key does not exist.")
@@ -185,6 +187,7 @@ class StreamlitApp():
         if 'reference_file' in st.session_state:
             self.reference_fp = st.session_state['reference_file']
             with sub_col2:
+                st.write('')
                 st.info(self.reference_fp)
             
         else:
@@ -193,6 +196,7 @@ class StreamlitApp():
         if "file_name" in st.session_state:
             self.data_fp = st.session_state["file_name"]
             with sub_col2:
+                    st.write('')
                     st.info(self.data_fp)
         else:
             st.warning("No substrate file selected or key does not exist.")
@@ -202,7 +206,6 @@ class StreamlitApp():
             st.markdown('**Step4: Press Start Processing**')
         with process_col2:
             if st.button("Start Processing"):
-                    st.write(f"Processing data from: {self.data_fp}")
                     st.session_state["processing_started"] = True
                     self.process_data(PeakFitting)
                     
