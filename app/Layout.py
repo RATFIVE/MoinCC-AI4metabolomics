@@ -11,7 +11,6 @@ from PIL import Image
 import lorem
 from LoadData import *
 from panel3_contour_plot import *
-from peak_fitting_v6 import PeakFitting
 import matplotlib.pyplot as plt
 from Process4Panels import Process4Panels
 import plotly.express as px
@@ -22,6 +21,7 @@ from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
+from peak_fitting_v7 import PeakFitting
 
 
 
@@ -33,17 +33,15 @@ data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotina
 # FA_20231122_2H_yeast_acetone-d6_3.csv
 reference_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240806_2H_yeast_Reference_standard_PBS.ser.csv')
 
-
-
 # Function to open a file dialog and get the file path
-def select_csv_file():
+def select_file(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]):
     """load data path
 
     Returns:
         dir_path (str): directory path
     """
     root = Tk()
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+    file_path = filedialog.askopenfilename(filetypes=filetypes)
     #dir_path = r'/Users/marco/Documents/UKSH/Data/Banzhaf_Marco_1996-09-03_B.MA._2/2024-04-11'
     root.destroy()
     if file_path == '':
@@ -121,34 +119,63 @@ class StreamlitApp():
             st.divider()
 
         with col2:
-            self.meta_fp = st.text_input('Metadata File Path', meta_fp)
+            # Define options
+            options = ["Model 1", "Model 2"]
+
+            # Create a selector
+            selected_option = st.selectbox("Choose the Model:", options)
+            if selected_option == "Model 1":
+                from peak_fitting_v7 import PeakFitting
+            if selected_option == 'Model 2':
+                from peak_fitting_v6 import PeakFitting
+
+            sub_col1, sub_col2 = st.columns([0.40, 0.60])
+
+            # Select the Metadata as xml
+            with sub_col1:
+                st.write('Select the Metadata as .xml')
+                select_meta_button = st.button(label='Select Metafile')
+                if select_meta_button:
+                    self.meta_fp = select_file(filetypes=[("XLSX files", "*.xlsx")])
+                    st.session_state["meta_file"] == self.meta_fp
+            #self.meta_fp = st.text_input('Metadata File Path', meta_fp)
 
             
-            sub_col1, sub_col2 = st.columns([0.10, 0.90])
+            # Select the Spectrum as csv 
             with sub_col1:
-                st.write('')
-                select_file_button = st.button(label='Select CSV', )
+                st.write('Select Spectrum as .csv')
+                select_file_button = st.button(label='Select Spectrum', )
                 if select_file_button:
-                    self.data_fp = select_csv_file()
+                    self.data_fp = select_file(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
                     st.session_state["file_name"] = self.data_fp
                     with sub_col2:
-                        #st.warning(self.data_fp)
                         st.info(self.data_fp)
 
             self.reference_fp = st.text_input('Reference File Path', reference_fp)
-        
-        if "file_name" in st.session_state and st.session_state["file_name"]:
+
+            
+        if 'meta_file' in st.session_state:
+            self.meta_fp = st.session_state['meta_file']
+        else:
+            st.warning("No file selected or key does not exist.")
+
+        if "file_name" in st.session_state:
             self.data_fp = st.session_state["file_name"]
         else:
             st.warning("No file selected or key does not exist.")
 
+        with col2:
+            if st.button("Start Processing"):
+                    st.write(f"Processing data from: {self.data_fp}")
+                    st.session_state["processing_started"] = True
+                    self.process_data()
+            
+        
+
             
         with col3:
             st.divider()
-            if st.button("Start Processing"):
-                st.write(f"Processing data from: {self.data_fp}")
-                st.session_state["processing_started"] = True
-                self.process_data()
+
 
         # Plit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
@@ -231,10 +258,13 @@ class StreamlitApp():
                 st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
                 st.markdown('# Substrate Plot')
                 panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-                raw_plot, lorentz_plot, noise_plot = panel_1_obj.plot(st.session_state['time_frame'])
-                st.plotly_chart(raw_plot, use_container_width=True)
-                st.plotly_chart(lorentz_plot, use_container_width=True)
-                st.plotly_chart(noise_plot, use_container_width=True)
+                one_plot = panel_1_obj.plot(st.session_state['time_frame'])
+                #one_plot = panel_1_obj.one_plot(st.session_state['time_frame'])
+                # st.plotly_chart(raw_plot, use_container_width=True)
+                # st.plotly_chart(lorentz_plot, use_container_width=True)
+                # st.plotly_chart(noise_plot, use_container_width=True)
+                st.plotly_chart(one_plot, use_container_width=True)
+                
             except:
                 pass
             

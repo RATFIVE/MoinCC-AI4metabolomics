@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from LoadData import *
 #from Layout import StreamlitApp
 import streamlit as st
+from plotly.subplots import make_subplots
 
 
 
@@ -41,19 +42,58 @@ class Panel1SpectrumPlot():
         fig1 = self.plot_raw(frame)
         fig2 = self.plot_sum_fit(frame)
         fig3 = self.plot_diff(frame)
-        return (fig1, fig2, fig3)
+
+        fig = make_subplots(rows=1, cols=1, subplot_titles=("Raw Data", "Sum Fit", "Diff"))
+    
+        # Add traces from fig_raw to the first subplot
+        for trace in fig1.data:
+            fig.add_trace(trace, row=1, col=1)
+        
+        # Add traces from fig_diff to the second subplot
+        for trace in fig2.data:
+            fig.add_trace(trace, row=1, col=1)
+        
+        # Add traces from fig_sm_fit to the third subplot
+        for trace in fig3.data:
+            fig.add_trace(trace, row=1, col=1)
+
+        fig.update_layout(
+            title='Spectrum',
+            xaxis_title='Chemical shift [ppm]',
+            yaxis_title='Intensity',
+            showlegend=True,
+            font=dict(
+                family="Courier New, monospace",  # Font family
+                size=32,                          # Font size
+            ),
+            #width=1000,
+            #height=900,
+            legend=dict(
+                x=0.95,
+                y=0.9,
+                xanchor='center',
+                yanchor='middle'
+            ),
+            yaxis=dict(range=[self.min_y, self.max_y]),
+            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),
+                          # To Change direction of x axis from low to high 
+        )
+
+        return fig
 
     def plot_raw(self, frame):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.data.iloc[:,0][::-1],       # To Change direction of x axis from low to high 
                                  y=self.data.iloc[:,frame][::-1],   # To Change direction of x axis from low to high 
-                                 mode='lines', name='Raw'))
+                                 mode='lines', name='Raw',
+                                 legendgroup='Group1'))
         
         fig.update_layout(
             title='Spectrum',
-            xaxis_title='Chemical Shift [ppm]',
+            xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
-            showlegend=False,
+            legendgroup='Group 1',
+            #showlegend=False,
             legend=dict(
                 x=0.95,
                 y=0.9,
@@ -69,10 +109,11 @@ class Panel1SpectrumPlot():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.differences.iloc[:,0][::-1],        # To Change direction of x axis from low to high 
                                  y=self.differences.iloc[:,frame][::-1],    # To Change direction of x axis from low to high 
-                                 mode='lines', name='Diff'))
+                                 mode='lines', name='Diff',
+                                 legendgroup='Group2'))
         fig.update_layout(
             title='Noise',
-            xaxis_title='Chemical Shift [ppm]',
+            xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
             legend=dict(
@@ -91,16 +132,28 @@ class Panel1SpectrumPlot():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0][::-1],           # To Change direction of x axis from low to high 
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
-                                 mode='lines', name='Sum Fit'))
+                                 mode='lines', 
+                                 name='Sum Fit',
+                                 legendgroup='Group3'))
+        
         for i in range(1, len(frame_data.columns)):
-            fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], y=frame_data.iloc[:,i], mode='lines', name=frame_data.columns[i]))
+            fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], 
+                                     y=frame_data.iloc[:,i], 
+                                     mode='lines', 
+                                     name=frame_data.columns[i],
+                                     legendgroup='Group4'))
 
             
         fig.update_layout(
             title='Sum Fit',
-            xaxis_title='Chemical Shift [ppm]',
+            xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
+            font=dict(
+                family="Courier New, monospace",  # Font family
+                size=32,                          # Font size
+                #color="RebeccaPurple"             # Font color
+            ),
             legend=dict(
                 x=0.95,
                 y=0.9,
@@ -111,3 +164,5 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         return fig
+
+   
