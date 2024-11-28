@@ -109,7 +109,7 @@ class Process4Panels:
                 # row i and columns k
                 kinetics[i,k] = sum(amplitudes.iloc[indices].values)
         kinetics = pd.DataFrame(kinetics, columns = substances)
-        kinetics['time'] = np.arange(0, kinetics.shape[0])
+        kinetics['time step'] = np.arange(0, kinetics.shape[0])
         kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
 
 #processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
