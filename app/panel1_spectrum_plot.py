@@ -106,7 +106,7 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)              # To Change direction of x axis from low to high 
         )    
         # Save the fig as pdf
-        pio.write_image(fig, f'Spectrum_{self.file_name}', format='pdf')   
+        pio.write_image(fig, f'Spectrum_{self.file_name}.pdf', format='pdf')   
         return fig
     
     def plot_diff(self, frame):
@@ -131,7 +131,7 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         # Save the fig as pdf
-        pio.write_image(fig, f'Noise_{self.file_name}', format='pdf')  
+        pio.write_image(fig, f'Noise_{self.file_name}.pdf', format='pdf')  
         return fig
 
     def plot_sum_fit(self, frame):
@@ -173,7 +173,7 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
         # Save the fig as pdf
-        pio.write_image(fig, f'Fitted_{self.file_name}', format='pdf') 
+        pio.write_image(fig, f'Fitted_{self.file_name}.pdf', format='pdf') 
         return fig
 
    
