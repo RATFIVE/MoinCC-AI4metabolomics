@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 from pathlib import Path
 import os
+import plotly.io as pio
 
 class KineticPlot:
     def __init__(self, path):   
@@ -21,7 +22,7 @@ class KineticPlot:
         )
 
         fig.update_layout(
-            title='Sum Fit',
+            title='Kinetic Plot',
             xaxis_title='Time step in a.u.',
             yaxis_title='Intensity',
             showlegend=True,
@@ -38,5 +39,7 @@ class KineticPlot:
             ),
                                   # To Change direction of x axis from low to high 
         )
+        # Save the fig as pdf
+        pio.write_image(fig, f'Kinetic_{self.file_name}', format='pdf')
         return fig
         
