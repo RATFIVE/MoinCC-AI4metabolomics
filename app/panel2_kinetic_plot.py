@@ -40,6 +40,6 @@ class KineticPlot:
                                   # To Change direction of x axis from low to high 
         )
         # Save the fig as pdf
-        pio.write_image(fig, f'Kinetic_{self.file_name}', format='pdf')
+        pio.write_image(fig, f'Kinetic_{self.basename }', format='pdf')
         return fig
         
