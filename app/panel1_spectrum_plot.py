@@ -7,6 +7,8 @@ from LoadData import *
 #from Layout import StreamlitApp
 import streamlit as st
 import plotly.io as pio
+import plotly.express as px
+from plotly.colors import sequential
 from plotly.subplots import make_subplots
 
 
@@ -19,6 +21,8 @@ class Panel1SpectrumPlot():
         self.spectrum_pdf = Path(self.plot_dir, f'Spectrum_{self.file_name}')
         self.noise_pdf = Path(self.plot_dir, f'Noise{self.file_name}')
         self.fitted_pdf = Path(self.plot_dir, f'Fitted_{self.file_name}')
+        self.colors = px.colors.qualitative.Plotly
+        self.template = 'plotly_white' 
 
         # Ensure the plot directory exists 
         os.makedirs(self.plot_dir, exist_ok=True)
@@ -101,7 +105,7 @@ class Panel1SpectrumPlot():
         fig.add_trace(go.Scatter(x=self.data.iloc[:,0][::-1],       # To Change direction of x axis from low to high 
                                  y=self.data.iloc[:,frame][::-1],   # To Change direction of x axis from low to high 
                                  mode='lines', name='Raw',
-                                 #legendgroup='Group1'
+                                 line=dict(color=self.colors[0])
                                  ))
         
         fig.update_layout(
@@ -117,8 +121,9 @@ class Panel1SpectrumPlot():
                 yanchor='middle'
             ),
             yaxis=dict(range=[self.min_y, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)              # To Change direction of x axis from low to high 
-        )    
+            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),              # To Change direction of x axis from low to high 
+            template=self.template
+            )    
         # Save the fig as pdf
         self.save_fig(fig, self.spectrum_pdf)  
         return fig
@@ -128,7 +133,7 @@ class Panel1SpectrumPlot():
         fig.add_trace(go.Scatter(x=self.differences.iloc[:,0][::-1],        # To Change direction of x axis from low to high 
                                  y=self.differences.iloc[:,frame][::-1],    # To Change direction of x axis from low to high 
                                  mode='lines', name='Diff',
-                                 #legendgroup='Group2'
+                                 line=dict(color=self.colors[-1])
                                  ))
         fig.update_layout(
             title='Noise',
@@ -142,8 +147,9 @@ class Panel1SpectrumPlot():
                 yanchor='middle'
             ),
             yaxis=dict(range=[self.differences.iloc[:,frame].min()*20, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
-        )
+            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),                     # To Change direction of x axis from low to high 
+            template=self.template
+            )
 
         
         # Save the fig as pdf
@@ -155,13 +161,13 @@ class Panel1SpectrumPlot():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0][::-1],           # To Change direction of x axis from low to high 
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
-                                 mode='lines', 
+                                 mode='lines+markers', 
                                  name='Sum Fit',
-                                 #legendgroup='Group3'
+                                 line=dict(color=self.colors[-1])
                                  ))
-        colors = ['blue', 'green', 'red', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
+        colors = px.colors.qualitative.Plotly
         for i in range(1, len(frame_data.columns)):
-            color = colors[(i - 1) % len(colors)]
+            color = self.colors[(i - 1) % len(colors)]
             fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], 
                                      y=frame_data.iloc[:,i], 
                                      mode='lines', 
@@ -183,15 +189,16 @@ class Panel1SpectrumPlot():
                 yanchor='middle'
             ),
             yaxis=dict(range=[self.min_y, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
-        )
+            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),                      # To Change direction of x axis from low to high 
+            template=self.template
+            )
         # Save the fig as pdf
         self.save_fig(fig, self.fitted_pdf)
         return fig
     
     def save_fig(self, fig, name):
-        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido')
-        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido') 
+        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido') 
         
 
 
