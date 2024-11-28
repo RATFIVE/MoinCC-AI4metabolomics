@@ -326,7 +326,7 @@ class StreamlitApp():
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
             st.markdown('# Reference')
-            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp, file_path=self.data_fp)
             i = st.slider('Select the frame for water reference', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
             reference_plot = Reference_obj.plot(i = i)
             st.pyplot(reference_plot)
