@@ -19,5 +19,24 @@ class KineticPlot:
             labels={'value': 'Value', 'variable': 'Series'},
             title=f"Kinetic Plot of {self.basename}"
         )
+
+        fig.update_layout(
+            title='Sum Fit',
+            xaxis_title='Time step in a.u.',
+            yaxis_title='Intensity',
+            showlegend=True,
+            font=dict(
+                #family="Courier New, monospace",  # Font family
+                size=32,                          # Font size
+                #color="RebeccaPurple"             # Font color
+            ),
+            legend=dict(
+                x=0.95,
+                y=0.9,
+                xanchor='center',
+                yanchor='middle'
+            ),
+                                  # To Change direction of x axis from low to high 
+        )
         return fig
         

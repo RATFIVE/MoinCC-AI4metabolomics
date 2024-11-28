@@ -43,7 +43,7 @@ class Panel1SpectrumPlot():
         fig2 = self.plot_sum_fit(frame)
         fig3 = self.plot_diff(frame)
 
-        fig = make_subplots(rows=1, cols=1, subplot_titles=("Raw Data", "Sum Fit", "Diff"))
+        fig = make_subplots(rows=1, cols=1, subplot_titles=(" ", " ", " "))
     
         # Add traces from fig_raw to the first subplot
         for trace in fig1.data:
@@ -63,7 +63,7 @@ class Panel1SpectrumPlot():
             yaxis_title='Intensity',
             showlegend=True,
             font=dict(
-                family="Courier New, monospace",  # Font family
+                #family="Courier New, monospace",  # Font family
                 size=32,                          # Font size
             ),
             #width=1000,
@@ -86,13 +86,14 @@ class Panel1SpectrumPlot():
         fig.add_trace(go.Scatter(x=self.data.iloc[:,0][::-1],       # To Change direction of x axis from low to high 
                                  y=self.data.iloc[:,frame][::-1],   # To Change direction of x axis from low to high 
                                  mode='lines', name='Raw',
-                                 legendgroup='Group1'))
+                                 #legendgroup='Group1'
+                                 ))
         
         fig.update_layout(
             title='Spectrum',
             xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
-            legendgroup='Group 1',
+            #legendgroup='Group 1',
             #showlegend=False,
             legend=dict(
                 x=0.95,
@@ -110,7 +111,8 @@ class Panel1SpectrumPlot():
         fig.add_trace(go.Scatter(x=self.differences.iloc[:,0][::-1],        # To Change direction of x axis from low to high 
                                  y=self.differences.iloc[:,frame][::-1],    # To Change direction of x axis from low to high 
                                  mode='lines', name='Diff',
-                                 legendgroup='Group2'))
+                                 #legendgroup='Group2'
+                                 ))
         fig.update_layout(
             title='Noise',
             xaxis_title='Chemical shift [ppm]',
@@ -134,14 +136,16 @@ class Panel1SpectrumPlot():
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
                                  mode='lines', 
                                  name='Sum Fit',
-                                 legendgroup='Group3'))
+                                 #legendgroup='Group3'
+                                 ))
         
         for i in range(1, len(frame_data.columns)):
             fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], 
                                      y=frame_data.iloc[:,i], 
                                      mode='lines', 
                                      name=frame_data.columns[i],
-                                     legendgroup='Group4'))
+                                     #legendgroup='Group4'
+                                     ))
 
             
         fig.update_layout(
@@ -150,7 +154,7 @@ class Panel1SpectrumPlot():
             yaxis_title='Intensity',
             showlegend=True,
             font=dict(
-                family="Courier New, monospace",  # Font family
+                #family="Courier New, monospace",  # Font family
                 size=32,                          # Font size
                 #color="RebeccaPurple"             # Font color
             ),
