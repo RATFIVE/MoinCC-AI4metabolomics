@@ -14,6 +14,9 @@ from tqdm import tqdm
 import sys
 import matplotlib.pyplot as plt
 
+# import streamlit loadbar
+import streamlit as st
+
 class PeakFitting:
     def __init__(self, fp_file, fp_meta):
         # file paths
@@ -32,7 +35,7 @@ class PeakFitting:
         self.meta_df = pd.read_excel(fp_meta)
 
         self.number_time_points = self.df.shape[1] - 1
-        self.time_points = np.arange(0, self.number_time_points) 
+        self.time_points = np.arange(1, self.number_time_points + 1) 
         self.x = self.df.iloc[:,0]
 
         # positions and corresponding names of the peaks
@@ -157,7 +160,7 @@ class PeakFitting:
     def fit(self, save_csv = True):
         # bounds for the first fitting, which corresponds to the first frame
         flattened_bounds = self.make_bounds(mode='first')
-
+        
         first_fit = True
         # iterate over all time points
         for i in tqdm(range(self.number_time_points), desc= self.file_name):

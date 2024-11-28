@@ -28,7 +28,7 @@
 - file name of sum_fit should be fitted (P1 Tom)
 - put time to the beginning (in kenitcs.csv) (P1 Tom)
 - add kinetics in mol - another .csv file (P1 Meike)
-- add constant to fitting (P2 Tom)
+- [DONE] add constant to fitting (P2 Tom)
 - Button to select also meta file and reference file (P1 Marco)
 - [DONE] Start Processing at the end of selecting  (P1 Marco)
 - Process bar after pressing the button (P2 Tom/Marco)

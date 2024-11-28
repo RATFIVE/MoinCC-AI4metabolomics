@@ -21,7 +21,7 @@ from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
-from peak_fitting_v7 import PeakFitting
+#from peak_fitting_v7 import PeakFitting
 
 
 
@@ -119,60 +119,91 @@ class StreamlitApp():
             st.divider()
 
         with col2:
-            # Define options
+            
+            # Selector for choosing the model
             options = ["Model 1", "Model 2"]
-
-            # Create a selector
             selected_option = st.selectbox("Choose the Model:", options)
-            if selected_option == "Model 1":
-                from peak_fitting_v7 import PeakFitting
-            if selected_option == 'Model 2':
-                from peak_fitting_v6 import PeakFitting
 
-            sub_col1, sub_col2 = st.columns([0.40, 0.60])
+            # Dynamically load and store the class in session_state
+            if selected_option == "Model 1":
+                
+                #if 'Model 1' in st.session_state:
+                st.session_state['Model 1'] = True  # Store the class in session state
+                st.session_state['Model 2'] = False 
+            
+            elif selected_option == "Model 2":
+                
+                #if 'Model 2' in st.session_state:
+                st.session_state['Model 1'] = False  # Store the class in session state
+                st.session_state['Model 2'] = True
+
+
+            sub_col1, sub_col2 = st.columns([0.30, 0.70])
 
             # Select the Metadata as xml
             with sub_col1:
-                st.write('Select the Metadata as .xml')
+                st.markdown('**Step 1: Select the Metadata as .xlsx**')
                 select_meta_button = st.button(label='Select Metafile')
                 if select_meta_button:
                     self.meta_fp = select_file(filetypes=[("XLSX files", "*.xlsx")])
-                    st.session_state["meta_file"] == self.meta_fp
-            #self.meta_fp = st.text_input('Metadata File Path', meta_fp)
-
-            
+                    st.session_state["meta_file"] = self.meta_fp
+                
             # Select the Spectrum as csv 
             with sub_col1:
-                st.write('Select Spectrum as .csv')
+                st.markdown('**Step2: Select Spectrum as .csv**')
                 select_file_button = st.button(label='Select Spectrum', )
                 if select_file_button:
                     self.data_fp = select_file(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
                     st.session_state["file_name"] = self.data_fp
-                    with sub_col2:
-                        st.info(self.data_fp)
 
-            self.reference_fp = st.text_input('Reference File Path', reference_fp)
+            # Select the Reference file as 
+            with sub_col1:
+                st.markdown('**Step3: Select the Reference File as .csv**')
+                select_reference_button = st.button(label='Select Reference')
+                if select_reference_button:
+                    self.reference_fp = select_file(filetypes=[("CSV files", "*.csv"), ("All files", "*.*")])
+                    st.session_state['reference_file'] = self.reference_fp
+                    
 
-            
+        # Session State for Model import
+        if 'Model 1' in st.session_state:
+            from peak_fitting_v7 import PeakFitting
+        
+        if 'Model 2' in st.session_state:
+            from peak_fitting_v6 import PeakFitting
+
+        # Session State for files
         if 'meta_file' in st.session_state:
             self.meta_fp = st.session_state['meta_file']
+            with sub_col2:
+                    st.info(self.meta_fp)
         else:
-            st.warning("No file selected or key does not exist.")
+            st.warning("No meta file selected or key does not exist.")
+
+        if 'reference_file' in st.session_state:
+            self.reference_fp = st.session_state['reference_file']
+            with sub_col2:
+                st.info(self.reference_fp)
+            
+        else:
+            st.warning("No reference file selected or key does not exist.")
 
         if "file_name" in st.session_state:
             self.data_fp = st.session_state["file_name"]
+            with sub_col2:
+                    st.info(self.data_fp)
         else:
-            st.warning("No file selected or key does not exist.")
-
+            st.warning("No substrate file selected or key does not exist.")
         with col2:
+            process_col1, process_col2, process_col3 = st.columns([2, 1, 1])  # 1:2:1 ratio
+        with process_col1:
+            st.markdown('**Step4: Press Start Processing**')
+        with process_col2:
             if st.button("Start Processing"):
                     st.write(f"Processing data from: {self.data_fp}")
                     st.session_state["processing_started"] = True
-                    self.process_data()
-            
-        
-
-            
+                    self.process_data(PeakFitting)
+                    
         with col3:
             st.divider()
 
@@ -190,7 +221,7 @@ class StreamlitApp():
         
     def main_page(self, main):
         with main:
-            st.markdown("### Main Page Content")
+            st.markdown("#### Main Page Content")
             if st.session_state.get("processing_started", True): # Set to false if it should open after pressing the button
                 self.panel1()
                 self.panel2()
@@ -199,7 +230,7 @@ class StreamlitApp():
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
-    def process_data(self):
+    def process_data(self, PeakFitting):
         #perform peak fitting
         fitter = PeakFitting(self.data_fp, self.meta_fp)
         fitter.fit()
@@ -209,6 +240,12 @@ class StreamlitApp():
         processor.save_substrate_individual()
         processor.save_difference()
         processor.save_kinetics()
+    
+    def process_plots(self):
+        self.panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
+        self.panel_2_obj = KineticPlot(self.data_fp)
+        self.panel_3_obj = ContourPlot(self.data_fp)
+        self.panel_4_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
 
     def about_page(self, about):
         with about:
@@ -254,31 +291,22 @@ class StreamlitApp():
 
         with st.expander("Panel 1 - Substrate Plot", expanded=True):
             # add a slider to select the frame
-            try:
-                st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
-                st.markdown('# Substrate Plot')
-                panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-                one_plot = panel_1_obj.plot(st.session_state['time_frame'])
-                #one_plot = panel_1_obj.one_plot(st.session_state['time_frame'])
-                # st.plotly_chart(raw_plot, use_container_width=True)
-                # st.plotly_chart(lorentz_plot, use_container_width=True)
-                # st.plotly_chart(noise_plot, use_container_width=True)
-                st.plotly_chart(one_plot, use_container_width=True)
-                
-            except:
-                pass
+            st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
+            st.markdown('# Substrate Plot')
+            st.write('Inside Panel 1')
+            panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
+            one_plot = panel_1_obj.plot(st.session_state['time_frame'])
+            st.plotly_chart(one_plot, use_container_width=True)
+
             
     def panel2(self):
         """ Kinetic Plot"""
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
-            try:
-                st.markdown('# Kinetic Plot')
-                plot = KineticPlot(self.data_fp)
-                fig = plot.plot() 
-                st.plotly_chart(fig, use_container_width=True)
-            except:
-                pass
-    
+            st.markdown('# Kinetic Plot')
+            plot = KineticPlot(self.data_fp)
+            fig = plot.plot() 
+            st.plotly_chart(fig, use_container_width=True)
+
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Contour Plot", expanded=True):
@@ -288,20 +316,16 @@ class StreamlitApp():
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
             st.pyplot(contourplot, clear_figure=True)
+
     def panel4(self):
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
             st.markdown('Reference')
             Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
-            
-            i = st.slider('Select the frame2', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
-
+            i = st.slider('Select the frame', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
             reference_plot = Reference_obj.plot(i = i)
             st.pyplot(reference_plot)
 
 
-          
-  
-    
     def run(self):
         self.header()

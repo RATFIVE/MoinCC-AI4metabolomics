@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
-import peak_fitting_v7
+import peak_fitting_v6
 
 
 
@@ -9,7 +9,7 @@ class Reference():
     def __init__(self, fp_file, fp_meta):
         self.data = pd.read_csv(fp_file)
         self.chem_shifts = self.data.iloc[:,0]
-        self.LorentzianFit = peak_fitting_v7.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
+        self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
     
