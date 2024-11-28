@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from LoadData import *
 #from Layout import StreamlitApp
 import streamlit as st
+import plotly.io as pio
 from plotly.subplots import make_subplots
 
 
@@ -78,7 +79,7 @@ class Panel1SpectrumPlot():
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),
                           # To Change direction of x axis from low to high 
         )
-
+    
         return fig
 
     def plot_raw(self, frame):
@@ -103,7 +104,9 @@ class Panel1SpectrumPlot():
             ),
             yaxis=dict(range=[self.min_y, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)              # To Change direction of x axis from low to high 
-        )        
+        )    
+        # Save the fig as pdf
+        pio.write_image(fig, f'Spectrum_{self.file_name}', format='pdf')   
         return fig
     
     def plot_diff(self, frame):
@@ -127,6 +130,8 @@ class Panel1SpectrumPlot():
             yaxis=dict(range=[self.differences.iloc[:,frame].min()*20, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
+        # Save the fig as pdf
+        pio.write_image(fig, f'Noise_{self.file_name}', format='pdf')  
         return fig
 
     def plot_sum_fit(self, frame):
@@ -149,7 +154,7 @@ class Panel1SpectrumPlot():
 
             
         fig.update_layout(
-            title='Sum Fit',
+            title='Fitted Lorenzian Curves',
             xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
@@ -167,6 +172,8 @@ class Panel1SpectrumPlot():
             yaxis=dict(range=[self.min_y, self.max_y]),
             xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5)                      # To Change direction of x axis from low to high 
         )
+        # Save the fig as pdf
+        pio.write_image(fig, f'Fitted_{self.file_name}', format='pdf') 
         return fig
 
    
