@@ -12,7 +12,6 @@
 
 # Notes from 27.11.
 - [DONE] Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
-- optinal group (select many) the lorenzian (P1 Marco)
 - Save the figures as pdf (P2 Marco)
 
 - Kinetic Plot, Dots instead of line (without a mean line) (P1 Tom)
