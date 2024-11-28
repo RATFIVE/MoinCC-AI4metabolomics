@@ -74,8 +74,8 @@ class Reference():
         ax[0].plot(self.fitting_params['Water_amp_4.7'])
         ax[0].axhline(y=self.fitting_params['Water_amp_4.7'].mean(), color='grey', linestyle='--')
         ax[0].set_title('Integral of water over time')
-        ax[0].set_xlabel('time step') 
-        ax[0].set_ylabel('integral value water peak')
+        ax[0].set_xlabel('Time step') 
+        ax[0].set_ylabel('Integral value water peak')
         # annotation
         ax[0].annotate(f'Calculated Convergence Factor = {self.reference_value:.3f}', 
                        xy=(1.05, 0.85), xycoords='axes fraction', 
@@ -89,7 +89,7 @@ class Reference():
 
         # Second plot
         #actual curve
-        ax[1].plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
+        ax[1].plot(self.chem_shifts, spectra_data, c='blue', label='Reference spectrum')
         
         # Lorentzian
         y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
