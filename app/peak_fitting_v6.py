@@ -41,7 +41,7 @@ class PeakFitting:
         self.number_substances = len(set(self.names))
 
          # initialize outputs
-        column_names =  ['Time'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
+        column_names =  ['Time'] + ['y_shift'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
 
         self.fitting_params = pd.DataFrame(columns=column_names).set_index('Time')
         self.fitting_params_error = pd.DataFrame(columns=column_names).set_index('Time')
@@ -60,9 +60,6 @@ class PeakFitting:
             positions: list of all ppm values
             names: list of all names of the ppm values
         """
-        print('file_name', self.file_name)
-        print('meta_df', self.meta_df)
-        print('data', self.df)
         self.meta_df = self.meta_df[self.meta_df['File'].astype(str).str.upper() == str(self.file_name).upper()]
 
         if self.meta_df.shape[0] == 0: #no metabolites listed --> only water present
@@ -71,11 +68,7 @@ class PeakFitting:
 
         positions = []
         names = []
-        print(self.meta_df['Substrate_ppm'])
-        print('Meta: ', self.meta_df)
-        print('')
         react_substrat = str(self.meta_df['Substrate_ppm'].iloc[0]).split(',')
-        print('React subst: ', react_substrat)
         if react_substrat != ['nan']:
             for i in range(len(react_substrat)):
                 names.append('ReacSubs')
@@ -96,19 +89,23 @@ class PeakFitting:
         return positions, names
 
     def make_bounds(self, mode, positions_fine = None,
+                    y_shift = (0, np.inf),
                     shift_bounds = (-np.inf, np.inf),width_bounds = (0, 3e-1), amplitude_bounds = (0, np.inf),
                     shift_bounds_fine = (- 0.1, 0.1), width_bounds_fine = (0, 3e-1), amplitude_bounds_fine = (0, np.inf)):
         if mode == 'first':
+            y_shift_lower_bounds = np.full(1, y_shift[0])
+            y_shift_upper_bounds = np.full(1, y_shift[1])
             shift_lower_bounds = np.full(1, shift_bounds[0])  # shifting the whole spectrum
             shift_upper_bounds = np.full(1, shift_bounds[1])
             width_lower_bounds = np.full(self.number_substances, width_bounds[0])
             width_upper_bounds = np.full(self.number_substances, width_bounds[1])
             amplitude_lower_bounds = np.full(self.number_substances, amplitude_bounds[0])
             amplitude_upper_bounds = np.full(self.number_substances, amplitude_bounds[1])
-            
-            return (np.concatenate([shift_lower_bounds, width_lower_bounds, amplitude_lower_bounds]), np.concatenate([shift_upper_bounds, width_upper_bounds, amplitude_upper_bounds]))
+            return (np.concatenate([y_shift_lower_bounds,shift_lower_bounds, width_lower_bounds, amplitude_lower_bounds]), np.concatenate([y_shift_upper_bounds,shift_upper_bounds, width_upper_bounds, amplitude_upper_bounds]))
         
         elif mode == 'fine':
+            y_shift_lower_bounds = np.full(1, y_shift[0])
+            y_shift_upper_bounds = np.full(1, y_shift[1])
             shift_lower_bounds_fine = positions_fine + shift_bounds_fine[0]
             # shift upper bounds fine-tun
             shift_upper_bounds_fine = positions_fine + shift_bounds_fine[1]
@@ -119,7 +116,7 @@ class PeakFitting:
             # amplitude upper bounds
             amplitude_upper_bounds = np.full(self.number_substances, amplitude_bounds_fine[1])
 
-            return (np.concatenate([shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds]), np.concatenate([shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds]))
+            return (np.concatenate([y_shift_lower_bounds, shift_lower_bounds_fine, width_lower_bounds, amplitude_lower_bounds]), np.concatenate([y_shift_upper_bounds, shift_upper_bounds_fine, width_upper_bounds, amplitude_upper_bounds]))
 
 
     def unpack_params_errors(self, popt, pcov):
@@ -149,12 +146,13 @@ class PeakFitting:
             if name != dummy:
                 k += 1
                 dummy = name
-            widths_final_error.append(error[self.number_peaks + k])
-            amplitudes_final_error.append(error[self.number_peaks + self.number_substances + k])
-            widths_final.append(popt[self.number_peaks + k])
-            amplitudes_final.append(popt[self.number_peaks + self.number_substances + k])
-
-        return np.concatenate([popt[:self.number_peaks], widths_final, amplitudes_final]), np.concatenate([error[:self.number_peaks], widths_final_error, amplitudes_final_error])
+            widths_final_error.append(error[self.number_peaks + k + 1])
+            amplitudes_final_error.append(error[self.number_peaks + self.number_substances + k + 1])
+            widths_final.append(popt[self.number_peaks + k + 1])
+            amplitudes_final.append(popt[self.number_peaks + self.number_substances + k + 1])
+            
+        return np.concatenate([np.array([popt[0]]), popt[1:self.number_peaks+1], widths_final, amplitudes_final]), \
+            np.concatenate([np.array([error[0]]), error[1:self.number_peaks+1], widths_final_error, amplitudes_final_error])
 
     def fit(self, save_csv = True):
         # bounds for the first fitting, which corresponds to the first frame
@@ -168,15 +166,17 @@ class PeakFitting:
                 # to increase fitting speed, increase tolerance 
                 if first_fit:
                     popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum(x,*params),
-                                        self.x, y, p0=[0] + [0.1]*self.number_substances + [1000]*self.number_substances,
+                                        self.x, y, p0=[0] + [0] + [0.1]*self.number_substances + [1000]*self.number_substances,
                                         maxfev=3000, ftol=1e-1, xtol=1e-1, bounds=flattened_bounds)
                     
+                    y_shift = np.array([popt[0]])
                     # init parameters for fine tuning
-                    positions_fine = popt[0] + self.positions
-                    widths = popt[1:self.number_substances+1] 
-                    amplitudes = popt[self.number_substances+1:]
+                    positions_fine = popt[1] + self.positions
+                    widths = popt[2:self.number_substances+2] 
+                    amplitudes = popt[self.number_substances+2:]
+
                     # starting parameters for fine tuning
-                    p0 = np.concatenate([positions_fine, widths, amplitudes])
+                    p0 = np.concatenate([y_shift, positions_fine, widths, amplitudes])
                     # bounds for fine tuning
                     flattened_bounds_fine = self.make_bounds(mode = 'fine', positions_fine = positions_fine)
                     first_fit = False
@@ -185,12 +185,16 @@ class PeakFitting:
                 popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum_fine_tune(x, *params),
                                         self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-6, xtol=1e-6)
 
-                positions_fine = popt[:self.number_peaks]
-                widths = popt[self.number_peaks:self.number_peaks + self.number_substances]
-                amplitudes = popt[self.number_peaks + self.number_substances:]
+                y_shift = np.array([popt[0]])
+                positions_fine = popt[1:self.number_peaks+1]
+                widths = popt[1+self.number_peaks:self.number_peaks + self.number_substances+1]
+                amplitudes = popt[self.number_peaks + self.number_substances+1:]
+
+                p0 = np.concatenate([y_shift, positions_fine, widths, amplitudes])
                 
                 # unpack the parameters and errors
                 self.fitting_params.loc[i], self.fitting_params_error.loc[i] = self.unpack_params_errors(popt, pcov)
+                print(self.fitting_params.loc[i])
                 # row i of dataframe is filled with the fitting parameters
                 #print(self.fitting_params.loc[i])
                 #sys.exit()
@@ -221,13 +225,14 @@ class PeakFitting:
         x is the independent variable array
         params should be a flattened list of shift, gamma, and A values
         '''
-        shift = params[0]            # Single shift parameter
-        gamma = params[1:self.number_substances+1]        # Extract n gamma values
-        A = params[self.number_substances+1:]             # Extract n A values
+        y_shift = params[0]           
+        shift = params[1]            # Single shift parameter
+        gamma = params[2:self.number_substances+2]        # Extract n gamma values
+        A = params[self.number_substances+2:]             # Extract n A values
 
         y = np.zeros(len(x))
         k = 0
-        current_name = self.names_substances[0] # not 0, it must be the first name from second ot third part of the mapping_names
+        current_name = self.names_substances[0]
         for i in range(self.number_peaks):
             # retrieve gamma and A values
             # Peak position is shared between all peaks
@@ -235,7 +240,7 @@ class PeakFitting:
                 k += 1
                 current_name = self.names_substances[i]
             if k < self.number_peaks:
-                y += self.lorentzian(x, shift + self.positions[i], gamma[k], A[k])
+                y += self.lorentzian(x, shift + self.positions[i], gamma[k], A[k]) + y_shift
         # stop code from execution
         return y
     
@@ -249,9 +254,10 @@ class PeakFitting:
         x is the independent variable array
         params should be a flattened list of x0, gamma, and A values
         '''
-        x0 = params[:self.number_peaks]
-        gamma = params[self.number_peaks:self.number_peaks + self.number_substances]
-        A = params[self.number_peaks+self.number_substances:]
+        y_shift = params[0]
+        x0 = params[1:self.number_peaks+1]
+        gamma = params[1+ self.number_peaks:self.number_peaks + self.number_substances+1]
+        A = params[self.number_peaks+self.number_substances+1:]
 
         y = np.zeros(len(x))
         k = 0
@@ -261,7 +267,7 @@ class PeakFitting:
                 k += 1
                 current_name = self.names_substances[i]
             if k < self.number_substances:
-                y += self.lorentzian(x, x0[i], gamma[k], A[k])
+                y += self.lorentzian(x, x0[i], gamma[k], A[k]) + y_shift
         return y
 
 # FA_20240207_2H_yeast_Fumarate-d2_5.csv

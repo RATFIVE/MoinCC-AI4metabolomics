@@ -38,8 +38,8 @@ class ContourPlot():
             vmin=zmin * self.Z.max(),
             vmax=zmax * self.Z.max()
         )
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Chemical Shift [ppm]')
+        ax.set_xlabel('Time step in a.u.')
+        ax.set_ylabel('Chemical shift [ppm]')
         ax.grid(True)
         return fig
 

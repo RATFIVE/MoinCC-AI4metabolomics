@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
-import peak_fitting_v6
+import peak_fitting_v7
 
 
 
@@ -9,7 +9,7 @@ class Reference():
     def __init__(self, fp_file, fp_meta):
         self.data = pd.read_csv(fp_file)
         self.chem_shifts = self.data.iloc[:,0]
-        self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
+        self.LorentzianFit = peak_fitting_v7.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
     
     def ReferenceValue(self):
@@ -72,8 +72,8 @@ class Reference():
         # amplitude
         ax[0].plot(self.fitting_params['Water_amp_4.7'])
         ax[0].set_title('Integral of water over time')
-        ax[0].set_xlabel('time') 
-        ax[0].set_ylabel('integral value water peak')
+        ax[0].set_xlabel('Time step in a.u.') 
+        ax[0].set_ylabel('Integral value of lorenzian fit')
 
         #axs[0].legend()
 
@@ -89,7 +89,7 @@ class Reference():
         ax[1].plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
         
         
-        ax[1].set_xlabel('Chemical Shifts')
+        ax[1].set_xlabel('Chemical shift [ppm]')
         ax[1].set_ylabel('Intensity')
         ax[1].set_title(f'Lorentzian fit for time step: {i}')
         ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
