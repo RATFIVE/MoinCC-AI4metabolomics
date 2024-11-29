@@ -300,6 +300,7 @@ class StreamlitApp():
             st.markdown('# Substrate Plot')
             st.write('Inside Panel 1')
             panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
+            st.write(f'Standarddeviation of noise: {panel_1_obj.differences.iloc[:,st.session_state['time_frame']].std():.3f}')
             one_plot = panel_1_obj.plot(st.session_state['time_frame'])
             st.plotly_chart(one_plot, use_container_width=True)
 
