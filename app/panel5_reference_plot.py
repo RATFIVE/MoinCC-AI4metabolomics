@@ -96,7 +96,7 @@ class Reference():
                                                  shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
                                                  gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
                                                  A= self.fitting_params.iloc[i]['Water_amp_4.7'])
-        ax[1].plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
+        ax[1].plot(self.chem_shifts, y_lorentzian + self.fitting_params.iloc[i]['y_shift'] , c='red', label='Lorentzian fit')
         
         
         ax[1].set_xlabel('Chemical shift [ppm]')
