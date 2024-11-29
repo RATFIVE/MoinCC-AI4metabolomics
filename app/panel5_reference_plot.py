@@ -2,16 +2,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import peak_fitting_v6
+import os
+from pathlib import Path
+import plotly.io as pio
 
 
 
 class Reference():
-    def __init__(self, fp_file, fp_meta):
+    def __init__(self, fp_file, fp_meta, file_path):
         self.data = pd.read_csv(fp_file)
         self.chem_shifts = self.data.iloc[:,0]
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
+        self.file_name = os.path.basename(file_path)
+        self.plot_dir = Path('output', self.file_name + '_output', 'plots')
+        self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
+
+        # Ensure the plot directory exists 
+        os.makedirs(self.plot_dir, exist_ok=True)
     
     def ReferenceValue(self):
         #get referenz concentration from meta data
@@ -94,7 +103,7 @@ class Reference():
         # Lorentzian
         y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
                                                  shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
-                                                 gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
+                                                  gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
                                                  A= self.fitting_params.iloc[i]['Water_amp_4.7'])
         ax[1].plot(self.chem_shifts, y_lorentzian + self.fitting_params.iloc[i]['y_shift'] , c='red', label='Lorentzian fit')
         
@@ -105,7 +114,16 @@ class Reference():
         ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
         ax[1].legend()
         plt.tight_layout()
+
+        # Save the figure as a PDF
+        self.save_fig(fig, self.reference_pdf)
+        #fig.savefig(f'Reference_{self.basename}.pdf', format='pdf')
         
     
-        return fig   
+        return fig  
+    
+    def save_fig(self, fig, name):
+        fig.savefig(f'{name}.pdf', format='pdf')
+        print(f'Saved at: {self.plot_dir} as {name}.pdf')
+        print(f'self.filename: {self.file_name}')
     

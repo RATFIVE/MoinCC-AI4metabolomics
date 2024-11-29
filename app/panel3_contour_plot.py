@@ -2,11 +2,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap
+import plotly.io as pio
+import os
 
 class ContourPlot():
     def __init__(self, file_path):
         self.file_path = file_path
         self.df = pd.read_csv(file_path)
+        self.basename = os.path.basename(self.file_path)
 
         # Assuming `self.df` is a DataFrame and `self.Z` is created from its data (excluding the first column)
         self.Z = self.df.iloc[:, 1:].to_numpy()
@@ -41,5 +44,9 @@ class ContourPlot():
         ax.set_xlabel('Time step')
         ax.set_ylabel('Chemical Shift [ppm]')
         ax.grid(True)
+
+        # Save the figure as a PDF
+        fig.savefig(f'ContourPlot_{self.basename}.pdf', format='pdf')
+
         return fig
 

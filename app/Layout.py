@@ -21,11 +21,14 @@ from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
+
 #from peak_fitting_v7 import PeakFitting
 
 
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
+# Custom CSS to change font size of buttons and other widgets
+
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
 data_fp = os.path.join(os.getcwd(), '..', 'Data', 'FA_20240517_2H_yeast_Nicotinamide-d4 _6.csv')
@@ -176,6 +179,7 @@ class StreamlitApp():
         if 'meta_file' in st.session_state:
             self.meta_fp = st.session_state['meta_file']
             with sub_col2:
+                    st.write('')
                     st.info(self.meta_fp)
         else:
             st.warning("No meta file selected or key does not exist.")
@@ -183,6 +187,7 @@ class StreamlitApp():
         if 'reference_file' in st.session_state:
             self.reference_fp = st.session_state['reference_file']
             with sub_col2:
+                st.write('')
                 st.info(self.reference_fp)
             
         else:
@@ -191,6 +196,7 @@ class StreamlitApp():
         if "file_name" in st.session_state:
             self.data_fp = st.session_state["file_name"]
             with sub_col2:
+                    st.write('')
                     st.info(self.data_fp)
         else:
             st.warning("No substrate file selected or key does not exist.")
@@ -200,7 +206,6 @@ class StreamlitApp():
             st.markdown('**Step4: Press Start Processing**')
         with process_col2:
             if st.button("Start Processing"):
-                    st.write(f"Processing data from: {self.data_fp}")
                     st.session_state["processing_started"] = True
                     self.process_data(PeakFitting)
                     
@@ -208,7 +213,7 @@ class StreamlitApp():
             st.divider()
 
 
-        # Plit into Main and Instruction Tabs
+        # Slit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
 
@@ -321,7 +326,7 @@ class StreamlitApp():
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
             st.markdown('# Reference')
-            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp, file_path=self.data_fp)
             i = st.slider('Select the frame for water reference', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
             reference_plot = Reference_obj.plot(i = i)
             st.pyplot(reference_plot)
