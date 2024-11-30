@@ -267,24 +267,71 @@ class StreamlitApp():
             st.markdown(f"""
                         ### Instructions:
 
-                        #### Step 1: 
-                        - Select the Metafile Path
-                        - Select the Substrate File Path
-                        - Select the Reference File Path
+                        #### Step 0: 
+                        **Choose the Model:**
+
+                        **Model 1:**
+
+                        Lorenzian curve fitting with parameters of the Meta Description
+
+                        **Model 2:**
+
+                        Lorenzian curve fitting + initial parameters derived from actual spectrum
+
+                        #### Step 1:
+                        - **Select the Metadata:** 
+                            
+                        The Metadata should be an xlsx file that has the following structure:
+                        | ID | File                                     | Expt_name                   | TR[s] | NS | TR total [s] | Substrate_name       | Substrate_N_D | Substrate_mM | Substrate_ppm | pH_before | pH_after | Reaction_temperature (Kelvin) | Yeast_suspension      | Substrate_solvent | Substrate_mM_added | Water_ppm | Metabolite_1      | Metabolite_2 | Metabolite_3 | Metabolite_4 | Metabolite_5 | Metabolite_1_ppm | Metabolite_2_ppm | Metabolite_3_ppm | Metabolite_4_ppm | Metabolite_5_ppm |
+                        |----|-----------------------------------------|-----------------------------|-------|----|--------------|----------------------|---------------|--------------|---------------|-----------|----------|-------------------------------|-----------------------|-------------------|--------------------|-----------|-------------------|--------------|--------------|--------------|--------------|------------------|------------------|------------------|------------------|------------------|
+                        | 1  | FA_20240206_2H_yeast_Acetone-d6_3.csv   | FA_20240206_2H_yeast_1_3    | 17.50 | 8  | 140          | Acetone-d6           | 6             | 15           | 2.32          | 5.06      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Propan-2-ol-d6 |              |              |              |              | 1.20             |                  |                  |                  |                  |
+                        | 2  | FA_20231123_2H_Yeast_Fumarate-d2_12.csv | FA_20231123_2H_Yeast_1_12   | 11.50 | 8  | 92           | Fumarate-d2          | 1,1           | 15           | 6.65          | 5.62      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Malate-d2(sum) |              |              |              |              | 4.368, 2.474     |                  |                  |                  |                  |
+                        | 3  | FA_20240207_2H_yeast_Fumarate-d2_5.csv  | FA_20240207_2H_yeast_1_5    | 11.50 | 8  | 92           | Fumarate-d2          | 1,1           | 15           | 6.65          | 5.60      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Malate-d2(sum) |              |              |              |              | 4.368, 2.474     |                  |                  |                  |                  |
+
+
+                        - **Select the Substrate**
+
+                        The subtrate file should be a .csv file which have the folloing structure:
+                        | 2H Chemical Shift (ppm) | FA_20240105_2H_yeast_1.5.ser#1 | FA_20240105_2H_yeast_1.5.ser#2 | FA_20240105_2H_yeast_1.5.ser#3 | FA_20240105_2H_yeast_1.5.ser#4 |
+                        |--------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+                        | Value 1                 | X1                             | X2                             | X3                             | X4                             |
+                        | Value 2                 | X5                             | X6                             | X7                             | X8                             |
+                        | Value 3                 | X9                             | X10                            | X11                            | X12                            |
+                        | ...                     | ...                            | ...                            | ...                            | ...                            |
+                        
+                        where X is the measured value
+
+
+                        - **Select the Reference File:**
+                        The reference file should be a .csv file which has the following structre:
+
+                        | 2H Chemical Shift (ppm) | FA_20240105_2H_yeast_1.5.ser#1 | FA_20240105_2H_yeast_1.5.ser#2 | FA_20240105_2H_yeast_1.5.ser#3 | FA_20240105_2H_yeast_1.5.ser#4 |
+                        |--------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+                        | Value 1                 | X1                             | X2                             | X3                             | X4                             |
+                        | Value 2                 | X5                             | X6                             | X7                             | X8                             |
+                        | Value 3                 | X9                             | X10                            | X11                            | X12                            |
+                        | ...                     | ...                            | ...                            | ...                            | ...                            |
+                        
+                        where X is the measured value
+
 
                         #### Step 2:
                         - Click Start Processing
 
                         #### Step 3:
-                        ### Substrate Plot
-                        - Use Sliders to slect the Frame, to investigate
+                        ##### Substrate Plot
+                        - Use Sliders to slect the Frame, to investigate the Spectrum which its coresponding fitted metabolite and substrates
+                        - In the legend, select the line to be or not to be visualized
+
+                        #### Kinetic Plot:
+                        - Kinetcs of the metabolites and substrate peaks
                         
                         ##### Contour Plot
-                        - Use Slider to selct the depth in % 
+                        - Visualize the full measured spectrum and select the depth [%] to visualize peaks
 
 
                         #### Reference Plot
-                        - Enjoy
+                        - Get the reference value on water.
 
 
                         """)
