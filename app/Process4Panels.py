@@ -39,7 +39,7 @@ class Process4Panels:
             y = np.zeros(len(x))
             for position,width, amplitude in zip(positions, widths, amplitudes):
                 y += self.lorentzian(x, position, width, amplitude, y_shift)
-            y = pd.DataFrame({str(i): y})
+            y = pd.DataFrame({'Time_Step_'+ str(i + 1): y})
             self.sum_df = pd.concat([self.sum_df, y] ,axis=1)
         self.sum_df.set_index('x')
         self.sum_df.to_csv(str(Path(str(self.output_dir), 'sum_fit.csv')),index=False)
@@ -75,7 +75,7 @@ class Process4Panels:
                 y = pd.DataFrame({substance : y})
                 time_frame_res = pd.concat([time_frame_res, y], axis = 1)
             
-            time_frame_res.to_csv(str(Path(str(output_path), f'sum_fit{i}.csv')), index=False)
+            time_frame_res.to_csv(str(Path(str(output_path), f'substance_fit_{i + 1}.csv')), index=False)
 
     def save_difference(self):
         # Extract the x-axis data
@@ -86,7 +86,7 @@ class Process4Panels:
         diff_columns = [self.data.iloc[:, i] - self.sum_df.iloc[:, i] for i in range(1, self.sum_df.shape[1])]
 
         diff_df = pd.concat(diff_columns, axis=1)
-        diff_df.columns = [str(i) for i in range(0, self.sum_df.shape[1]-1)]
+        diff_df.columns = ['Time_Step_' + str(i) for i in range(1, self.sum_df.shape[1])]
         differences = pd.concat([differences, diff_df], axis=1)
         differences.to_csv(Path(self.output_dir) / 'differences.csv', index=False)
     
@@ -109,14 +109,15 @@ class Process4Panels:
                 # row i and columns k
                 kinetics[i,k] = sum(amplitudes.iloc[indices].values)
         kinetics = pd.DataFrame(kinetics, columns = substances)
-        kinetics['time step'] = np.arange(0, kinetics.shape[0])
-        kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
+        kinetics['Time_Step'] = np.arange(1, kinetics.shape[0]+1)
+        kinetics.set_index('Time_Step', inplace=True)
+        kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'))
 
-# processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
-# processer.save_sum_spectra()
-# processer.save_substrate_individual()
-# processer.save_difference()
-# processer.save_kinetics()
+#processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
+#processer.save_sum_spectra()
+#processer.save_substrate_individual()
+#processer.save_difference()
+#processer.save_kinetics()
 
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv

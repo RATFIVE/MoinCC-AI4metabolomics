@@ -17,10 +17,10 @@ class KineticPlot:
         self.template = 'plotly_white'
  
     def plot(self):
-        fig = px.line(
+        fig = px.scatter(
             self.kin_df,
-            x='time step',
-            y=self.kin_df.columns[:-1],  # Select all columns except 'time' for y
+            x='Time_Step',
+            y=self.kin_df.columns[1:],  # Select all columns except 'time' for y
             labels={'value': 'Value', 'variable': 'Series'},
             title=f"Kinetic Plot of {self.basename}",
             color_discrete_sequence=self.colors
@@ -32,7 +32,7 @@ class KineticPlot:
             yaxis_title='Intensity',
             showlegend=True,
             font=dict(
-                size=16,                          # Font size
+                size=20,                          # Font size
             ), 
             legend=dict(
                 x=0.95,
@@ -44,7 +44,7 @@ class KineticPlot:
             )
     
         # Save the fig as pdf
-        self.save_fig(fig, self.kinetic_pdf)
+        #self.save_fig(fig, self.kinetic_pdf)
         
         return fig
     

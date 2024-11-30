@@ -199,20 +199,29 @@ class StreamlitApp():
                     st.write('')
                     st.info(self.data_fp)
         else:
-            st.warning("No substrate file selected or key does not exist.")
+            st.warning("No substrate file selected or file does not exist.")
         with col2:
             process_col1, process_col2, process_col3 = st.columns([2, 1, 1])  # 1:2:1 ratio
         with process_col1:
-            st.markdown('**Step4: Press Start Processing**')
+            st.markdown('**Step 4: Press Start Processing**')
         with process_col2:
             if st.button("Start Processing"):
+                    st.session_state['button_pressed'] = True
                     st.session_state["processing_started"] = True
+
+        if 'processing_started' in st.session_state :
+            if 'button_pressed' in st.session_state:
+                if st.session_state['button_pressed']:
+                    information = st.empty()
+                    information.info("Processing the data. Please wait...")
                     self.process_data(PeakFitting)
+                    self.process_plots()
+                    information.empty()
+                    st.session_state['button_pressed'] = None
+
                     
         with col3:
             st.divider()
-
-
         # Slit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
@@ -247,10 +256,10 @@ class StreamlitApp():
         processor.save_kinetics()
     
     def process_plots(self):
-        self.panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-        self.panel_2_obj = KineticPlot(self.data_fp)
-        self.panel_3_obj = ContourPlot(self.data_fp)
-        self.panel_4_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+        st.session_state['panel_1_obj'] = Panel1SpectrumPlot(file_path = self.data_fp)
+        st.session_state['panel_2_obj'] = KineticPlot(self.data_fp)
+        st.session_state['panel_3_obj'] = ContourPlot(self.data_fp)
+        st.session_state['panel_obj_4'] = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
 
     def about_page(self, about):
         with about:
@@ -299,8 +308,7 @@ class StreamlitApp():
             st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
             st.markdown('# Substrate Plot')
             st.write('Inside Panel 1')
-            panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-            one_plot = panel_1_obj.plot(st.session_state['time_frame'])
+            one_plot = st.session_state['panel_1_obj'].plot(st.session_state['time_frame'])
             st.plotly_chart(one_plot, use_container_width=True)
 
             
@@ -308,29 +316,25 @@ class StreamlitApp():
         """ Kinetic Plot"""
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
             st.markdown('# Kinetic Plot')
-            plot = KineticPlot(self.data_fp)
-            fig = plot.plot() 
+            fig = st.session_state['panel_2_obj'].plot() 
             st.plotly_chart(fig, use_container_width=True)
 
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Contour Plot", expanded=True):
             st.markdown('# Contour Plot')
-            panel_3_obj = ContourPlot(self.data_fp)
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
-            contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
+            contourplot = st.session_state['panel_3_obj'].plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
             st.pyplot(contourplot, clear_figure=True)
 
     def panel4(self):
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
             st.markdown('# Reference')
-            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp, file_path=self.data_fp)
-            i = st.slider('Select the frame for water reference', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
-            reference_plot = Reference_obj.plot(i = i)
+            i = st.slider('Select the frame for water reference', min_value=1, max_value= st.session_state['panel_obj_4'].data.shape[1], value=1) #max_value ist falsch, sessionstate?
+            reference_plot = st.session_state['panel_obj_4'].plot(i = i)
             st.pyplot(reference_plot)
-
 
     def run(self):
         self.header()

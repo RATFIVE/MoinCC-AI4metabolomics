@@ -35,7 +35,7 @@ class Panel1SpectrumPlot():
         # Read in and sort files numerically by the number in their names
         ind_file_names = sorted(
             os.listdir(Path('output', f'{self.file_name}_output', 'substance_fits')),
-            key=lambda x: int(x.split('_fit')[1].split('.csv')[0])  # Extract number for sorting
+            key=lambda x: int(x.split('_fit_')[1].split('.csv')[0])  # Extract number for sorting
         )
 
         # Load the CSV files in the sorted order
@@ -151,7 +151,6 @@ class Panel1SpectrumPlot():
             template=self.template
             )
 
-        
         # Save the fig as pdf
         self.save_fig(fig, self.noise_pdf) 
         return fig
@@ -197,7 +196,8 @@ class Panel1SpectrumPlot():
         return fig
     
     def save_fig(self, fig, name):
-        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        pass
+        #pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
         #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido') 
         
 

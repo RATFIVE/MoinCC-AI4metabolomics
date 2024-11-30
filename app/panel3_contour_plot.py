@@ -46,7 +46,7 @@ class ContourPlot():
         ax.grid(True)
 
         # Save the figure as a PDF
-        fig.savefig(f'ContourPlot_{self.basename}.pdf', format='pdf')
+        #fig.savefig(f'ContourPlot_{self.basename}.pdf', format='pdf')
 
         return fig
 

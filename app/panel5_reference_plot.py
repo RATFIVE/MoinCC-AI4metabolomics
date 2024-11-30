@@ -9,13 +9,13 @@ import plotly.io as pio
 
 
 class Reference():
-    def __init__(self, fp_file, fp_meta, file_path):
+    def __init__(self, fp_file, fp_meta):
         self.data = pd.read_csv(fp_file)
         self.chem_shifts = self.data.iloc[:,0]
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
-        self.file_name = os.path.basename(file_path)
+        self.file_name = os.path.basename(fp_file)
         self.plot_dir = Path('output', self.file_name + '_output', 'plots')
         self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
 
@@ -123,7 +123,8 @@ class Reference():
         return fig  
     
     def save_fig(self, fig, name):
-        fig.savefig(f'{name}.pdf', format='pdf')
-        print(f'Saved at: {self.plot_dir} as {name}.pdf')
-        print(f'self.filename: {self.file_name}')
+        pass
+        #fig.savefig(f'{name}.pdf', format='pdf')
+        #print(f'Saved at: {self.plot_dir} as {name}.pdf')
+        #print(f'self.filename: {self.file_name}')
     
