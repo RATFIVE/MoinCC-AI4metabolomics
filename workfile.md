@@ -12,7 +12,7 @@
 
 # Notes from 27.11.
 - [DONE] Putting everything in one plot,  Sleect between stacked and overlayed (P1 Marco)
-- Save the figures as pdf (P2 Marco)
+- [DONE] Save the figures as pdf (P2 Marco)
 
 - Kinetic Plot, Dots instead of line (without a mean line) (P1 Tom)
 - Shifted frames by one  (P2 Meike)

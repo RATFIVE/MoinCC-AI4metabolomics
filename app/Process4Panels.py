@@ -112,11 +112,11 @@ class Process4Panels:
         kinetics['time step'] = np.arange(0, kinetics.shape[0])
         kinetics.to_csv(Path(self.output_dir, 'kinetics.csv'),index=False)
 
-processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
-processer.save_sum_spectra()
-processer.save_substrate_individual()
-processer.save_difference()
-processer.save_kinetics()
+# processer = Process4Panels('/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv')
+# processer.save_sum_spectra()
+# processer.save_substrate_individual()
+# processer.save_difference()
+# processer.save_kinetics()
 
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv
 # output/FA_20240731_2H_yeast_Fumarate-d2_15_200.ser.csv_output/fitting_params.csv
