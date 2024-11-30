@@ -33,7 +33,7 @@
 - [DONE] Progress bar after pressing the button (P2 Tom/Marco)
 - [DONE] Select the model  (P1 Tom/Marco)
 - Wirte a README (P3)
-- write instructions (P1 Marco), Monday
+- [DONE] write instructions (P1 Marco), Monday
 - [DONE] performance (Matplotlib, Plotly, Session_state) (P3 All)
 - [DONE]Beide Modell zusammen ist aktuell mit bug (P1 Tom)
 - Save Reference Plot in correct directory (P1 Meike)
