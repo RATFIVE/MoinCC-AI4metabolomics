@@ -21,7 +21,7 @@ class Panel1SpectrumPlot():
         self.spectrum_pdf = Path(self.plot_dir, f'Spectrum_{self.file_name}')
         self.noise_pdf = Path(self.plot_dir, f'Noise{self.file_name}')
         self.fitted_pdf = Path(self.plot_dir, f'Fitted_{self.file_name}')
-        self.colors = px.colors.qualitative.Plotly
+        self.colors = px.colors.qualitative.Alphabet
         self.template = 'plotly_white' 
 
         # Ensure the plot directory exists 
@@ -133,7 +133,7 @@ class Panel1SpectrumPlot():
         fig.add_trace(go.Scatter(x=self.differences.iloc[:,0][::-1],        # To Change direction of x axis from low to high 
                                  y=self.differences.iloc[:,frame][::-1],    # To Change direction of x axis from low to high 
                                  mode='lines', name='Diff',
-                                 line=dict(color=self.colors[-1])
+                                 line=dict(color=self.colors[1])
                                  ))
         fig.update_layout(
             title='Noise',
@@ -158,15 +158,17 @@ class Panel1SpectrumPlot():
     def plot_sum_fit(self, frame):
         frame_data = self.individual_fits[frame -1 ]
         fig = go.Figure()
+        
         fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0][::-1],           # To Change direction of x axis from low to high 
                                  y=self.sum_data.iloc[:,frame][::-1],       # To Change direction of x axis from low to high 
-                                 mode='lines+markers', 
+                                 mode='lines', 
                                  name='Sum Fit',
-                                 line=dict(color=self.colors[-1])
+                                 line=dict(color=self.colors[2])
                                  ))
-        colors = px.colors.qualitative.Plotly
+        
+        
         for i in range(1, len(frame_data.columns)):
-            color = self.colors[(i - 1) % len(colors)]
+            color = self.colors[(i + 2) % len(self.colors)]
             fig.add_trace(go.Scatter(x=self.sum_data.iloc[:,0], 
                                      y=frame_data.iloc[:,i], 
                                      mode='lines', 
@@ -196,9 +198,8 @@ class Panel1SpectrumPlot():
         return fig
     
     def save_fig(self, fig, name):
-        pass
-        #pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
-        #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido') 
+        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         
 
 
