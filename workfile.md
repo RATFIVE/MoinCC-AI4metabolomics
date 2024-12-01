@@ -40,6 +40,7 @@
 - [DONE] Increase Font size for all plots (P1 All)
 - Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
 - Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
+- Software beenden Button? [Marco]
 
 
 
