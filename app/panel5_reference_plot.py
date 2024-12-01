@@ -117,14 +117,15 @@ class Reference():
 
         # Save the figure as a PDF
         self.save_fig(fig, self.reference_pdf)
-        #fig.savefig(f'Reference_{self.basename}.pdf', format='pdf')
+
         
     
         return fig  
     
-    def save_fig(self, fig, name):
-        pass
-        #fig.savefig(f'{name}.pdf', format='pdf')
-        #print(f'Saved at: {self.plot_dir} as {name}.pdf')
-        #print(f'self.filename: {self.file_name}')
+    def save_fig(self, fig, name, width=1200, height=800):
+        
+        # Konvertieren der Breite und Höhe von Pixel in Zoll (dpi = 300)
+        fig.set_size_inches(width / 100, height / 100)
+        fig.savefig(f'{name}.pdf', format='pdf')
+        fig.savefig(f'{name}.png', format='png')
     

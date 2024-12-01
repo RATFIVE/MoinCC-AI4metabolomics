@@ -13,7 +13,7 @@ class KineticPlot:
         self.kin_fp = Path('output', os.path.basename(self.path) + '_output', 'kinetics.csv')
         self.kin_df = pd.read_csv(self.kin_fp)
         self.kinetic_pdf = Path(self.plot_dir, f'Kinetic_{self.basename}')
-        self.colors = px.colors.qualitative.Alphabet
+        self.colors = px.colors.qualitative.Dark24
         self.template = 'plotly_white'
  
     def plot(self):
@@ -28,18 +28,26 @@ class KineticPlot:
         )
 
         fig.update_layout(
-            title='Kinetic Plot',
-            xaxis_title='Time step',
+            title=dict(
+                text='Kinetic',
+                font=dict(size=24)  # Font size for the title
+            ),
+            xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
-            font=dict(
-                size=20,                          # Font size
-            ), 
             legend=dict(
                 x=0.95,
                 y=0.9,
                 xanchor='center',
                 yanchor='middle'
+            ),
+            yaxis=dict(
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)            # Font size for y-axis ticks
+            ),
+            xaxis=dict(
+                titlefont=dict(size=18),          # Font size for x-axis title
+                tickfont=dict(size=18)            # Font size for x-axis ticks
             ),
             template=self.template
             )

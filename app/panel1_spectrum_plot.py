@@ -21,7 +21,7 @@ class Panel1SpectrumPlot():
         self.spectrum_pdf = Path(self.plot_dir, f'Spectrum_{self.file_name}')
         self.noise_pdf = Path(self.plot_dir, f'Noise{self.file_name}')
         self.fitted_pdf = Path(self.plot_dir, f'Fitted_{self.file_name}')
-        self.colors = px.colors.qualitative.Alphabet
+        self.colors = px.colors.qualitative.Dark24
         self.template = 'plotly_white' 
 
         # Ensure the plot directory exists 
@@ -73,7 +73,7 @@ class Panel1SpectrumPlot():
         fig.update_layout(
             title=dict(
                 text='Spectrum',
-                font=dict(size=30)  # Font size for the title
+                font=dict(size=24)  # Font size for the title
             ),
             xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
@@ -86,13 +86,13 @@ class Panel1SpectrumPlot():
             ),
             yaxis=dict(
                 range=[self.min_y, self.max_y],
-                titlefont=dict(size=24),          # Font size for y-axis title
+                titlefont=dict(size=18),          # Font size for y-axis title
                 tickfont=dict(size=18)            # Font size for y-axis ticks
             ),
             xaxis=dict(
                 range=[self.max_x, self.min_x],
                 dtick=0.5,
-                titlefont=dict(size=24),          # Font size for x-axis title
+                titlefont=dict(size=18),          # Font size for x-axis title
                 tickfont=dict(size=18)            # Font size for x-axis ticks
             )
                           # To Change direction of x axis from low to high 
@@ -120,8 +120,17 @@ class Panel1SpectrumPlot():
                 xanchor='center',
                 yanchor='middle'
             ),
-            yaxis=dict(range=[self.min_y, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),              # To Change direction of x axis from low to high 
+            yaxis=dict(
+                range=[self.min_y, self.max_y],
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)
+                ),
+            xaxis=dict(
+                range=[self.max_x, self.min_x], 
+                dtick=0.5,
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)
+                ),              
             template=self.template
             )    
         # Save the fig as pdf
@@ -146,8 +155,17 @@ class Panel1SpectrumPlot():
                 xanchor='center',
                 yanchor='middle'
             ),
-            yaxis=dict(range=[self.differences.iloc[:,frame].min()*20, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),                     # To Change direction of x axis from low to high 
+            yaxis=dict(
+                range=[self.differences.iloc[:,frame].min()*20, self.max_y],
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)
+                       ),
+            xaxis=dict(
+                range=[self.max_x, self.min_x], 
+                dtick=0.5,
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18),
+                ),                                                                                                                          # To Change direction of x axis from low to high 
             template=self.template
             )
 
@@ -189,8 +207,16 @@ class Panel1SpectrumPlot():
                 xanchor='center',
                 yanchor='middle'
             ),
-            yaxis=dict(range=[self.min_y, self.max_y]),
-            xaxis=dict(range=[self.max_x, self.min_x], dtick=0.5),                      # To Change direction of x axis from low to high 
+            yaxis=dict(
+                range=[self.min_y, self.max_y],
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18),
+                ),
+            xaxis=dict(
+                range=[self.max_x, self.min_x], 
+                dtick=0.5,
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)),                      # To Change direction of x axis from low to high 
             template=self.template
             )
         # Save the fig as pdf
