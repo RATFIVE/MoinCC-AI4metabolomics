@@ -131,7 +131,7 @@ class Panel1SpectrumPlot():
             template=self.template
             )    
         # Save the fig as pdf
-        self.save_fig(fig, self.spectrum_pdf)  
+        #self.save_fig(fig, self.spectrum_pdf)  
         return fig
     
     def plot_diff(self, frame):
@@ -167,7 +167,7 @@ class Panel1SpectrumPlot():
             )
 
         # Save the fig as pdf
-        self.save_fig(fig, self.noise_pdf) 
+        #self.save_fig(fig, self.noise_pdf) 
         return fig
 
     def plot_sum_fit(self, frame):
@@ -221,9 +221,9 @@ class Panel1SpectrumPlot():
         return fig
     
     def save_fig(self, fig, name):
-        pass
-        #pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
-        #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
+        
+        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         
 
 
