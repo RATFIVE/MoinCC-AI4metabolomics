@@ -29,7 +29,7 @@ class KineticPlot:
 
         fig.update_layout(
             title=dict(
-                text='Kinetic',
+                text='Substance Kinetics',
                 font=dict(size=24)  # Font size for the title
             ),
             xaxis_title='Chemical shift [ppm]',
