@@ -41,6 +41,9 @@
 - Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
 - Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
 - Software beenden Button? [Marco]
+- check whether it works with water+yeast  Reference (P2 Meike)
+- create streamlit .exe (P1 Meike)
+- plot titles dependent on file name?(P3 Marco/Tom)
 
 
 
