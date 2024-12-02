@@ -7,8 +7,6 @@ import os
 import sys
 import psutil  # For checking running processes
 from pathlib import Path
-from PIL import Image
-import lorem
 from LoadData import *
 from panel3_contour_plot import *
 import matplotlib.pyplot as plt
@@ -22,8 +20,7 @@ from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
 import time
-from pynput.keyboard import Controller, Key
-import psutil
+#from pynput.keyboard import Controller, Key
 
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
@@ -242,23 +239,23 @@ class StreamlitApp():
                 self.panel4()
 
                 # Shutdown button
-                exit_app = st.button("Shut Down")
-                if exit_app:
-                    # Give a bit of delay for user experience
-                    time.sleep(0.1)
-                    # Close streamlit browser tab
+                # exit_app = st.button("Shut Down")
+                # if exit_app:
+                #     Give a bit of delay for user experience
+                #     time.sleep(0.1)
+                #     Close streamlit browser tab
                     
-                    keyboard = Controller()
-                    # Simulate pressing and releasing "ctrl+w"
-                    keyboard.press(Key.ctrl)
-                    keyboard.press('w')
-                    keyboard.release('w')
-                    keyboard.release(Key.ctrl)
+                #     keyboard = Controller()
+                #     Simulate pressing and releasing "ctrl+w"
+                #     keyboard.press(Key.ctrl)
+                #     keyboard.press('w')
+                #     keyboard.release('w')
+                #     keyboard.release(Key.ctrl)
 
-                    # Terminate streamlit python process
-                    pid = os.getpid()
-                    p = psutil.Process(pid)
-                    p.terminate()
+                #     Terminate streamlit python process
+                #     pid = os.getpid()
+                #     p = psutil.Process(pid)
+                #     p.terminate()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
