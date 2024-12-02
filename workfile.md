@@ -36,7 +36,7 @@
 - [DONE] write instructions (P1 Marco), Monday
 - [DONE] performance (Matplotlib, Plotly, Session_state) (P3 All)
 - [DONE]Beide Modell zusammen ist aktuell mit bug (P1 Tom)
-- Save Reference Plot in correct directory (P1 Meike) ??
+- [DONE] Save Reference Plot in correct directory (P1 Marcou) ??
 - [DONE] Increase Font size for all plots (P1 All)
 - Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
 - Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
