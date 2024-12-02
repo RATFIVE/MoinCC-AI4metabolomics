@@ -382,8 +382,7 @@ class StreamlitApp():
                 self.save_to_pdf(session_state=st.session_state['panel_1_obj'],
                                 fig=one_plot,
                                 file_basename=os.path.basename(self.data_fp),
-                                file_name=f'Substrate_{os.path.basename(self.data_fp)}_{st.session_state['time_frame']}'
-                                )
+                                file_name=f"Substrate_{os.path.basename(self.data_fp)}_{st.session_state['time_frame']}"                             )
 
             
     def panel2(self):
