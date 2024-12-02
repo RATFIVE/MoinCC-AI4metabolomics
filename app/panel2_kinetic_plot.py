@@ -58,6 +58,7 @@ class KineticPlot:
         return fig
     
     def save_fig(self, fig, name):
-        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
-        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
+        pass
+        #pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         

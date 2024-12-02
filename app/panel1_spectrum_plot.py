@@ -11,8 +11,6 @@ import plotly.express as px
 from plotly.colors import sequential
 from plotly.subplots import make_subplots
 
-
-
 class Panel1SpectrumPlot():
     def __init__(self, file_path):
         self.file_path = file_path
@@ -26,7 +24,6 @@ class Panel1SpectrumPlot():
 
         # Ensure the plot directory exists 
         os.makedirs(self.plot_dir, exist_ok=True)
-        
         
         self.data = pd.read_csv(file_path, header = 0)
         self.sum_data = pd.read_csv(Path('output', f'{self.file_name}_output', 'sum_fit.csv'), header = 0)
@@ -224,8 +221,9 @@ class Panel1SpectrumPlot():
         return fig
     
     def save_fig(self, fig, name):
-        pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
-        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
+        pass
+        #pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        #pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         
 
 

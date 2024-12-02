@@ -72,9 +72,10 @@ class PeakFitting:
         """
         self.meta_df = self.meta_df[self.meta_df['File'].astype(str).str.upper() == str(self.file_name).upper()]
 
+        error = st.empty()
         if self.meta_df.shape[0] == 0: #no metabolites listed --> only water present
             print(f'No metadata found for {self.file_name}')
-        
+            error.warning('Filename not found in metadata file.')
 
         positions = []
         names = []
