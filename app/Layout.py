@@ -259,7 +259,9 @@ class StreamlitApp():
         st.session_state['panel_1_obj'] = Panel1SpectrumPlot(file_path = self.data_fp)
         st.session_state['panel_2_obj'] = KineticPlot(self.data_fp)
         st.session_state['panel_3_obj'] = ContourPlot(self.data_fp)
-        st.session_state['panel_obj_4'] = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+        st.session_state['panel_obj_4'] = Reference(fp_ref = self.reference_fp, fp_meta = self.meta_fp, fp_data = self.data_fp)
+
+        st.session_state['panel_obj_4'].save_kinetics_mmol()
 
     def about_page(self, about):
         with about:

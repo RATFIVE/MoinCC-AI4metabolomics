@@ -9,15 +9,18 @@ import plotly.io as pio
 
 
 class Reference():
-    def __init__(self, fp_file, fp_meta):
-        self.data = pd.read_csv(fp_file)
+    def __init__(self, fp_ref, fp_meta, fp_data):
+        self.data = pd.read_csv(fp_ref)
         self.chem_shifts = self.data.iloc[:,0]
-        self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
+        self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_ref , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
-        self.file_name = os.path.basename(fp_file)
+        self.file_name = os.path.basename(fp_ref)
         self.plot_dir = Path('output', self.file_name + '_output', 'plots')
         self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
+        #kinetics
+        self.kin_fp = Path('output', os.path.basename(fp_data) + '_output', 'kinetics.csv')
+        self.kin_df = pd.read_csv(self.kin_fp)
 
         # Ensure the plot directory exists 
         os.makedirs(self.plot_dir, exist_ok=True)
@@ -33,45 +36,10 @@ class Reference():
             print("mMol value couldn't be extracted from Substrate_mM_added ")
 
         #calculate ref_factor
-        ref_factor = mmol / self.fitting_params['Water_amp_4.7'].mean()
+        reference_value = mmol / self.fitting_params['Water_amp_4.7'].mean()
 
-        return ref_factor
-
-    # def plot_water_amplitude(self):
-
-    #     fig, ax = plt.subplots()
-    #     ax.plot(self.fitting_params['Water_amp_4.7'])
-    #     ax.set_xlabel('time')  
-    #     ax.set_ylabel('integral value water peak')
-        
-    #     plt.show()
-        
-    #     return fig #, ax  
-     
-    
-    # def plot_lorentzian(self, i):
-        
-    #     spectra_data = self.data.iloc[:,i+1]
-        
-    #     fig, ax = plt.subplots()
-        
-    #     # actual curve
-    #     ax.plot(self.chem_shifts, spectra_data, c='blue', label='Reference Spectrum')
-        
-    #     # Lorentzian
-    #     y_lorentzian = self.LorentzianFit.lorentzian(x=self.data.iloc[:,0], 
-    #                                              shift= self.fitting_params.iloc[i]['Water_pos_4.7'],
-    #                                              gamma= self.fitting_params.iloc[i]['Water_width_4.7'], 
-    #                                              A= self.fitting_params.iloc[i]['Water_amp_4.7'])
-    #     ax.plot(self.chem_shifts, y_lorentzian, c='red', label='Lorentzian fit')
-        
-    #     ax.set_xlabel('Chemical Shifts')
-    #     ax.set_ylabel('Intensity')
-    #     ax.legend()
-        
-    #     plt.show()
-        
-    #     return fig #, ax 
+        return reference_value
+ 
     
     def plot(self, i):
         spectra_data = self.data.iloc[:,i+1]
@@ -128,4 +96,14 @@ class Reference():
         fig.set_size_inches(width / 100, height / 100)
         fig.savefig(f'{name}.pdf', format='pdf')
         fig.savefig(f'{name}.png', format='png')
+
+    def save_kinetics_mmol(self):
+        kin_mmol = self.kin_df 
+        value_col = ['ReacSubs','Metab1','Water'] 
+
+        for col in value_col:
+            kin_mmol[col] *=self.reference_value
+
+        kin_mmol.to_csv(Path(self.output_dir, 'kinetics_mmol.csv'))
+
     
