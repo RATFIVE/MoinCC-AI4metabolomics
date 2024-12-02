@@ -217,7 +217,7 @@ class Panel1SpectrumPlot():
             template=self.template
             )
         # Save the fig as pdf
-        self.save_fig(fig, self.fitted_pdf)
+        #self.save_fig(fig, self.fitted_pdf)
         return fig
     
     def save_fig(self, fig, name):

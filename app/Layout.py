@@ -171,31 +171,31 @@ class StreamlitApp():
         if 'Model 2' in st.session_state:
             from peak_fitting_v6 import PeakFitting
 
-        # Session State for files
-        if 'meta_file' in st.session_state:
-            self.meta_fp = st.session_state['meta_file']
-            with sub_col2:
-                    st.write('')
-                    st.info(self.meta_fp)
-        else:
-            st.warning("No meta file selected or key does not exist.")
-
-        if 'reference_file' in st.session_state:
-            self.reference_fp = st.session_state['reference_file']
-            with sub_col2:
+        with sub_col2:
+            # Session State for files
+            if 'meta_file' in st.session_state:
+                self.meta_fp = st.session_state['meta_file']
                 st.write('')
-                st.info(self.reference_fp)
-            
-        else:
-            st.warning("No reference file selected or key does not exist.")
-
-        if "file_name" in st.session_state:
-            self.data_fp = st.session_state["file_name"]
-            with sub_col2:
+                st.info(self.meta_fp)
+            else:
+                st.warning("No meta file selected or key does not exist.")
+            if "file_name" in st.session_state:
+                self.data_fp = st.session_state["file_name"]
+                with sub_col2:
+                        st.write('')
+                        st.info(self.data_fp)
+            else:
+                st.warning("No substrate file selected or file does not exist.")
+                
+            if 'reference_file' in st.session_state:
+                self.reference_fp = st.session_state['reference_file']
+                with sub_col2:
                     st.write('')
-                    st.info(self.data_fp)
-        else:
-            st.warning("No substrate file selected or file does not exist.")
+                    st.info(self.reference_fp)
+                
+            else:
+                st.warning("No reference file selected or key does not exist.")
+
         with col2:
             process_col1, process_col2, process_col3 = st.columns([2, 1, 1])  # 1:2:1 ratio
         with process_col1:
@@ -400,6 +400,19 @@ class StreamlitApp():
             i = st.slider('Select the frame for water reference', min_value=1, max_value= st.session_state['panel_obj_4'].data.shape[1], value=1) #max_value ist falsch, sessionstate?
             reference_plot = st.session_state['panel_obj_4'].plot(i = i)
             st.pyplot(reference_plot)
+            save_reference_button = st.button(label='Save Reference as PDF')
+            with save_reference_button:
+                self.save_to_pdf(session_state=st.session_state['panel_obj_4'],
+                                fig=reference_plot,
+                                name=Path('output', os.path.basename(self.meta_fp)+'_output', 'plots', f'Reference_{self.meta_fp}'))
+                
+    # os.path.basename(fp_ref)
+    # self.plot_dir = Path('output', self.file_name + '_output', 'plots')
+    # self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}'
+    def save_to_pdf(self, session_state, fig, name):
+        session_state.save_fig(fig=fig, name=name)
+
+        
 
     def run(self):
         self.header()

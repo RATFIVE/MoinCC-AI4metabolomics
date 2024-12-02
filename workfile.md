@@ -15,18 +15,18 @@
 - [DONE] Save the figures as pdf (P2 Marco)
 
 - [DONE] Kinetic Plot, Dots instead of line (without a mean line) (P1 Tom)
-- Shifted frames by one  (P2 Meike)
-- Caracterize how similar the noise is. (Mean, std of all the noise frames) (P2 Meike)
+- [DONE]Shifted frames by one  (P2 tom)
+- [DONE] Caracterize how similar the noise is. (Mean, std of all the noise frames) (P2 Meike)
 - [WILLNOTBEDONE] Line width of the lorenzians should not change (maybe 10%) constrain of for the fitting (P3 Tom)
-- Print the reference value (P1 Meike)
+- [DONE]Print the reference value (P1 Meike)
 - [DONE] time with s, min h? Time Step instead of time (P1 Meike)
-- reference factor mit in die anderen plots (P3 all)
+- reference factor mit in die anderen plots (P3 all) 
 - [DONE] Font is too small (P1 Marco)
 - [DONE] Capitalisation in the labels (P1 Marco)
 - [DONE] Use the same label names on e.g y axis  (P1 Marco)
 - [Done] file name of sum_fit should be fitted (P1 Tom)
 - [DONE] put time to the beginning (in kenitcs.csv) (P1 Tom)
-- add kinetics in mol - another .csv file (P1 Meike)
+- [DONE] add kinetics in mol - another .csv file (P1 Meike)
 - [DONE] add constant to fitting (P2 Tom)
 - [DONE] Button to select also meta file and reference file (P1 Marco)
 - [DONE] Start Processing at the end of selecting  (P1 Marco)
@@ -36,7 +36,7 @@
 - [DONE] write instructions (P1 Marco), Monday
 - [DONE] performance (Matplotlib, Plotly, Session_state) (P3 All)
 - [DONE]Beide Modell zusammen ist aktuell mit bug (P1 Tom)
-- Save Reference Plot in correct directory (P1 Meike)
+- Save Reference Plot in correct directory (P1 Meike) ??
 - [DONE] Increase Font size for all plots (P1 All)
 - Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
 - Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)

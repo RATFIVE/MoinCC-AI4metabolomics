@@ -45,7 +45,7 @@ class ContourPlot():
             vmax=zmax * self.Z.max()
         )
         ax.set_xlabel('Time step')
-        ax.set_ylabel('Chemical Shift [ppm]')
+        ax.set_ylabel('Chemical hift [ppm]')
         ax.grid(True)
 
         # Save the figure as a PDF
