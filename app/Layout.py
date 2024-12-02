@@ -21,6 +21,10 @@ from panel1_spectrum_plot import Panel1SpectrumPlot
 from panel2_kinetic_plot import KineticPlot
 from panel3_contour_plot import ContourPlot
 from panel5_reference_plot import Reference
+import time
+from pynput.keyboard import Controller, Key
+import psutil
+
 
 st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
 # Custom CSS to change font size of buttons and other widgets
@@ -236,6 +240,25 @@ class StreamlitApp():
                 self.panel2()
                 self.panel3()  
                 self.panel4()
+
+                # Shutdown button
+                exit_app = st.button("Shut Down")
+                if exit_app:
+                    # Give a bit of delay for user experience
+                    time.sleep(0.1)
+                    # Close streamlit browser tab
+                    
+                    keyboard = Controller()
+                    # Simulate pressing and releasing "ctrl+w"
+                    keyboard.press(Key.ctrl)
+                    keyboard.press('w')
+                    keyboard.release('w')
+                    keyboard.release(Key.ctrl)
+
+                    # Terminate streamlit python process
+                    pid = os.getpid()
+                    p = psutil.Process(pid)
+                    p.terminate()
             else:
                 st.info("Click 'Start Processing' to see the analysis panels.")
     
