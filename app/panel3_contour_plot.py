@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 from matplotlib.colors import ListedColormap
 import plotly.io as pio
 import os
@@ -10,6 +11,8 @@ class ContourPlot():
         self.file_path = file_path
         self.df = pd.read_csv(file_path)
         self.basename = os.path.basename(self.file_path)
+        self.plot_dir = Path('output', self.basename + '_output', 'plots')
+        self.contour_pdf = Path(self.plot_dir, f'Contour_{self.basename}')
 
         # Assuming `self.df` is a DataFrame and `self.Z` is created from its data (excluding the first column)
         self.Z = self.df.iloc[:, 1:].to_numpy()
@@ -46,7 +49,13 @@ class ContourPlot():
         ax.grid(True)
 
         # Save the figure as a PDF
-        fig.savefig(f'ContourPlot_{self.basename}.pdf', format='pdf')
+        self.save_fig(fig, self.contour_pdf)
 
         return fig
+    
+    def save_fig(self, fig, name, width=1200, height=800):
+        # Konvertieren der Breite und Höhe von Pixel in Zoll (dpi = 300)
+        fig.set_size_inches(width / 100, height / 100)
+        fig.savefig(f'{name}.pdf', format='pdf')
+        fig.savefig(f'{name}.png', format='png')
 

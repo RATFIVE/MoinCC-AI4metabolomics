@@ -9,13 +9,13 @@ import plotly.io as pio
 
 
 class Reference():
-    def __init__(self, fp_file, fp_meta, file_path):
+    def __init__(self, fp_file, fp_meta):
         self.data = pd.read_csv(fp_file)
         self.chem_shifts = self.data.iloc[:,0]
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_file , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
-        self.file_name = os.path.basename(file_path)
+        self.file_name = os.path.basename(fp_file)
         self.plot_dir = Path('output', self.file_name + '_output', 'plots')
         self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
 
@@ -117,13 +117,15 @@ class Reference():
 
         # Save the figure as a PDF
         self.save_fig(fig, self.reference_pdf)
-        #fig.savefig(f'Reference_{self.basename}.pdf', format='pdf')
+
         
     
         return fig  
     
-    def save_fig(self, fig, name):
+    def save_fig(self, fig, name, width=1200, height=800):
+        
+        # Konvertieren der Breite und Höhe von Pixel in Zoll (dpi = 300)
+        fig.set_size_inches(width / 100, height / 100)
         fig.savefig(f'{name}.pdf', format='pdf')
-        print(f'Saved at: {self.plot_dir} as {name}.pdf')
-        print(f'self.filename: {self.file_name}')
+        fig.savefig(f'{name}.png', format='png')
     

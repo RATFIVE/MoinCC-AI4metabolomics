@@ -13,32 +13,41 @@ class KineticPlot:
         self.kin_fp = Path('output', os.path.basename(self.path) + '_output', 'kinetics.csv')
         self.kin_df = pd.read_csv(self.kin_fp)
         self.kinetic_pdf = Path(self.plot_dir, f'Kinetic_{self.basename}')
-        self.colors = px.colors.qualitative.Plotly
+        self.colors = px.colors.qualitative.Dark24
         self.template = 'plotly_white'
  
     def plot(self):
-        fig = px.line(
+        colors = self.colors[3:]
+        fig = px.scatter(
             self.kin_df,
-            x='time step',
-            y=self.kin_df.columns[:-1],  # Select all columns except 'time' for y
+            x='Time_Step',
+            y=self.kin_df.columns[1:],  # Select all columns except 'time' for y
             labels={'value': 'Value', 'variable': 'Series'},
             title=f"Kinetic Plot of {self.basename}",
-            color_discrete_sequence=self.colors
+            color_discrete_sequence=colors
         )
 
         fig.update_layout(
-            title='Kinetic Plot',
-            xaxis_title='Time step',
+            title=dict(
+                text='Kinetic',
+                font=dict(size=24)  # Font size for the title
+            ),
+            xaxis_title='Chemical shift [ppm]',
             yaxis_title='Intensity',
             showlegend=True,
-            font=dict(
-                size=16,                          # Font size
-            ), 
             legend=dict(
                 x=0.95,
                 y=0.9,
                 xanchor='center',
                 yanchor='middle'
+            ),
+            yaxis=dict(
+                titlefont=dict(size=18),          # Font size for y-axis title
+                tickfont=dict(size=18)            # Font size for y-axis ticks
+            ),
+            xaxis=dict(
+                titlefont=dict(size=18),          # Font size for x-axis title
+                tickfont=dict(size=18)            # Font size for x-axis ticks
             ),
             template=self.template
             )
@@ -50,4 +59,5 @@ class KineticPlot:
     
     def save_fig(self, fig, name):
         pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
+        pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         

@@ -44,10 +44,17 @@ class PeakFitting:
         self.number_substances = len(set(self.names))
 
          # initialize outputs
-        column_names =  ['Time'] + ['y_shift'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
+        column_names =  ['Time_Step'] + ['y_shift'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
 
-        self.fitting_params = pd.DataFrame(columns=column_names).set_index('Time')
-        self.fitting_params_error = pd.DataFrame(columns=column_names).set_index('Time')
+        self.fitting_params = pd.DataFrame(columns=column_names)
+        self.fitting_params_error = pd.DataFrame(columns=column_names)
+
+        # set ti
+        self.fitting_params['Time_Step'] = self.time_points
+        self.fitting_params_error['Time_Step'] = self.time_points
+        
+        self.fitting_params = self.fitting_params.set_index('Time_Step')
+        self.fitting_params_error = self.fitting_params_error.set_index('Time_Step')
 
         self.names_substances =  deepcopy(self.names) + list(dict.fromkeys(self.names)) + list(dict.fromkeys(self.names)) # Not a relevant instance attribute, so putting somewhere else?
         
@@ -161,6 +168,8 @@ class PeakFitting:
         # bounds for the first fitting, which corresponds to the first frame
         flattened_bounds = self.make_bounds(mode='first')
         
+        progress_bar = st.empty()
+        load_bar = progress_bar.progress(0)
         first_fit = True
         # iterate over all time points
         for i in tqdm(range(self.number_time_points), desc= self.file_name):
@@ -196,15 +205,17 @@ class PeakFitting:
                 p0 = np.concatenate([y_shift, positions_fine, widths, amplitudes])
                 
                 # unpack the parameters and errors
-                self.fitting_params.loc[i], self.fitting_params_error.loc[i] = self.unpack_params_errors(popt, pcov)
-                print(self.fitting_params.loc[i])
-                # row i of dataframe is filled with the fitting parameters
-                #print(self.fitting_params.loc[i])
-                #sys.exit()
-                
+                self.fitting_params.loc[i + 1], self.fitting_params_error.loc[i + 1] = self.unpack_params_errors(popt, pcov)
             except RuntimeError:
                 print(f'Could not fit time frame number {i}. Skipping...')
+            load_bar.progress((i+1) / self.number_time_points)
+        # remove loadbar
+        progress_bar.empty()
         
+        # set all NA values to 0, in case some time frames could not be fitted!
+        self.fitting_params.fillna(0, inplace=True)
+        self.fitting_params_error.fillna(0,inplace=True)
+
         # save results
         if save_csv == True:
             self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
@@ -276,7 +287,7 @@ class PeakFitting:
 # FA_20240207_2H_yeast_Fumarate-d2_5.csv
 #input_file = '../Data/FA_20240213_2H_yeast_Fumarate-d2_9.csv'
 #meta_file =  '/home/tom-ruge/Schreibtisch/Fachhochschule/Semester_2/Appl_Project_MOIN_CC/MoinCC-AI4metabolomics/Data/Data_description_main.xlsx'
-###
+##
 #pf = PeakFitting(input_file, meta_file)
 #pf.fit()
 # Error Handling: Are filepathe existing?

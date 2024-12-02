@@ -199,20 +199,29 @@ class StreamlitApp():
                     st.write('')
                     st.info(self.data_fp)
         else:
-            st.warning("No substrate file selected or key does not exist.")
+            st.warning("No substrate file selected or file does not exist.")
         with col2:
             process_col1, process_col2, process_col3 = st.columns([2, 1, 1])  # 1:2:1 ratio
         with process_col1:
-            st.markdown('**Step4: Press Start Processing**')
+            st.markdown('**Step 4: Press Start Processing**')
         with process_col2:
             if st.button("Start Processing"):
+                    st.session_state['button_pressed'] = True
                     st.session_state["processing_started"] = True
+
+        if 'processing_started' in st.session_state :
+            if 'button_pressed' in st.session_state:
+                if st.session_state['button_pressed']:
+                    information = st.empty()
+                    information.info("Processing the data. Please wait...")
                     self.process_data(PeakFitting)
+                    self.process_plots()
+                    information.empty()
+                    st.session_state['button_pressed'] = None
+
                     
         with col3:
             st.divider()
-
-
         # Slit into Main and Instruction Tabs
         main, about = st.tabs(['Main Page', 'Instructions'])
 
@@ -247,10 +256,10 @@ class StreamlitApp():
         processor.save_kinetics()
     
     def process_plots(self):
-        self.panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
-        self.panel_2_obj = KineticPlot(self.data_fp)
-        self.panel_3_obj = ContourPlot(self.data_fp)
-        self.panel_4_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
+        st.session_state['panel_1_obj'] = Panel1SpectrumPlot(file_path = self.data_fp)
+        st.session_state['panel_2_obj'] = KineticPlot(self.data_fp)
+        st.session_state['panel_3_obj'] = ContourPlot(self.data_fp)
+        st.session_state['panel_obj_4'] = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp)
 
     def about_page(self, about):
         with about:
@@ -258,24 +267,71 @@ class StreamlitApp():
             st.markdown(f"""
                         ### Instructions:
 
-                        #### Step 1: 
-                        - Select the Metafile Path
-                        - Select the Substrate File Path
-                        - Select the Reference File Path
+                        #### Step 0: 
+                        **Choose the Model:**
+
+                        **Model 1:**
+
+                        Lorenzian curve fitting with parameters of the Meta Description
+
+                        **Model 2:**
+
+                        Lorenzian curve fitting + initial parameters derived from actual spectrum
+
+                        #### Step 1:
+                        - **Select the Metadata:** 
+                            
+                        The Metadata should be an xlsx file that has the following structure:
+                        | ID | File                                     | Expt_name                   | TR[s] | NS | TR total [s] | Substrate_name       | Substrate_N_D | Substrate_mM | Substrate_ppm | pH_before | pH_after | Reaction_temperature (Kelvin) | Yeast_suspension      | Substrate_solvent | Substrate_mM_added | Water_ppm | Metabolite_1      | Metabolite_2 | Metabolite_3 | Metabolite_4 | Metabolite_5 | Metabolite_1_ppm | Metabolite_2_ppm | Metabolite_3_ppm | Metabolite_4_ppm | Metabolite_5_ppm |
+                        |----|-----------------------------------------|-----------------------------|-------|----|--------------|----------------------|---------------|--------------|---------------|-----------|----------|-------------------------------|-----------------------|-------------------|--------------------|-----------|-------------------|--------------|--------------|--------------|--------------|------------------|------------------|------------------|------------------|------------------|
+                        | 1  | FA_20240206_2H_yeast_Acetone-d6_3.csv   | FA_20240206_2H_yeast_1_3    | 17.50 | 8  | 140          | Acetone-d6           | 6             | 15           | 2.32          | 5.06      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Propan-2-ol-d6 |              |              |              |              | 1.20             |                  |                  |                  |                  |
+                        | 2  | FA_20231123_2H_Yeast_Fumarate-d2_12.csv | FA_20231123_2H_Yeast_1_12   | 11.50 | 8  | 92           | Fumarate-d2          | 1,1           | 15           | 6.65          | 5.62      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Malate-d2(sum) |              |              |              |              | 4.368, 2.474     |                  |                  |                  |                  |
+                        | 3  | FA_20240207_2H_yeast_Fumarate-d2_5.csv  | FA_20240207_2H_yeast_1_5    | 11.50 | 8  | 92           | Fumarate-d2          | 1,1           | 15           | 6.65          | 5.60      | 310      | 1g yeast in 7mL water        | PBS (50mM)           | 30mM              | 4.70     | Malate-d2(sum) |              |              |              |              | 4.368, 2.474     |                  |                  |                  |                  |
+
+
+                        - **Select the Substrate**
+
+                        The subtrate file should be a .csv file which have the folloing structure:
+                        | 2H Chemical Shift (ppm) | FA_20240105_2H_yeast_1.5.ser#1 | FA_20240105_2H_yeast_1.5.ser#2 | FA_20240105_2H_yeast_1.5.ser#3 | FA_20240105_2H_yeast_1.5.ser#4 |
+                        |--------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+                        | Value 1                 | X1                             | X2                             | X3                             | X4                             |
+                        | Value 2                 | X5                             | X6                             | X7                             | X8                             |
+                        | Value 3                 | X9                             | X10                            | X11                            | X12                            |
+                        | ...                     | ...                            | ...                            | ...                            | ...                            |
+                        
+                        where X is the measured value
+
+
+                        - **Select the Reference File:**
+                        The reference file should be a .csv file which has the following structre:
+
+                        | 2H Chemical Shift (ppm) | FA_20240105_2H_yeast_1.5.ser#1 | FA_20240105_2H_yeast_1.5.ser#2 | FA_20240105_2H_yeast_1.5.ser#3 | FA_20240105_2H_yeast_1.5.ser#4 |
+                        |--------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+                        | Value 1                 | X1                             | X2                             | X3                             | X4                             |
+                        | Value 2                 | X5                             | X6                             | X7                             | X8                             |
+                        | Value 3                 | X9                             | X10                            | X11                            | X12                            |
+                        | ...                     | ...                            | ...                            | ...                            | ...                            |
+                        
+                        where X is the measured value
+
 
                         #### Step 2:
                         - Click Start Processing
 
                         #### Step 3:
-                        ### Substrate Plot
-                        - Use Sliders to slect the Frame, to investigate
+                        ##### Substrate Plot
+                        - Use Sliders to slect the Frame, to investigate the Spectrum which its coresponding fitted metabolite and substrates
+                        - In the legend, select the line to be or not to be visualized
+
+                        #### Kinetic Plot:
+                        - Kinetcs of the metabolites and substrate peaks
                         
                         ##### Contour Plot
-                        - Use Slider to selct the depth in % 
+                        - Visualize the full measured spectrum and select the depth [%] to visualize peaks
 
 
                         #### Reference Plot
-                        - Enjoy
+                        - Get the reference value on water.
 
 
                         """)
@@ -299,8 +355,9 @@ class StreamlitApp():
             st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
             st.markdown('# Substrate Plot')
             st.write('Inside Panel 1')
-            panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             st.write(f'Standarddeviation of noise: {panel_1_obj.differences.iloc[:,st.session_state['time_frame']].std():.3f}')
+
+            panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             one_plot = panel_1_obj.plot(st.session_state['time_frame'])
             st.plotly_chart(one_plot, use_container_width=True)
 
@@ -309,29 +366,25 @@ class StreamlitApp():
         """ Kinetic Plot"""
         with st.expander("Panel 2 - Kinetic Plot", expanded=True):
             st.markdown('# Kinetic Plot')
-            plot = KineticPlot(self.data_fp)
-            fig = plot.plot() 
+            fig = st.session_state['panel_2_obj'].plot() 
             st.plotly_chart(fig, use_container_width=True)
 
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Contour Plot", expanded=True):
             st.markdown('# Contour Plot')
-            panel_3_obj = ContourPlot(self.data_fp)
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
-            contourplot = panel_3_obj.plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
+            contourplot = st.session_state['panel_3_obj'].plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
             st.pyplot(contourplot, clear_figure=True)
 
     def panel4(self):
         """Reference Plot"""
         with st.expander("Panel 4 - Reference", expanded=True):
             st.markdown('# Reference')
-            Reference_obj = Reference(fp_file = self.reference_fp, fp_meta = self.meta_fp, file_path=self.data_fp)
-            i = st.slider('Select the frame for water reference', min_value=1, max_value= Reference_obj.data.shape[1], value=1) #max_value ist falsch, sessionstate?
-            reference_plot = Reference_obj.plot(i = i)
+            i = st.slider('Select the frame for water reference', min_value=1, max_value= st.session_state['panel_obj_4'].data.shape[1], value=1) #max_value ist falsch, sessionstate?
+            reference_plot = st.session_state['panel_obj_4'].plot(i = i)
             st.pyplot(reference_plot)
-
 
     def run(self):
         self.header()

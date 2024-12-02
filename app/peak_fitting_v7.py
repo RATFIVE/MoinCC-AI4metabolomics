@@ -11,9 +11,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 from copy import deepcopy
 from tqdm import tqdm
-import sys
-import matplotlib.pyplot as plt
 from peakpos_df import SpectraAnalysis
+import streamlit as st
 
 class PeakFitting:
     def __init__(self, fp_file, fp_meta):
@@ -33,7 +32,7 @@ class PeakFitting:
         self.meta_df = pd.read_excel(fp_meta)
 
         self.number_time_points = self.df.shape[1] - 1
-        self.time_points = np.arange(0, self.number_time_points) 
+        self.time_points = np.arange(1, self.number_time_points + 1) 
         self.x = self.df.iloc[:,0]
 
         # positions and corresponding names of the peaks
@@ -43,19 +42,22 @@ class PeakFitting:
         self.number_substances = len(set(self.names))
 
          # initialize outputs
-        column_names =  ['Time'] + ['y_shift'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
+        column_names =  ['Time_Step'] + ['y_shift'] + [f'{name}_pos_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_width_{pos}' for name, pos in zip(self.names, self.positions)] + [f'{name}_amp_{pos}' for name, pos in zip(self.names, self.positions)]
 
-        self.fitting_params = pd.DataFrame(columns=column_names).set_index('Time')
-        self.fitting_params_error = pd.DataFrame(columns=column_names).set_index('Time')
+        self.fitting_params = pd.DataFrame(columns=column_names)
+        self.fitting_params_error = pd.DataFrame(columns=column_names)
+        self.fitting_params['Time_Step'] = self.time_points
+        self.fitting_params_error['Time_Step'] = self.time_points
+
+        self.fitting_params = self.fitting_params.set_index('Time_Step')
+        self.fitting_params_error = self.fitting_params_error.set_index('Time_Step')
 
         self.names_substances =  deepcopy(self.names) + list(dict.fromkeys(self.names)) + list(dict.fromkeys(self.names)) # Not a relevant instance attribute, so putting somewhere else?
         
+
         # Meikes code
         fix_pos = SpectraAnalysis(self.df, self.positions)
         self.positions = fix_pos.peak_df()['Found Peaks']
-        print('Meike: ', self.positions[0])
-    
-
 
     def extract_ppm_all(self):
         """
@@ -152,6 +154,8 @@ class PeakFitting:
             np.concatenate([np.array([error[0]]), error[1:self.number_peaks+1], widths_final_error, amplitudes_final_error])
 
     def fit(self, save_csv = True):
+        progress_bar = st.empty()
+        load_bar = progress_bar.progress(0)
         first_fit = True
         # iterate over all time points
         for i in tqdm(range(self.number_time_points), desc= self.file_name):
@@ -178,11 +182,19 @@ class PeakFitting:
                 p0 = np.concatenate([y_shift, positions_fine, widths, amplitudes])
 
                 # unpack the parameters and errors
-                self.fitting_params.loc[i], self.fitting_params_error.loc[i] = self.unpack_params_errors(popt, pcov)
+                self.fitting_params.loc[i+1], self.fitting_params_error.loc[i+1] = self.unpack_params_errors(popt, pcov)
                 
             except RuntimeError:
                 print(f'Could not fit time frame number {i}. Skipping...')
-        
+            load_bar.progress((i+1) / self.number_time_points)
+
+        # remove loadbar
+        progress_bar.empty()
+
+        # set all NA values to 0, in case some time frames could not be fitted!
+        self.fitting_params.fillna(0, inplace=True)
+        self.fitting_params_error.fillna(0,inplace=True)
+
         # save results
         if save_csv == True:
             self.fitting_params.to_csv(self.output_direc + 'fitting_params.csv')
