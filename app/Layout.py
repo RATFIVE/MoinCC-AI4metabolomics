@@ -376,6 +376,15 @@ class StreamlitApp():
             one_plot = st.session_state['panel_1_obj'].plot(st.session_state['time_frame'])
             st.plotly_chart(one_plot, use_container_width=True)
 
+            # Save the Plot as PDF
+            save_contour_button = st.button(label='Save Substrate as PDF')
+            if save_contour_button:
+                self.save_to_pdf(session_state=st.session_state['panel_1_obj'],
+                                fig=one_plot,
+                                file_basename=os.path.basename(self.data_fp),
+                                file_name=f'Substrate_{os.path.basename(self.data_fp)}_{st.session_state['time_frame']}'
+                                )
+
             
     def panel2(self):
         """ Kinetic Plot"""
@@ -384,6 +393,15 @@ class StreamlitApp():
             fig = st.session_state['panel_2_obj'].plot() 
             st.plotly_chart(fig, use_container_width=True)
 
+            # Save the Plot as PDF
+            save_contour_button = st.button(label='Save Kinectic as PDF')
+            if save_contour_button:
+                self.save_to_pdf(session_state=st.session_state['panel_2_obj'],
+                                fig=fig,
+                                file_basename=os.path.basename(self.data_fp),
+                                file_name=f'Kinetic_{os.path.basename(self.data_fp)}'
+                                )
+
     def panel3(self):
         """Contour Plot"""
         with st.expander("Panel 3 - Contour Plot", expanded=True):
@@ -391,7 +409,16 @@ class StreamlitApp():
             # one range slider for both max and min
             zmin_zmax = st.slider('Select Zmin and Zmax', min_value=0.0, max_value=1.0, value=(0.0, 1.0))
             contourplot = st.session_state['panel_3_obj'].plot(zmin=zmin_zmax[0], zmax=zmin_zmax[1])
-            st.pyplot(contourplot, clear_figure=True)
+            st.pyplot(contourplot, clear_figure=False)
+
+            # Save the Plot as PDF
+            save_contour_button = st.button(label='Save Contour as PDF')
+            if save_contour_button:
+                self.save_to_pdf(session_state=st.session_state['panel_3_obj'],
+                                fig=contourplot,
+                                file_basename=os.path.basename(self.data_fp),
+                                file_name=f'Contour_{os.path.basename(self.data_fp)}_{zmin_zmax}'
+                                )
 
     def panel4(self):
         """Reference Plot"""
@@ -400,16 +427,26 @@ class StreamlitApp():
             i = st.slider('Select the frame for water reference', min_value=1, max_value= st.session_state['panel_obj_4'].data.shape[1], value=1) #max_value ist falsch, sessionstate?
             reference_plot = st.session_state['panel_obj_4'].plot(i = i)
             st.pyplot(reference_plot)
+
+            # Save the Plot as PDF
             save_reference_button = st.button(label='Save Reference as PDF')
-            with save_reference_button:
+            if save_reference_button:
                 self.save_to_pdf(session_state=st.session_state['panel_obj_4'],
                                 fig=reference_plot,
-                                name=Path('output', os.path.basename(self.meta_fp)+'_output', 'plots', f'Reference_{self.meta_fp}'))
+                                file_basename=os.path.basename(self.reference_fp),
+                                file_name=f'Reference_{os.path.basename(self.reference_fp)}_{i}'
+                                )
+                                
                 
     # os.path.basename(fp_ref)
     # self.plot_dir = Path('output', self.file_name + '_output', 'plots')
     # self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}'
-    def save_to_pdf(self, session_state, fig, name):
+    def save_to_pdf(self, session_state, fig, file_basename, file_name):
+        
+        plot_dir = Path('output', file_basename + '_output', 'plots')
+        os.makedirs(plot_dir, exist_ok=True)
+        name = Path(plot_dir, f'{file_name}_{file_basename}')
+
         session_state.save_fig(fig=fig, name=name)
 
         

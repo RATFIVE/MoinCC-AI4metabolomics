@@ -49,14 +49,14 @@ class ContourPlot():
         ax.grid(True)
 
         # Save the figure as a PDF
-        self.save_fig(fig, self.contour_pdf)
+        #self.save_fig(fig, self.contour_pdf)
 
         return fig
     
     def save_fig(self, fig, name, width=1200, height=800):
-        pass
+        
         # Konvertieren der Breite und Höhe von Pixel in Zoll (dpi = 300)
-        #fig.set_size_inches(width / 100, height / 100)
-        #fig.savefig(f'{name}.pdf', format='pdf')
-        #fig.savefig(f'{name}.png', format='png')
+        fig.set_size_inches(width / 100, height / 100)
+        fig.savefig(f'{name}.pdf', format='pdf')
+        fig.savefig(f'{name}.png', format='png')
 
