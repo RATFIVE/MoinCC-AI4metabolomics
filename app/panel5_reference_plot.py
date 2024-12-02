@@ -19,6 +19,9 @@ class Reference():
         self.plot_dir = Path('output', self.file_name + '_output', 'plots')
         self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
         #kinetics
+        self.file_name = os.path.basename(fp_data)
+        self.output_dir = Path('output', self.file_name + '_output')
+
         self.kin_fp = Path('output', os.path.basename(fp_data) + '_output', 'kinetics.csv')
         self.kin_df = pd.read_csv(self.kin_fp)
 
