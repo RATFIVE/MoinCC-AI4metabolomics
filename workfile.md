@@ -164,3 +164,11 @@ $$
 
 
 
+
+
+sudo docker build -t streamlit-app .
+
+sudo docker run -it --rm -p 8501:8501 \
+  -v /home/generalpegasus/Documents/Programme/MoinCC-AI4metabolomics/Data:/app/input \
+  -v /home/generalpegasus/Documents/Programme/MoinCC-AI4metabolomics/app/output:/app/output \
+  streamlit-app
