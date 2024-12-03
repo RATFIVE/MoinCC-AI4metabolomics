@@ -45,7 +45,24 @@
 - plot titles dependent on file name?(P3 Marco/Tom)
 - Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
 
+# Presentation
 
+## Introduction
+- Ziel des Projects (Spectren die wir analysiere möchten, und wir das integral berechnen möchten aber wegen overlaps ist das nicht möglich)
+- (ansprechen das Overlaps in den Daten vorhanden sind und eien einfacher Peak detectioon nicht geht)
+- Welche Daten & wie sehen sie aus
+
+
+## Deepl Learning Approich kurz anspechen
+- Problem der Umsetzung einfachen Machine Learning modell ansprechen (nicht gelabelt)
+
+## Lorenzian Curve Fitting vorstellen
+
+## Meikes Ableitungsmodel zur peak position finden 
+
+## Diskussion wie das Modell durch Meikes Ansatz besser wird
+
+## App vorstellen
 
 
 ## Questions 24. 09.24
