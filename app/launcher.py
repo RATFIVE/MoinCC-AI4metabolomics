@@ -1,25 +1,12 @@
 import subprocess
 import platform
 
-# Path to your Streamlit app
-app_file = "app.py"
+# Example: Listing files in the current directory (similar to 'dir')
+command = r"streamlit run D:\\Dokumente\\MoinCC-AI4metabolomics\\app\\app.py"  # Windows command
+result = subprocess.run(command, shell=True, text=True, capture_output=True)
 
-# Determine the platform and open the terminal accordingly
-def start_streamlit():
-    try:
-        if platform.system() == "Windows":
-            # For Windows, use 'start' to open a new terminal
-            subprocess.run(f'start cmd /k streamlit run {app_file}', shell=True)
-        elif platform.system() == "Darwin":  # macOS
-            # For macOS, use 'open -a Terminal' to open a new terminal
-            subprocess.run(f'open -a Terminal "streamlit run {app_file}"', shell=True)
-        elif platform.system() == "Linux":
-            # For Linux, use 'gnome-terminal' or another terminal emulator
-            subprocess.run(f'gnome-terminal -- bash -c "streamlit run {app_file}; exec bash"', shell=True)
-        else:
-            print("Unsupported operating system.")
-    except Exception as e:
-        print(f"Failed to start Streamlit: {e}")
-
-# Run the function
-start_streamlit()
+# Print the output and any error messages
+print("Output:")
+print(result.stdout)
+print("Errors:")
+print(result.stderr)
