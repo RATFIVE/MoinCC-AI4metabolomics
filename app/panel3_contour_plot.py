@@ -46,6 +46,7 @@ class ContourPlot():
         )
         ax.set_xlabel('Time step')
         ax.set_ylabel('Chemical hift [ppm]')
+        ax.set_title(f'Contour plot of File {self.basename}')
         ax.grid(True)
 
         # Save the figure as a PDF

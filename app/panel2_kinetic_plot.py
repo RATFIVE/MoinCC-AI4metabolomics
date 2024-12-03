@@ -23,13 +23,12 @@ class KineticPlot:
             x='Time_Step',
             y=self.kin_df.columns[1:],  # Select all columns except 'time' for y
             labels={'value': 'Value', 'variable': 'Series'},
-            title=f"Kinetic Plot of {self.basename}",
             color_discrete_sequence=colors
         )
 
         fig.update_layout(
             title=dict(
-                text='Substance Kinetics',
+                text=f'Substance Kinetics for File {self.basename}',
                 font=dict(size=24)  # Font size for the title
             ),
             xaxis_title='Chemical shift [ppm]',
