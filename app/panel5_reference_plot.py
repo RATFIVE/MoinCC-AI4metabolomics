@@ -84,6 +84,9 @@ class Reference():
         ax[1].set_title(f'Lorentzian fit for time step: {i}')
         ax[1].set_xlim(max(self.chem_shifts),min(self.chem_shifts))
         ax[1].legend()
+
+        # global title
+        fig.suptitle('Reference spectrum and Lorentzian fit of File: ' + self.file_name)
         plt.tight_layout()
 
         # Save the figure as a PDF

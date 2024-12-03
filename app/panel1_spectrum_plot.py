@@ -69,7 +69,7 @@ class Panel1SpectrumPlot():
 
         fig.update_layout(
             title=dict(
-                text='Spectrum',
+                text=f'Spectra for File {self.file_name} for Frame {frame}',
                 font=dict(size=24)  # Font size for the title
             ),
             xaxis_title='Chemical shift [ppm]',
@@ -221,7 +221,6 @@ class Panel1SpectrumPlot():
         return fig
     
     def save_fig(self, fig, name):
-        
         pio.write_image(fig, f'{name}.pdf', format='pdf', engine='kaleido', width=1200, height=800)
         pio.write_image(fig, f'{name}.png', format='png', engine='kaleido', width=1200, height=800) 
         
