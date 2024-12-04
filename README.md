@@ -1,71 +1,45 @@
-# Automated MRI Spectra Metabolite Detector
+# MoinCC - AI4metabolomics
+
 Analyzing an organism's metabolism is crucial for understanding and monitoring diseases and treatments. Magnetic resonance imaging (MRI) is the only technique to measure the metabolism noninvasively, in vivo, and in vitro.
-## Goal 
-The goal of this project is to create an application which automatically maps metabolites to recorded yeast spectra, by specifying the reaction metabolite in advance. 
-
-## Plan
-16.11 ist Heute
-19.11 Meeting:
-    - Absprache wie soll das board aussehen(Welceh Plots? Wie sollten die Plots genau assehen(x, achse, y achse usw.))
-    - Veränderung über die Zeit
-    - Mindestanzahl datenpunkte für ppm finder(Signifikanz?)
-    - Deep Learning Model vorstellen.
-    - Wie soll die Applikation verpackt sein. Docker, exe, python file?
-    - Metadaten. Wie müssen die Aussehen? Nächste Woche -> also nächsten    
-    - Wann könnt Ihr unsere App und das fitting 'korrigiert' haben? -> Termin für 1. version
-
-21.11 Übergabe an Tom spätestens und dann implementieren
-24.11 Beta Dashboard 
-
-26.11 Meeting: Dashboard Besprechung. Dauer länger
-26.11 Start Dokumentation
-26.11 Nächste Consulation(9 Uhr) - Deadline Programmieren, Consultatioj
-
-3.12 
-
-10.12
-
-13.12 MoinCC Projektabgabe mit Präsi
-19.12 Präsi FH
-22.12 Deadline Abgabe Dokument
 
 
-Fitting Outputs:
-**app/**
-- **README.md**  
-  | Documentation for the application.
 
-- **app.py**  
-  | Main script to run the application.
 
-- **.config**  
-  | Configuration file for application settings.
+## Run the App
 
-- **curve_fitting.py**  
-  | Script handling the curve fitting algorithms.
+### requirements
+This application should work with python version >= 3.10. But we did not tried all python versions.
 
-- **DataLoader.py**  
-  | Script for loading and processing data.
+### Start the app
 
-- **output_dir/**  
-  | Directory containing all output results.
+1. Download this directory and putit into a place on your system where you like. You can download the directory using either git:
 
-  - **File_Name/** (A directory for each processed file)
-    |-- **fitted_spectra/**
-    |   |-- `file_name_1.csv`
-    |   |-- `file_name_2.csv`
-    |   |-- ...
-    |
-    |-- **difference_spectra/**
-    |   |-- `file_name_1.csv`
-    |   |-- `file_name_2.csv`
-    |   |-- ...
-    |
-    |-- **individual_curves/**
-    |   |-- `file_name_1.csv`
-    |
-    |-- `file_spectra_params.csv`
-    |
-    |-- `fitted_spectra_params_error.csv`
-    |
-    |-- `integral_spectra_over_time.csv`
+```bash
+git clone https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
+```
+or download the directory from the github directory by 1. opening this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics, 2. press on the green code button and 3. 'Download ZIP'.
+
+2. Use this command to install the erequired python packages
+
+```bash
+pip install requirements.txt
+```
+
+3. go in the app directory
+```bash
+cd MoinCC-AI4metabolomics/app
+```
+
+4. Start the app
+```bash
+streamlit run app.py --server.port=8501
+```
+The app should open now in the browser
+
+You can always access the app by the url. Paste this in your browser(for example Firefox) 
+
+http://localhost:8501
+
+## Quit the app
+To quit the app go back to the running terminal and press **CTRL + C**
+
