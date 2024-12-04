@@ -16,6 +16,7 @@ import streamlit as st
 
 class PeakFitting:
     def __init__(self, fp_file, fp_meta):
+        st.write('Using v7')
         # file paths
         self.fp_file = fp_file
         self.fp_meta = fp_meta
@@ -102,7 +103,7 @@ class PeakFitting:
 
     def make_bounds(self, positions_fine = None,
                     y_shift = (0,np.inf),
-                    shift_bounds_fine = (- 0.05, 0.05), width_bounds_fine = (0, 1e-1), amplitude_bounds_fine = (0, np.inf)):
+                    shift_bounds_fine = (- 0.1, 0.1), width_bounds_fine = (0, 3e-1), amplitude_bounds_fine = (0, np.inf)):
         
         y_shift_lower_bound = np.array([y_shift[0]])
         y_shift_upper_bound = np.array([y_shift[1]])
@@ -172,14 +173,14 @@ class PeakFitting:
 
                 # Fine tune the fit
                 popt, pcov = curve_fit(lambda x, *params: self.grey_spectrum_fine_tune(x, *params),
-                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-3, xtol=1e-3)
+                                        self.x, y, p0 = p0, maxfev=20000, bounds = flattened_bounds_fine, ftol=1e-6, xtol=1e-6)
                 
                 y_shift = np.array([popt[0]])
                 positions_fine = popt[1:self.number_peaks+1]
                 widths = popt[self.number_peaks+1:self.number_peaks + self.number_substances+1]
                 amplitudes = popt[self.number_peaks + self.number_substances+1:]
                 
-                p0 = np.concatenate([y_shift, positions_fine, widths, amplitudes])
+                p0 = np.concatenate([y_shift, np.array(self.positions[i]), widths, amplitudes])
 
                 # unpack the parameters and errors
                 self.fitting_params.loc[i+1], self.fitting_params_error.loc[i+1] = self.unpack_params_errors(popt, pcov)

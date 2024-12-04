@@ -4,7 +4,7 @@ After peak fitting V2 we will perform a fine tuning according to version 1.
 Outcome:
     The model semmed to perform less good as V1, since the peaks are sometimes shifted accross the hole world. More then in model 1.
 
-    -> Apllying bounding boxes to the fitting might be a good idea. But I will go back to teh first moel again and will try to improve the fitting there,
+    -> Applying bounding boxes to the fitting might be a good idea. But I will go back to teh first moel again and will try to improve the fitting there,
        by finding apprpriate bounding boxes.
 '''
 
