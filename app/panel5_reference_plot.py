@@ -29,7 +29,12 @@ class Reference():
         os.makedirs(self.plot_dir, exist_ok=True)
     
     def ReferenceValue(self):
-        #get referenz concentration from meta data
+        """ne
+
+        Returns:
+            reference_value: factor to calculate concentration in mmol from integral value
+        """
+        #get reference concentration from meta data
         mmol = re.findall(r'[0-9\.]+', self.LorentzianFit.meta_df.iloc[0]['Substrate_mM_added'])
         mmol = float(mmol[0])
 
@@ -45,6 +50,14 @@ class Reference():
  
     
     def plot(self, i):
+        """_summary_
+
+        Args:
+            i (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         spectra_data = self.data.iloc[:,i+1]
 
 
@@ -97,6 +110,14 @@ class Reference():
         return fig  
     
     def save_fig(self, fig, name, width=1200, height=800):
+        """_summary_
+
+        Args:
+            fig (_type_): _description_
+            name (_type_): _description_
+            width (int, optional): _description_. Defaults to 1200.
+            height (int, optional): _description_. Defaults to 800.
+        """
         
         #Konvertieren der Breite und Höhe von Pixel in Zoll (dpi = 300)
         fig.set_size_inches(width / 100, height / 100)
@@ -104,6 +125,8 @@ class Reference():
         fig.savefig(f'{name}.png', format='png')
 
     def save_kinetics_mmol(self):
+        """_summary_
+        """
         kin_mmol = self.kin_df.copy().set_index('Time_Step') 
         value_col = ['ReacSubs','Metab1','Water'] 
 

@@ -57,7 +57,7 @@ class SpectraAnalysis:
         data_normalized.columns = self.data.columns
         return data_normalized, norm_shift
 
-    def peak_identify(self, data_normalized, reference_peaks, initial_threshold=85, max_shift=0.02): #max_shift maybe
+    def peak_identify(self, data_normalized, reference_peaks, initial_threshold=85, max_shift=0.1): #max_shift maybe
         """Searches for peaks and adds them to list based on expected values. 
         Threshold is continually lowered until all expected peaks are found or more unknown peaks are found than expected
         
