@@ -19,6 +19,7 @@ import streamlit as st
 
 class PeakFitting:
     def __init__(self, fp_file, fp_meta):
+        st.write('Using v6')
         # file paths
         self.fp_file = fp_file
         self.fp_meta = fp_meta

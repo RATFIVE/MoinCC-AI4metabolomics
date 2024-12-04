@@ -1,71 +1,70 @@
-# Automated MRI Spectra Metabolite Detector
+# MoinCC - AI4metabolomics
+
 Analyzing an organism's metabolism is crucial for understanding and monitoring diseases and treatments. Magnetic resonance imaging (MRI) is the only technique to measure the metabolism noninvasively, in vivo, and in vitro.
-## Goal 
-The goal of this project is to create an application which automatically maps metabolites to recorded yeast spectra, by specifying the reaction metabolite in advance. 
 
-## Plan
-16.11 ist Heute
-19.11 Meeting:
-    - Absprache wie soll das board aussehen(Welceh Plots? Wie sollten die Plots genau assehen(x, achse, y achse usw.))
-    - Veränderung über die Zeit
-    - Mindestanzahl datenpunkte für ppm finder(Signifikanz?)
-    - Deep Learning Model vorstellen.
-    - Wie soll die Applikation verpackt sein. Docker, exe, python file?
-    - Metadaten. Wie müssen die Aussehen? Nächste Woche -> also nächsten    
-    - Wann könnt Ihr unsere App und das fitting 'korrigiert' haben? -> Termin für 1. version
-
-21.11 Übergabe an Tom spätestens und dann implementieren
-24.11 Beta Dashboard 
-
-26.11 Meeting: Dashboard Besprechung. Dauer länger
-26.11 Start Dokumentation
-26.11 Nächste Consulation(9 Uhr) - Deadline Programmieren, Consultatioj
-
-3.12 
-
-10.12
-
-13.12 MoinCC Projektabgabe mit Präsi
-19.12 Präsi FH
-22.12 Deadline Abgabe Dokument
+With this applications you can detect and measure the abundance of prespecified substances of NMR spectra. 
 
 
-Fitting Outputs:
-**app/**
-- **README.md**  
-  | Documentation for the application.
 
-- **app.py**  
-  | Main script to run the application.
 
-- **.config**  
-  | Configuration file for application settings.
+## Run the App
+### Notes
+This app is not a fully debugged application. Some cases may lead to bugs. These bugs should not apply to the fitting process itself. If you run into an error, please restart the app. It is important to quit the app via the terminal by pressing CTRL + C.
 
-- **curve_fitting.py**  
-  | Script handling the curve fitting algorithms.
+It is recommended to use python version >= 3.10 for this application. 
 
-- **DataLoader.py**  
-  | Script for loading and processing data.
+### Install Git
+To use git, please install it with following this [link](https://git-scm.com/downloads).
 
-- **output_dir/**  
-  | Directory containing all output results.
 
-  - **File_Name/** (A directory for each processed file)
-    |-- **fitted_spectra/**
-    |   |-- `file_name_1.csv`
-    |   |-- `file_name_2.csv`
-    |   |-- ...
-    |
-    |-- **difference_spectra/**
-    |   |-- `file_name_1.csv`
-    |   |-- `file_name_2.csv`
-    |   |-- ...
-    |
-    |-- **individual_curves/**
-    |   |-- `file_name_1.csv`
-    |
-    |-- `file_spectra_params.csv`
-    |
-    |-- `fitted_spectra_params_error.csv`
-    |
-    |-- `integral_spectra_over_time.csv`
+
+### Download the GitHub repository
+
+1. Download this directory and put it into a place on your system where you like. You can download the directory using either git:
+
+```bash
+git clone --depth 1 https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
+```
+or download the directory from the github repository by 1. opening this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics, 2. press on the green code button and 3. 'Download ZIP'. Depending on your internet speed it will take certain time because of past development code.
+
+### Install Virtual Envirnoment
+You can install all the libaries in a seperate python enviroment.
+
+1. Go into the app directory:
+
+```bash
+
+cd path_of_your_download_dir\MoinCC-AI4metabolomics\app
+```
+
+
+2. Create a Virtual Environment in the app dir:
+```bash
+python -m venv .MoinCC
+```
+
+3. Activate the Virtual Environment
+```bash
+\.MoinCC\Scripts activate.bat
+```
+
+4. Use this command to install the required python packages
+
+```bash
+pip install -r requirements.txt
+```
+
+
+5. Start the app
+```bash
+streamlit run app.py --server.port=8501
+```
+The app should open now in the browser
+
+You can always access the app by the url. Paste this in your browser(for example Firefox) 
+```bash
+http://localhost:8501
+```
+
+### Quit the app
+To quit the app go back to the running terminal and press `CTRL + C`. This is important. If this is not done more and more instances would be created and will eventually fill up the memory(RAM). 

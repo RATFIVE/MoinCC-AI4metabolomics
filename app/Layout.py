@@ -165,10 +165,9 @@ class StreamlitApp():
                     
 
         # Session State for Model import
-        if 'Model 1' in st.session_state:
+        if st.session_state['Model 1'] == True:
             from peak_fitting_v7 import PeakFitting
-        
-        if 'Model 2' in st.session_state:
+        else:
             from peak_fitting_v6 import PeakFitting
 
         with sub_col2:

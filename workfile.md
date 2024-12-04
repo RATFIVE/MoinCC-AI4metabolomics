@@ -32,20 +32,39 @@
 - [DONE] Start Processing at the end of selecting  (P1 Marco)
 - [DONE] Progress bar after pressing the button (P2 Tom/Marco)
 - [DONE] Select the model  (P1 Tom/Marco)
-- Wirte a README (P3)
 - [DONE] write instructions (P1 Marco), Monday
 - [DONE] performance (Matplotlib, Plotly, Session_state) (P3 All)
 - [DONE]Beide Modell zusammen ist aktuell mit bug (P1 Tom)
 - [DONE] Save Reference Plot in correct directory (P1 Marcou) ??
 - [DONE] Increase Font size for all plots (P1 All)
-- Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
-- Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
-- Software beenden Button? [Marco]
+- [DONE] Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
+- [DONE] Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
+- [DONE] Software beenden Button? [Marco]
 - check whether it works with water+yeast  Reference (P2 Meike)
-- create streamlit .exe (P1 Meike)
-- plot titles dependent on file name?(P3 Marco/Tom)
+- [NotDOABLE]create streamlit .exe (P1 Meike)
+- [DONE] plot titles dependent on file name?(P3 Marco/Tom)
+- [DONE] Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
+- Code verständlich kommentieren (alle)
+- gemeinsam durchgehen und Code bereinigen (alle)
+
+# Presentation
+
+## Introduction
+- Ziel des Projects (Spectren die wir analysiere möchten, und wir das integral berechnen möchten aber wegen overlaps ist das nicht möglich)
+- (ansprechen das Overlaps in den Daten vorhanden sind und eien einfacher Peak detectioon nicht geht)
+- Welche Daten & wie sehen sie aus
 
 
+## Deepl Learning Approich kurz anspechen
+- Problem der Umsetzung einfachen Machine Learning modell ansprechen (nicht gelabelt)
+
+## Lorenzian Curve Fitting vorstellen
+
+## Meikes Ableitungsmodel zur peak position finden 
+
+## Diskussion wie das Modell durch Meikes Ansatz besser wird
+
+## App vorstellen
 
 
 ## Questions 24. 09.24
@@ -161,14 +180,108 @@ $$
 ## Model 2 - Peakfinder NumPy
 
 
+# From workfile:
+## Plan
+16.11 ist Heute
+19.11 Meeting:
+    - Absprache wie soll das board aussehen(Welceh Plots? Wie sollten die Plots genau assehen(x, achse, y achse usw.))
+    - Veränderung über die Zeit
+    - Mindestanzahl datenpunkte für ppm finder(Signifikanz?)
+    - Deep Learning Model vorstellen.
+    - Wie soll die Applikation verpackt sein. Docker, exe, python file?
+    - Metadaten. Wie müssen die Aussehen? Nächste Woche -> also nächsten    
+    - Wann könnt Ihr unsere App und das fitting 'korrigiert' haben? -> Termin für 1. version
+
+21.11 Übergabe an Tom spätestens und dann implementieren
+24.11 Beta Dashboard 
+
+26.11 Meeting: Dashboard Besprechung. Dauer länger
+26.11 Start Dokumentation
+26.11 Nächste Consulation(9 Uhr) - Deadline Programmieren, Consultatioj
+
+3.12 
+
+10.12
+
+13.12 MoinCC Projektabgabe mit Präsi
+19.12 Präsi FH
+22.12 Deadline Abgabe Dokument
 
 
 
 
-
+# Docker Befehle
 sudo docker build -t streamlit-app .
 
 sudo docker run -it --rm -p 8501:8501 \
   -v /home/generalpegasus/Documents/Programme/MoinCC-AI4metabolomics/Data:/app/input \
   -v /home/generalpegasus/Documents/Programme/MoinCC-AI4metabolomics/app/output:/app/output \
   streamlit-app
+
+
+## Plan
+16.11 ist Heute
+19.11 Meeting:
+    - Absprache wie soll das board aussehen(Welceh Plots? Wie sollten die Plots genau assehen(x, achse, y achse usw.))
+    - Veränderung über die Zeit
+    - Mindestanzahl datenpunkte für ppm finder(Signifikanz?)
+    - Deep Learning Model vorstellen.
+    - Wie soll die Applikation verpackt sein. Docker, exe, python file?
+    - Metadaten. Wie müssen die Aussehen? Nächste Woche -> also nächsten    
+    - Wann könnt Ihr unsere App und das fitting 'korrigiert' haben? -> Termin für 1. version
+
+21.11 Übergabe an Tom spätestens und dann implementieren
+24.11 Beta Dashboard 
+
+26.11 Meeting: Dashboard Besprechung. Dauer länger
+26.11 Start Dokumentation
+26.11 Nächste Consulation(9 Uhr) - Deadline Programmieren, Consultatioj
+
+3.12 
+
+10.12
+
+13.12 MoinCC Projektabgabe mit Präsi
+19.12 Präsi FH
+22.12 Deadline Abgabe Dokument
+
+
+Fitting Outputs:
+**app/**
+- **README.md**  
+  | Documentation for the application.
+
+- **app.py**  
+  | Main script to run the application.
+
+- **.config**  
+  | Configuration file for application settings.
+
+- **curve_fitting.py**  
+  | Script handling the curve fitting algorithms.
+
+- **DataLoader.py**  
+  | Script for loading and processing data.
+
+- **output_dir/**  
+  | Directory containing all output results.
+
+  - **File_Name/** (A directory for each processed file)
+    |-- **fitted_spectra/**
+    |   |-- `file_name_1.csv`
+    |   |-- `file_name_2.csv`
+    |   |-- ...
+    |
+    |-- **difference_spectra/**
+    |   |-- `file_name_1.csv`
+    |   |-- `file_name_2.csv`
+    |   |-- ...
+    |
+    |-- **individual_curves/**
+    |   |-- `file_name_1.csv`
+    |
+    |-- `file_spectra_params.csv`
+    |
+    |-- `fitted_spectra_params_error.csv`
+    |
+    |-- `integral_spectra_over_time.csv`
