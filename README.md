@@ -12,7 +12,7 @@ This app is not a fully debugged application. Some cases may lead to bugs. These
  MakePVIt ius reWe recommend to close the appThis application should work with python version >= 3.10. But we did not tried all python versions. 
 
 
-### Install a Virtual Envirnoment
+### Install Virtual Envirnoment
 You can install all the libaries in a seperate python enviroment
 
 Create Virtual Environment:
