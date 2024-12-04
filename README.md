@@ -30,7 +30,7 @@ Activate the Virtual Environment
 1. Download this directory and putit into a place on your system where you like. You can download the directory using either git:
 
 ```bash
-git clone https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
+git clone --depth 1 https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
 ```
 or download the directory from the github directory by 1. opening this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics, 2. press on the green code button and 3. 'Download ZIP'.
 
