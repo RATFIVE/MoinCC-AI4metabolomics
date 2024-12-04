@@ -41,9 +41,11 @@
 - [DONE] Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
 - [DONE] Software beenden Button? [Marco]
 - check whether it works with water+yeast  Reference (P2 Meike)
-- create streamlit .exe (P1 Meike)
+- [NotDOABLE]create streamlit .exe (P1 Meike)
 - plot titles dependent on file name?(P3 Marco/Tom)
 - Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
+- Code verständlich kommentieren (alle)
+- gemeinsam durchgehen und Code bereinigen (alle)
 
 # Presentation
 
