@@ -120,17 +120,17 @@ class StreamlitApp():
         with col2:
             
             # Selector for choosing the model
-            options = ["Model 1", "Model 2"]
+            options = ["Model 1: Lorentzian Fit", "Model 2: Lorentzian fit with prefitting"]
             selected_option = st.selectbox("Choose the Model:", options)
 
             # Dynamically load and store the class in session_state
-            if selected_option == "Model 1":
+            if selected_option == "Model 1: Lorentzian Fit":
                 
                 #if 'Model 1' in st.session_state:
                 st.session_state['Model 1'] = True  # Store the class in session state
                 st.session_state['Model 2'] = False 
             
-            elif selected_option == "Model 2":
+            elif selected_option == "Model 2: Lorentzian fit with prefitting":
                 
                 #if 'Model 2' in st.session_state:
                 st.session_state['Model 1'] = False  # Store the class in session state
@@ -166,9 +166,9 @@ class StreamlitApp():
 
         # Session State for Model import
         if st.session_state['Model 1'] == True:
-            from peak_fitting_v7 import PeakFitting
-        else:
             from peak_fitting_v6 import PeakFitting
+        else:
+            from peak_fitting_v7 import PeakFitting
 
         with sub_col2:
             # Session State for files
