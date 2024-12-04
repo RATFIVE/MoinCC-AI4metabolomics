@@ -42,8 +42,8 @@
 - [DONE] Software beenden Button? [Marco]
 - check whether it works with water+yeast  Reference (P2 Meike)
 - [NotDOABLE]create streamlit .exe (P1 Meike)
-- plot titles dependent on file name?(P3 Marco/Tom)
-- Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
+- [DONE] plot titles dependent on file name?(P3 Marco/Tom)
+- [DONE] Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
 - Code verständlich kommentieren (alle)
 - gemeinsam durchgehen und Code bereinigen (alle)
 
