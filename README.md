@@ -27,9 +27,9 @@ git clone --depth 1 https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
 ```
 or download the directory from the github repository by  
 
-    1. opening this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics,
+    1. open this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics,
     2. press on the green code button and 
-    3. 'Download ZIP'. Depending on your internet speed it will take certain time because of past development code.
+    3. 'Download ZIP'. Depending on your internet speed it will take a certain time because of past development code.
 
 ### Install Virtual Envirnoment
 You can install all the libaries in a seperate python enviroment.
