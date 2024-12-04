@@ -25,7 +25,11 @@ To use git, please install it with following this [link](https://git-scm.com/dow
 ```bash
 git clone --depth 1 https://github.com/RATFIVE/MoinCC-AI4metabolomics.git
 ```
-or download the directory from the github repository by 1. opening this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics, 2. press on the green code button and 3. 'Download ZIP'. Depending on your internet speed it will take certain time because of past development code.
+or download the directory from the github repository by  
+
+    1. open this link: https://github.com/RATFIVE/MoinCC-AI4metabolomics,
+    2. press on the green code button and 
+    3. 'Download ZIP'. Depending on your internet speed it will take a certain time because of past development code.
 
 ### Install Virtual Envirnoment
 You can install all the libaries in a seperate python enviroment.
@@ -34,7 +38,7 @@ You can install all the libaries in a seperate python enviroment.
 
 ```bash
 
-cd path_of_your_download_dir\MoinCC-AI4metabolomics\app
+cd path_of_your_download_dir\MoinCC-AI4metabolomics-main\app
 ```
 
 
@@ -45,7 +49,7 @@ python -m venv .MoinCC
 
 3. Activate the Virtual Environment
 ```bash
-\.MoinCC\Scripts activate.bat
+.MoinCC\Scripts\activate
 ```
 
 4. Use this command to install the required python packages
