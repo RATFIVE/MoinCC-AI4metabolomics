@@ -32,20 +32,37 @@
 - [DONE] Start Processing at the end of selecting  (P1 Marco)
 - [DONE] Progress bar after pressing the button (P2 Tom/Marco)
 - [DONE] Select the model  (P1 Tom/Marco)
-- Wirte a README (P3)
 - [DONE] write instructions (P1 Marco), Monday
 - [DONE] performance (Matplotlib, Plotly, Session_state) (P3 All)
 - [DONE]Beide Modell zusammen ist aktuell mit bug (P1 Tom)
 - [DONE] Save Reference Plot in correct directory (P1 Marcou) ??
 - [DONE] Increase Font size for all plots (P1 All)
-- Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
-- Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
-- Software beenden Button? [Marco]
+- [DONE] Writing is too slow (P2 All) -> Does actually not make a big difference. Plotly is slow and makes the biggest difference.
+- [DONE] Is first time point of reference/contour plot 0 or 1?(P1 Meike, Marco)
+- [DONE] Software beenden Button? [Marco]
 - check whether it works with water+yeast  Reference (P2 Meike)
 - create streamlit .exe (P1 Meike)
 - plot titles dependent on file name?(P3 Marco/Tom)
+- Erstellen einer README Datei zur beschreibung wie die app gestartet werden kann. [Tom/Marco]
+
+# Presentation
+
+## Introduction
+- Ziel des Projects (Spectren die wir analysiere möchten, und wir das integral berechnen möchten aber wegen overlaps ist das nicht möglich)
+- (ansprechen das Overlaps in den Daten vorhanden sind und eien einfacher Peak detectioon nicht geht)
+- Welche Daten & wie sehen sie aus
 
 
+## Deepl Learning Approich kurz anspechen
+- Problem der Umsetzung einfachen Machine Learning modell ansprechen (nicht gelabelt)
+
+## Lorenzian Curve Fitting vorstellen
+
+## Meikes Ableitungsmodel zur peak position finden 
+
+## Diskussion wie das Modell durch Meikes Ansatz besser wird
+
+## App vorstellen
 
 
 ## Questions 24. 09.24
