@@ -39,7 +39,7 @@ class Reference():
         mmol = float(mmol[0])
 
         if mmol:
-            print(mmol)  
+            print()  
         else:
             print("mMol value couldn't be extracted from Substrate_mM_added ")
 
