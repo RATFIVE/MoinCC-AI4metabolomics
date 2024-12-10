@@ -431,7 +431,7 @@ class StreamlitApp():
             if save_reference_button:
                 self.save_to_pdf(session_state=st.session_state['panel_obj_4'],  # Stellen Sie sicher, dass panel_3_obj das korrekte Objekt für diesen Aufruf ist
                         fig=reference_plot,
-                        file_basename=os.path.basename(self.data_fp),  # Verwendung des Basisnamens von data_fp, wie im funktionierenden Beispiel
+                        file_basename=os.path.basename(self.reference_fp),  # Verwendung des Basisnamens von data_fp, wie im funktionierenden Beispiel
                         file_name=f'Reference_{os.path.basename(self.reference_fp)}_{i}')
                                     
                 
