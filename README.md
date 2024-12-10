@@ -17,7 +17,6 @@ It is recommended to use python version >= 3.10 for this application.
 To use git, please install it with following this [link](https://git-scm.com/downloads).
 
 
-
 ### Download the GitHub repository
 
 1. Download this directory and put it into a place on your system where you like. You can download the directory using either git:
