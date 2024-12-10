@@ -110,7 +110,7 @@ class SpectraAnalysis:
 
         return found, other
 
-    def peak_df(self, min_cols_per_section=20, max_shift = None):
+    def peak_df(self, min_cols_per_section=5, max_shift = None):
         """Normalizes the given data to chem_shift(water) = 4.7 
         splits spectra into sections over time
         identifies peaks in summed up sections
