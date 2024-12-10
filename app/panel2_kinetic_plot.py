@@ -31,8 +31,8 @@ class KineticPlot:
                 text=f'Substance Kinetics for File {self.basename}',
                 font=dict(size=24)  # Font size for the title
             ),
-            xaxis_title='Chemical shift [ppm]',
-            yaxis_title='Intensity',
+            xaxis_title='Time Step',
+            yaxis_title='Integral',
             showlegend=True,
             legend=dict(
                 x=0.95,
