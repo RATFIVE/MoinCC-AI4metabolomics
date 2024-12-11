@@ -15,9 +15,9 @@ class Reference():
         self.LorentzianFit = peak_fitting_v6.PeakFitting(fp_file = fp_ref , fp_meta = fp_meta)
         self.fitting_params = self.LorentzianFit.fit(save_csv= False)
         self.reference_value = self.ReferenceValue()
-        self.file_name = os.path.basename(fp_ref)
-        self.plot_dir = Path('output', self.file_name + '_output', 'plots')
-        self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name}')
+        self.file_name_ref = os.path.basename(fp_ref)
+        self.plot_dir = Path('output', self.file_name_ref + '_output', 'plots')
+        self.reference_pdf = Path(self.plot_dir, f'Reference_{self.file_name_ref}')
         #kinetics
         self.file_name = os.path.basename(fp_data)
         self.output_dir = Path('output', self.file_name + '_output')
@@ -99,7 +99,7 @@ class Reference():
         ax[1].legend()
 
         # global title
-        fig.suptitle('Reference spectrum and Lorentzian fit of File: ' + self.file_name)
+        fig.suptitle('Reference spectrum and Lorentzian fit of File: ' + self.file_name_ref)
         plt.tight_layout()
 
         # Save the figure as a PDF
