@@ -370,7 +370,7 @@ class StreamlitApp():
             # add a slider to select the frame
             st.session_state['time_frame'] = st.slider('Select the frame', min_value=1, max_value=sum_fit.shape[1], value=1)
             st.markdown('# Substrate Plot')
-            st.write(f"Standarddeviation of noise: {st.session_state['panel_1_obj'].differences.iloc[:,st.session_state['time_frame']].std():.3f}")
+            st.write(f"Standard deviation of noise: {st.session_state['panel_1_obj'].differences.iloc[:,st.session_state['time_frame']].std():.3f}")
             #panel_1_obj = Panel1SpectrumPlot(file_path = self.data_fp)
             one_plot = st.session_state['panel_1_obj'].plot(st.session_state['time_frame'])
             st.plotly_chart(one_plot, use_container_width=True)

@@ -45,7 +45,7 @@ class ContourPlot():
             vmax=zmax * self.Z.max()
         )
         ax.set_xlabel('Time step')
-        ax.set_ylabel('Chemical hift [ppm]')
+        ax.set_ylabel('Chemical shift [ppm]')
         ax.set_title(f'Contour plot of File {self.basename}')
         ax.grid(True)
 
