@@ -44,6 +44,12 @@ class ContourPlot():
             vmin=zmin * self.Z.max(),
             vmax=zmax * self.Z.max()
         )
+
+        # Add a colorbar
+        # Add a color bar
+        cbar = fig.colorbar(contour, ax=ax)
+        cbar.set_label('Intensity')
+
         ax.set_xlabel('Time step')
         ax.set_ylabel('Chemical shift [ppm]')
         ax.set_title(f'Contour plot of File {self.basename}')
