@@ -23,7 +23,7 @@ import time
 #from pynput.keyboard import Controller, Key
 
 
-st.set_page_config(layout="wide", page_title="MoinCC - Application", page_icon=":shark:")
+st.set_page_config(layout="wide", page_title="SBMI - Application", page_icon=":shark:")
 # Custom CSS to change font size of buttons and other widgets
 
 meta_fp = os.path.join(os.getcwd(), '..', 'Data', 'Data_description_main.xlsx')
@@ -112,7 +112,7 @@ class StreamlitApp():
 
 
     def header(self):
-        st.markdown("""<h1 style="text-align: center;">MoinCC - Application</h1>""", unsafe_allow_html=True)
+        st.markdown("""<h1 style="text-align: center;">SBMI - Application</h1>""", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.2, 0.8, 0.2])
         with col1:
             st.divider()
