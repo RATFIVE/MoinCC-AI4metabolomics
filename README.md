@@ -1,4 +1,4 @@
-# MoinCC - AI4metabolomics
+# SBMI - AI4metabolomics
 
 Analyzing an organism's metabolism is crucial for understanding and monitoring diseases and treatments. Magnetic resonance imaging (MRI) is the only technique to measure the metabolism noninvasively, in vivo, and in vitro.
 
